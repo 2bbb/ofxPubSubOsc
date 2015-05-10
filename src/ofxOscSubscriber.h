@@ -42,7 +42,8 @@ namespace ofx {
         
         define_set_arithmetic(float);
         define_set_arithmetic(double);
-#undef define_set_type
+#undef define_set_arithmetic
+        
         void set(string &v, ofxOscMessage &m, size_t offset = 0) {
             v = m.getArgAsString(offset);
         }
