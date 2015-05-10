@@ -145,10 +145,10 @@ namespace ofx {
         }
         
         OscSubscriber() {
-            ofAddListener(ofEvents().update, this, &OscSubscriber::update);
+            ofAddListener(ofEvents().update, this, &OscSubscriber::update, OF_EVENT_ORDER_BEFORE_APP);
         }
         virtual ~OscSubscriber() {
-            ofRemoveListener(ofEvents().update, this, &OscSubscriber::update);
+            ofRemoveListener(ofEvents().update, this, &OscSubscriber::update, OF_EVENT_ORDER_BEFORE_APP);
         }
         TargetsMap targetsMap;
         static OscSubscriber *sharedInstance;
