@@ -4,7 +4,7 @@ subscribe OSC message.
 
 ## How to use?
 
-* template <typename T> ofxSubscribeOSC(int _port_, const string &_address_, T &value);
+* template \<typename T\> ofxSubscribeOSC(int _port_, const string &_address_, T &value);
 
 bind value to OSC message has _address_ incoming from _port_.
 
