@@ -132,6 +132,14 @@ namespace ofx {
             targetsMap.erase(port);
         }
         
+        inline bool isSubscribed(int port) const {
+            return targetsMap.find(port) != targetsMap.end();
+        }
+
+        inline bool isSubscribed(int port, const string &address) const {
+            return isSubscribed(port) && (targetsMap.at(port).second.find(address) != targetsMap.at(port).second.end());
+        }
+        
     private:
         void update(ofEventArgs &args) {
             for(TargetsMap::iterator _ = targetsMap.begin(); _ != targetsMap.end(); _++) {
