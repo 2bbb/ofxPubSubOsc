@@ -25,47 +25,49 @@ namespace ofx {
         }
         
     private:
-#define define_set_type(type, Type) \
+#define define_set_arithmetic(type) \
         inline void set(type &v, ofxOscMessage &m, size_t offset = 0) { \
-            v = m.getArgAs##Type(offset); \
+            if(m.getArgType(offset) == OFXOSC_TYPE_INT32) v = m.getArgAsInt32(offset); \
+            else if(m.getArgType(offset) == OFXOSC_TYPE_INT64) v = m.getArgAsInt64(offset); \
+            else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); \
         }
-        define_set_type(bool, Int32);
-        define_set_type(char, Int32);
-        define_set_type(unsigned char, Int32);
-        define_set_type(int, Int32);
-        define_set_type(unsigned int, Int32);
+        define_set_arithmetic(bool);
+        define_set_arithmetic(char);
+        define_set_arithmetic(unsigned char);
+        define_set_arithmetic(int);
+        define_set_arithmetic(unsigned int);
         
-        define_set_type(long, Int64);
-        define_set_type(unsigned long, Int64);
+        define_set_arithmetic(long);
+        define_set_arithmetic(unsigned long);
         
-        define_set_type(float, Float);
-        define_set_type(double, Float);
+        define_set_arithmetic(float);
+        define_set_arithmetic(double);
 #undef define_set_type
         void set(string &v, ofxOscMessage &m, size_t offset = 0) {
             v = m.getArgAsString(offset);
         }
         
         void set(ofColor &v, ofxOscMessage &m, size_t offset = 0)
-            { setColor(m, &ofxOscMessage::getArgAsInt32, 255, offset); }
+            { setColor(m, 255, offset); }
         void set(ofFloatColor &v, ofxOscMessage &m, size_t offset = 0)
-            { setColor(m, &ofxOscMessage::getArgAsFloat, 1.0f, offset); }
+            { setColor(m, 1.0f, offset); }
         template <typename U>
-        void setColor(ofxOscMessage &m, U (ofxOscMessage::*getArg)(int), U defaultValue, size_t offset = 0) {
+        void setColor(ofxOscMessage &m, U defaultValue, size_t offset = 0) {
             if(m.getNumArgs() == 1) {
-                t.r = m.*getArg(offset);
-                t.g = m.*getArg(offset);
-                t.b = m.*getArg(offset);
+                set(t.r, m, offset);
+                set(t.g, m, offset);
+                set(t.b, m, offset);
                 t.a = defaultValue;
             } else if(m.getNumArgs() == 3) {
-                t.r = m.*getArg(offset + 0);
-                t.g = m.*getArg(offset + 1);
-                t.b = m.*getArg(offset + 2);
+                set(t.r, m, offset + 0);
+                set(t.g, m, offset + 1);
+                set(t.b, m, offset + 2);
                 t.a = defaultValue;
             } else if(m.getNumArgs() == 4) {
-                t.r = m.*getArg(offset + 0);
-                t.g = m.*getArg(offset + 1);
-                t.b = m.*getArg(offset + 2);
-                t.a = m.*getArg(offset + 3);
+                set(t.r, m, offset + 0);
+                set(t.g, m, offset + 1);
+                set(t.b, m, offset + 2);
+                set(t.a, m, offset + 3);
             }
         }
         
@@ -77,8 +79,8 @@ namespace ofx {
             { setVec<4>(message, offset); }
         template <size_t n>
         inline void setVec(ofxOscMessage &message, size_t offset = 0) {
-            for(int i = offset; i < offset + min(message.getNumArgs(), static_cast<int>(n)); i++) {
-                t[i] = message.getArgAsFloat(i);
+            for(int i = 0; i < min(message.getNumArgs(), static_cast<int>(n)); i++) {
+                set(t[i], message, offset + i);
             }
         }
         
@@ -94,10 +96,10 @@ namespace ofx {
         }
         
         inline void set(ofRectangle &v, ofxOscMessage &message, size_t offset = 0) {
-            v.x      = message.getArgAsFloat(offset + 0);
-            v.y      = message.getArgAsFloat(offset + 1);
-            v.width  = message.getArgAsFloat(offset + 2);
-            v.height = message.getArgAsFloat(offset + 3);
+            set(v.x, message, offset + 0);
+            set(v.y, message, offset + 1);
+            set(v.width, message, offset + 2);
+            set(v.height, message, offset + 3);
         }
         
         T &t;
