@@ -77,7 +77,7 @@ namespace ofx {
             { setVec<4>(message, offset); }
         template <size_t n>
         inline void setVec(ofxOscMessage &message, size_t offset = 0) {
-            for(int i = offset; i < offset + n; i++) {
+            for(int i = offset; i < offset + min(message.getNumArgs(), static_cast<int>(n)); i++) {
                 t[i] = message.getArgAsFloat(i);
             }
         }
@@ -112,13 +112,22 @@ namespace ofx {
         }
         
         template <typename T>
-        void addReference(int port, const string &key, T &value) {
+        void subscribe(int port, const string &address, T &value) {
             if(targetsMap.find(port) == targetsMap.end()) {
                 shared_ptr<ofxOscReceiver> receiver(new ofxOscReceiver);
                 receiver->setup(port);
                 targetsMap.insert(make_pair(port, make_pair(receiver, Targets())));
             }
-            targetsMap[port].second.insert(make_pair(key, shared_ptr<AbstractParameter>(new Parameter<T>(value))));
+            targetsMap[port].second.insert(make_pair(address, shared_ptr<AbstractParameter>(new Parameter<T>(value))));
+        }
+        
+        void unsubscribe(int port, const string &address) {
+            if(targetsMap.find(port) == targetsMap.end()) return;
+            targetsMap[port].second.erase(address);
+        }
+        
+        void unsubscribe(int port) {
+            targetsMap.erase(port);
         }
         
     private:
@@ -148,3 +157,16 @@ namespace ofx {
 };
 
 typedef ofx::OscSubscriber ofxOscSubscriber;
+
+template <typename T>
+inline void ofxSubscribeOsc(int port, const string &address, T &value) {
+    ofxOscSubscriber::getSharedInstance().subscribe(port, address, value);
+}
+
+inline void ofxUnsubscribeOsc(int port, const string &address) {
+    ofxOscSubscriber::getSharedInstance().unsubscribe(port, address);
+}
+
+inline void ofxUnsubscribeOsc(int port) {
+    ofxOscSubscriber::getSharedInstance().unsubscribe(port);
+}
