@@ -10,6 +10,8 @@
 #include "ofMain.h"
 #include "ofxOsc.h"
 
+#include "details/ofx_type_traits.h"
+
 namespace ofx {
     class OscSubscriber {
         struct AbstractParameter {
@@ -93,13 +95,17 @@ else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); 
             
             template <typename U, size_t size>
             inline void set(U v[size], ofxOscMessage &m, size_t offset = 0) {
-                for(int i = 0; i < size; i++) set(v[i], m, offset + i);
+                for(int i = 0; i < size; i++) {
+                    set(v[i], m, offset + i * ofx_type_traits<U>::size);
+                }
             }
             
             template <typename U>
             inline void set(vector<U> &v, ofxOscMessage &m, size_t offset = 0) {
                 if(v.size() < m.getNumArgs()) { v.resize(m.getNumArgs()); }
-                for(int i = 0; i < v.size(); i++) { set(v[i], m, offset + i); }
+                for(int i = 0; i < v.size(); i++) {
+                    set(v[i], m, offset + i * ofx_type_traits<U>::size);
+                }
             }
             
             T &t;
