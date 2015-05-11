@@ -20,7 +20,7 @@ namespace ofx {
         struct Parameter : AbstractParameter {
             Parameter(T &t) : t(t) {}
             virtual void set(ofxOscMessage &message) { set(t, message); }
-            
+        
         private:
 #define define_set_arithmetic(type) \
 inline void set(type &v, ofxOscMessage &m, size_t offset = 0) { \
@@ -98,6 +98,40 @@ else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); 
             T &t;
         };
         
+        struct CallbackParameter : AbstractParameter {
+        private:
+            typedef void (*Callback)(ofxOscMessage &);
+        public:
+            CallbackParameter(Callback callback)
+            : callback(callback) {}
+            
+            virtual void set(ofxOscMessage &message) {
+                callback(message);
+            }
+
+        private:
+            Callback callback;
+        };
+
+        template <typename T>
+        struct MethodCallbackParameter : AbstractParameter {
+        private:
+            typedef void (T::*Callback)(ofxOscMessage &);
+        public:
+            MethodCallbackParameter(T &that, Callback callback)
+            : that(that), callback(callback) {}
+            MethodCallbackParameter(T *that, Callback callback)
+            : that(*that), callback(callback) {}
+            
+            virtual void set(ofxOscMessage &message) {
+                that.*callback(message);
+            }
+            
+        private:
+            Callback callback;
+            T &that;
+        };
+
         typedef shared_ptr<AbstractParameter> ParameterRef;
         typedef shared_ptr<ofxOscReceiver> OscReceiverRef;
         typedef map<string, ParameterRef> Targets;
@@ -116,6 +150,35 @@ else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); 
                 targetsMap.insert(make_pair(port, make_pair(receiver, Targets())));
             }
             targetsMap[port].second.insert(make_pair(address, ParameterRef(new Parameter<T>(value))));
+        }
+        
+        void subscribe(int port, const string &address, void (*callback)(ofxOscMessage &)) {
+            if(targetsMap.find(port) == targetsMap.end()) {
+                OscReceiverRef receiver(new ofxOscReceiver);
+                receiver->setup(port);
+                targetsMap.insert(make_pair(port, make_pair(receiver, Targets())));
+            }
+            targetsMap[port].second.insert(make_pair(address, ParameterRef(new CallbackParameter(callback))));
+        }
+        
+        template <typename T>
+        void subscribe(int port, const string &address, T &that, void (T::*callback)(ofxOscMessage &)) {
+            if(targetsMap.find(port) == targetsMap.end()) {
+                OscReceiverRef receiver(new ofxOscReceiver);
+                receiver->setup(port);
+                targetsMap.insert(make_pair(port, make_pair(receiver, Targets())));
+            }
+            targetsMap[port].second.insert(make_pair(address, ParameterRef(new MethodCallbackParameter<T>(that, callback))));
+        }
+
+        template <typename T>
+        void subscribe(int port, const string &address, T *that, void (T::*callback)(ofxOscMessage &)) {
+            if(targetsMap.find(port) == targetsMap.end()) {
+                OscReceiverRef receiver(new ofxOscReceiver);
+                receiver->setup(port);
+                targetsMap.insert(make_pair(port, make_pair(receiver, Targets())));
+            }
+            targetsMap[port].second.insert(make_pair(address, ParameterRef(new MethodCallbackParameter<T>(that, callback))));
         }
         
         void unsubscribe(int port, const string &address) {
