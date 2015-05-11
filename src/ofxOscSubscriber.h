@@ -70,11 +70,18 @@ else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); 
             inline void set(ofVec2f &v, ofxOscMessage &message, size_t offset = 0) { setVec<2>(message, offset); }
             inline void set(ofVec3f &v, ofxOscMessage &message, size_t offset = 0) { setVec<3>(message, offset); }
             inline void set(ofVec4f &v, ofxOscMessage &message, size_t offset = 0) { setVec<4>(message, offset); }
+            inline void set(ofQuaternion &v, ofxOscMessage &message, size_t offset = 0) { setVec<4>(message, offset); }
+            inline void set(ofMatrix3x3 &v, ofxOscMessage &message, size_t offset = 0) { setVec<9>(message, offset); }
+
             template <size_t n>
             inline void setVec(ofxOscMessage &message, size_t offset = 0) {
                 for(int i = 0; i < min(static_cast<size_t>(message.getNumArgs()), n); i++) {
                     set(t[i], message, offset + i);
                 }
+            }
+            
+            inline void set(ofMatrix4x4 &v, ofxOscMessage &message, size_t offset = 0) {
+                for(int j = 0; j < 4; j++) for(int i = 0; i < 4; i++) set(v(i, j), message, offset + 4 * j + i);
             }
             
             inline void set(ofRectangle &v, ofxOscMessage &message, size_t offset = 0) {

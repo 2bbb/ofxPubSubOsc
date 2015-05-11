@@ -63,10 +63,16 @@ typedef T type; \
             inline void set(ofxOscMessage &m, const ofVec2f &v) const { setVec<2>(m, v); }
             inline void set(ofxOscMessage &m, const ofVec3f &v) const { setVec<3>(m, v); }
             inline void set(ofxOscMessage &m, const ofVec4f &v) const { setVec<4>(m, v); }
+            inline void set(ofxOscMessage &m, const ofQuaternion &v) const { setVec<4>(m, v); }
+            inline void set(ofxOscMessage &m, const ofMatrix3x3 &v) const { setVec<9>(m, v); }
             
             template <size_t n, typename T>
             inline void setVec(ofxOscMessage &m, const T &v) const {
                 for(int i = 0; i < n; i++) { set(m, v[i]); }
+            }
+            
+            inline void set(ofxOscMessage &m, const ofMatrix4x4 &v) const {
+                for(int j = 0; j < 4; j++) for(int i = 0; i < 4; i++) set(m, v(i, j));
             }
             
             inline void set(ofxOscMessage &m, const ofRectangle &v) const {
