@@ -52,6 +52,7 @@ namespace ofx {
             }
             
             inline void set(ofColor &v, ofxOscMessage &m, size_t offset = 0) { setColor(m, 255, offset); }
+            inline void set(ofShortColor &v, ofxOscMessage &m, size_t offset = 0) { setColor(m, 65535, offset); }
             inline void set(ofFloatColor &v, ofxOscMessage &m, size_t offset = 0) { setColor(m, 1.0f, offset); }
             template <typename U>
             inline void setColor(ofxOscMessage &m, U defaultValue, size_t offset = 0) {
