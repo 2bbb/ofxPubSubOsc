@@ -148,7 +148,7 @@ typedef T type; \
             GetterParameter(U &that, Getter getter) : getter(getter), that(that) {}
             
         protected:
-            virtual TypeRef(T) get() { return that.*getter(); }
+            virtual TypeRef(T) get() { return (that.*getter)(); }
         private:
             Getter getter;
             U &that;
