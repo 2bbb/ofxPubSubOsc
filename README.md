@@ -69,6 +69,10 @@ unpublish all OSC messages is send to _ip:port_.
 
 ### 2015/05/11 ver 0.02 release
 
+* add subscribe with callback
+
+### 2015/05/11 ver 0.02 release
+
 * rename from ofxOscSubscriber
 * add ofxOscPublisher
 
