@@ -1,10 +1,12 @@
-# ofxOscSubscriber
+# ofxPubSubOsc
 
-subscribe OSC message.
+publish/subscribe OSC message.
 
-## How to use?
+## API
 
-* template \<typename T\> ofxSubscribeOSC(int _port_, const string &_address_, T &value);
+### ofxSubscribeOsc
+
+* template \<typename T\> ofxSubscribeOsc(int _port_, const string &_address_, T &value);
 
 bind value to OSC message has _address_ incoming from _port_.
 
@@ -17,7 +19,29 @@ unbind OSC message has _address_ incoming from _port_.
 
 unbind all OSC messages incoming from _port_.
 
+### ofxPublishOsc
+
+* template \<typename T\> ofxPublishOsc(const string &_ip_, int _port_, const string &_address_, T &_value_);
+* template \<typename T\> ofxPublishOsc(const string &_ip_, int _port_, const string &_address_, T (*_getter_)());
+* template \<typename T, typename U\> ofxPublishOsc(const string &_ip_, int _port_, const string &_address_, U \*_that_, T (U::*_getter_)());
+
+publish _value_ / _getter()_ / _that.*getter()_ to OSC message has _address_ to _ip:port_.
+
+
+* ofxUnpublishOSC(int _port_, const string &_address_);
+
+unpublish OSC message has _address_ is send to _ip:port_.
+
+* ofxUnpublishOSC(int _port_);
+
+unpublish all OSC messages is send to _ip:port_.
+
 ## Update history
+
+### 2015/05/11 ver 0.02 release
+
+* rename from ofxOscSubscriber
+* add ofxOscPublisher
 
 ### 2015/05/09 ver 0.01 release
 
