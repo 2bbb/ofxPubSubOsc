@@ -87,6 +87,13 @@ MIT License.
 * ISHII 2bit [bufferRenaiss co., ltd.]
 * ishii[at]buffer-renaiss.com
 
+## Special Thanks
+
+* [HIGA Satoru](http://github.com/satoruhiga)
+* [SHIMIZU Motoi](http://github.com/motoishmz)
+* [IWATANI Nariaki](http://github.com/nariakiiwatani)
+* [HIEDA Naoto](http://github.com/micuat)
+
 ## At the last
 
 Please create new issue, if there is a problem.
