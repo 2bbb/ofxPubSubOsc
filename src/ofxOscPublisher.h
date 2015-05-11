@@ -162,7 +162,7 @@ typedef T type; \
         
     public:
         static OscPublisher &getSharedInstance() {
-            return *(sharedInstance ?: sharedInstance = new OscPublisher);
+            return *(sharedInstance ? sharedInstance : sharedInstance = new OscPublisher);
         }
         
         inline void publish(const string &ip, int port, const string &address, ParameterRef ref) {

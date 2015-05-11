@@ -136,7 +136,7 @@ else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); 
         
     public:
         static OscSubscriber &getSharedInstance() {
-            return *(sharedInstance ?: sharedInstance = new OscSubscriber);
+            return *(sharedInstance ? sharedInstance : sharedInstance = new OscSubscriber);
         }
         
         template <typename T>
@@ -149,7 +149,7 @@ else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); 
             targetsMap[port].second.insert(make_pair(address, ParameterRef(new Parameter<T>(value))));
         }
         
-        void subscribe(int port, const string &address, typename CallbackParameter::Callback callback) {
+        void subscribe(int port, const string &address, void (*callback)(ofxOscMessage &)) {
             if(targetsMap.find(port) == targetsMap.end()) {
                 OscReceiverRef receiver(new ofxOscReceiver);
                 receiver->setup(port);
@@ -159,7 +159,7 @@ else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); 
         }
         
         template <typename T>
-        void subscribe(int port, const string &address, T &that, typename MethodCallbackParameter<T>::Callback callback) {
+        void subscribe(int port, const string &address, T &that, void (T::*callback)(ofxOscMessage &)) {
             if(targetsMap.find(port) == targetsMap.end()) {
                 OscReceiverRef receiver(new ofxOscReceiver);
                 receiver->setup(port);
@@ -169,7 +169,7 @@ else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); 
         }
 
         template <typename T>
-        void subscribe(int port, const string &address, T *that, typename MethodCallbackParameter<T>::Callback callback) {
+        void subscribe(int port, const string &address, T *that, void (T::*callback)(ofxOscMessage &)) {
             if(targetsMap.find(port) == targetsMap.end()) {
                 OscReceiverRef receiver(new ofxOscReceiver);
                 receiver->setup(port);
