@@ -99,9 +99,8 @@ else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); 
         };
         
         struct CallbackParameter : AbstractParameter {
-        private:
-            typedef void (*Callback)(ofxOscMessage &);
         public:
+            typedef void (*Callback)(ofxOscMessage &);
             CallbackParameter(Callback callback)
             : callback(callback) {}
             
@@ -115,16 +114,14 @@ else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); 
 
         template <typename T>
         struct MethodCallbackParameter : AbstractParameter {
-        private:
             typedef void (T::*Callback)(ofxOscMessage &);
-        public:
             MethodCallbackParameter(T &that, Callback callback)
             : that(that), callback(callback) {}
             MethodCallbackParameter(T *that, Callback callback)
             : that(*that), callback(callback) {}
             
             virtual void set(ofxOscMessage &message) {
-                that.*callback(message);
+                (that.*callback)(message);
             }
             
         private:
@@ -152,7 +149,7 @@ else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); 
             targetsMap[port].second.insert(make_pair(address, ParameterRef(new Parameter<T>(value))));
         }
         
-        void subscribe(int port, const string &address, void (*callback)(ofxOscMessage &)) {
+        void subscribe(int port, const string &address, typename CallbackParameter::Callback callback) {
             if(targetsMap.find(port) == targetsMap.end()) {
                 OscReceiverRef receiver(new ofxOscReceiver);
                 receiver->setup(port);
@@ -162,7 +159,7 @@ else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); 
         }
         
         template <typename T>
-        void subscribe(int port, const string &address, T &that, void (T::*callback)(ofxOscMessage &)) {
+        void subscribe(int port, const string &address, T &that, typename MethodCallbackParameter<T>::Callback callback) {
             if(targetsMap.find(port) == targetsMap.end()) {
                 OscReceiverRef receiver(new ofxOscReceiver);
                 receiver->setup(port);
@@ -172,7 +169,7 @@ else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); 
         }
 
         template <typename T>
-        void subscribe(int port, const string &address, T *that, void (T::*callback)(ofxOscMessage &)) {
+        void subscribe(int port, const string &address, T *that, typename MethodCallbackParameter<T>::Callback callback) {
             if(targetsMap.find(port) == targetsMap.end()) {
                 OscReceiverRef receiver(new ofxOscReceiver);
                 receiver->setup(port);
@@ -229,6 +226,20 @@ typedef ofx::OscSubscriber ofxOscSubscriber;
 template <typename T>
 inline void ofxSubscribeOsc(int port, const string &address, T &value) {
     ofxOscSubscriber::getSharedInstance().subscribe(port, address, value);
+}
+
+void ofxSubscribeOsc(int port, const string &address, void (*callback)(ofxOscMessage &)) {
+    ofxOscSubscriber::getSharedInstance().subscribe(port, address, callback);
+}
+
+template <typename T>
+void ofxSubscribeOsc(int port, const string &address, T &that, void (T::*callback)(ofxOscMessage &)) {
+    ofxOscSubscriber::getSharedInstance().subscribe(port, address, that, callback);
+}
+
+template <typename T>
+void ofxSubscribeOsc(int port, const string &address, T *that, void (T::*callback)(ofxOscMessage &)) {
+    ofxOscSubscriber::getSharedInstance().subscribe(port, address, that, callback);
 }
 
 inline void ofxUnsubscribeOsc(int port, const string &address) {
