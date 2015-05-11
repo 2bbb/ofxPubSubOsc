@@ -2,6 +2,31 @@
 
 publish/subscribe OSC message.
 
+## How to use
+
+```
+
+class ofApp : public ofBaseApp {
+	int foo;
+	ofColor c;
+	ofPoint p;
+public:
+	void setup() {
+		ofxSubscribeOsc(9005, "/foo", foo);
+		ofxSubscribeOsc(9005, "/color", c);
+		ofxSubscribeOsc(9005, "/p", p);
+		
+		ofxPublishOsc("localhost", 9006, "/fps", &ofGetFrameRate);
+	}
+	
+	void draw() {
+		ofSetColor(c);
+		ofDrawCircle(p, 5);
+	}
+};
+
+```
+
 ## API
 
 ### ofxSubscribeOsc

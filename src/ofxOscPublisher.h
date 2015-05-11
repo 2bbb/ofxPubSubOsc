@@ -33,7 +33,8 @@ typedef T type; \
         define_add_reference_if_non_arithmetic(double);
 #undef define_add_reference_if_non_arithmetic
 #define TypeRef(T) typename add_reference_if_non_arithmetic<T>::type
-    }
+    };
+    
     class OscPublisher {
         struct AbstractParameter {
             virtual void send(ofxOscSender &sender, const string &address) {}
