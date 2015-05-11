@@ -25,11 +25,11 @@ namespace ofx {
         
         private:
 #define define_set_arithmetic(type) \
-inline void set(type &v, ofxOscMessage &m, size_t offset = 0) { \
-if(m.getArgType(offset) == OFXOSC_TYPE_INT32) v = m.getArgAsInt32(offset); \
-else if(m.getArgType(offset) == OFXOSC_TYPE_INT64) v = m.getArgAsInt64(offset); \
-else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); \
-}
+            inline void set(type &v, ofxOscMessage &m, size_t offset = 0) { \
+                if(m.getArgType(offset) == OFXOSC_TYPE_INT32) v = m.getArgAsInt32(offset); \
+                else if(m.getArgType(offset) == OFXOSC_TYPE_INT64) v = m.getArgAsInt64(offset); \
+                else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); \
+            }
             define_set_arithmetic(bool);
             define_set_arithmetic(char);
             define_set_arithmetic(unsigned char);
