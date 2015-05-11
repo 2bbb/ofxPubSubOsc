@@ -31,10 +31,14 @@ public:
 
 ### ofxSubscribeOsc
 
-* template \<typename T\> ofxSubscribeOsc(int _port_, const string &_address_, T &value);
+* template \<typename T\> ofxSubscribeOsc(int _port_, const string &_address_, T &_value_);
+* ofxSubscribeOsc(int _port_, const string &_address_, void (*callback)(ofxOscMessage &));
+* template \<typename T\> ofxSubscribeOsc(int _port_, const string &_address_, T &_that_, void (T::*_callback_)(ofxOscMessage &));
+* template \<typename T\> ofxSubscribeOsc(int _port_, const string &_address_, T * _that_, void (T::*_callback_)(ofxOscMessage &));
 
-bind value to OSC message has _address_ incoming from _port_.
+bind value/function/method to OSC message has _address_ incoming from _port_.
 
+if use function/method, then call `callback(mess)` or `that.*callback(mess)` when receive OSC message `mess`.
 
 * ofxUnsubscribeOSC(int _port_, const string &_address_);
 
