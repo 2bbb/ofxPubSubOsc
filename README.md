@@ -67,7 +67,7 @@ unpublish all OSC messages is send to _ip:port_.
 
 ## Update history
 
-### 2015/05/11 ver 0.02 release
+### 2015/05/11 ver 0.03 release
 
 * add subscribe with callback
 
