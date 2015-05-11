@@ -43,14 +43,18 @@ else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); 
             define_set_arithmetic(double);
 #undef define_set_arithmetic
             
-            void set(string &v, ofxOscMessage &m, size_t offset = 0) {
+            inline void set(string &v, ofxOscMessage &m, size_t offset = 0) {
                 v = m.getArgAsString(offset);
             }
             
-            void set(ofColor &v, ofxOscMessage &m, size_t offset = 0) { setColor(m, 255, offset); }
-            void set(ofFloatColor &v, ofxOscMessage &m, size_t offset = 0) { setColor(m, 1.0f, offset); }
+            inline void set(ofBuffer &v, ofxOscMessage &m, size_t offset = 0) {
+                v = m.getArgAsBlob(offset);
+            }
+            
+            inline void set(ofColor &v, ofxOscMessage &m, size_t offset = 0) { setColor(m, 255, offset); }
+            inline void set(ofFloatColor &v, ofxOscMessage &m, size_t offset = 0) { setColor(m, 1.0f, offset); }
             template <typename U>
-            void setColor(ofxOscMessage &m, U defaultValue, size_t offset = 0) {
+            inline void setColor(ofxOscMessage &m, U defaultValue, size_t offset = 0) {
                 if(m.getNumArgs() == 1) {
                     set(t.r, m, offset);
                     set(t.g, m, offset);
@@ -74,7 +78,7 @@ else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); 
             inline void set(ofVec4f &v, ofxOscMessage &message, size_t offset = 0) { setVec<4>(message, offset); }
             inline void set(ofQuaternion &v, ofxOscMessage &message, size_t offset = 0) { setVec<4>(message, offset); }
             inline void set(ofMatrix3x3 &v, ofxOscMessage &message, size_t offset = 0) { setVec<9>(message, offset); }
-
+            
             template <size_t n>
             inline void setVec(ofxOscMessage &message, size_t offset = 0) {
                 for(int i = 0; i < min(static_cast<size_t>(message.getNumArgs()), n); i++) {
