@@ -271,21 +271,21 @@ typedef T type; \
 typedef ofx::OscPublisher ofxOscPublisher;
 
 template <typename T>
-void ofxPublishOsc(const string &ip, int port, const string &address, const T &value, bool whenValueIsChanged = false) {
+inline void ofxPublishOsc(const string &ip, int port, const string &address, const T &value, bool whenValueIsChanged = false) {
     ofxOscPublisher::getSharedInstance().publish(ip, port, address, value, whenValueIsChanged);
 }
 
 template <typename T>
-void ofxPublishOsc(const string &ip, int port, const string &address, T (*getter)(), bool whenValueIsChanged = false) {
+inline void ofxPublishOsc(const string &ip, int port, const string &address, T (*getter)(), bool whenValueIsChanged = false) {
     ofxOscPublisher::getSharedInstance().publish(ip, port, address, getter, whenValueIsChanged);
 }
 
 template <typename T, typename U>
-void ofxPublishOsc(const string &ip, int port, const string &address, U *that, T (U::*getter)(), bool whenValueIsChanged = false) {
+inline void ofxPublishOsc(const string &ip, int port, const string &address, U *that, T (U::*getter)(), bool whenValueIsChanged = false) {
     ofxOscPublisher::getSharedInstance().publish(ip, port, address, that, getter, whenValueIsChanged);
 }
 
 template <typename T, typename U>
-void ofxPublishOsc(const string &ip, int port, const string &address, U &that, T (U::*getter)(), bool whenValueIsChanged = false) {
+inline void ofxPublishOsc(const string &ip, int port, const string &address, U &that, T (U::*getter)(), bool whenValueIsChanged = false) {
     ofxOscPublisher::getSharedInstance().publish(ip, port, address, that, getter, whenValueIsChanged);
 }

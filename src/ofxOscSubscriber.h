@@ -244,17 +244,17 @@ inline void ofxSubscribeOsc(int port, const string &address, T &value) {
     ofxOscSubscriber::getSharedInstance().subscribe(port, address, value);
 }
 
-void ofxSubscribeOsc(int port, const string &address, void (*callback)(ofxOscMessage &)) {
+inline void ofxSubscribeOsc(int port, const string &address, void (*callback)(ofxOscMessage &)) {
     ofxOscSubscriber::getSharedInstance().subscribe(port, address, callback);
 }
 
 template <typename T>
-void ofxSubscribeOsc(int port, const string &address, T &that, void (T::*callback)(ofxOscMessage &)) {
+inline void ofxSubscribeOsc(int port, const string &address, T &that, void (T::*callback)(ofxOscMessage &)) {
     ofxOscSubscriber::getSharedInstance().subscribe(port, address, that, callback);
 }
 
 template <typename T>
-void ofxSubscribeOsc(int port, const string &address, T *that, void (T::*callback)(ofxOscMessage &)) {
+inline void ofxSubscribeOsc(int port, const string &address, T *that, void (T::*callback)(ofxOscMessage &)) {
     ofxOscSubscriber::getSharedInstance().subscribe(port, address, that, callback);
 }
 
