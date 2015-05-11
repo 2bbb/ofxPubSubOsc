@@ -153,7 +153,8 @@ else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); 
         
     public:
         static OscSubscriber &getSharedInstance() {
-            return *(sharedInstance ? sharedInstance : sharedInstance = new OscSubscriber);
+            static OscSubscriber *sharedInstance = new OscSubscriber;
+            return *sharedInstance;
         }
         
         template <typename T>
@@ -233,9 +234,7 @@ else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); 
             ofRemoveListener(ofEvents().update, this, &OscSubscriber::update, OF_EVENT_ORDER_BEFORE_APP);
         }
         TargetsMap targetsMap;
-        static OscSubscriber *sharedInstance;
     };
-    OscSubscriber *OscSubscriber::sharedInstance = NULL;
 };
 
 typedef ofx::OscSubscriber ofxOscSubscriber;

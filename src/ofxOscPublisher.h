@@ -178,7 +178,8 @@ typedef T type; \
         
     public:
         static OscPublisher &getSharedInstance() {
-            return *(sharedInstance ? sharedInstance : sharedInstance = new OscPublisher);
+            static OscPublisher *sharedInstance = new OscPublisher;
+            return *sharedInstance;
         }
         
         inline void publish(const string &ip, int port, const string &address, ParameterRef ref) {
@@ -264,9 +265,7 @@ typedef T type; \
             ofRemoveListener(ofEvents().update, this, &OscPublisher::update, OF_EVENT_ORDER_BEFORE_APP);
         }
         TargetsMap targetsMap;
-        static OscPublisher *sharedInstance;
     };
-    OscPublisher *OscPublisher::sharedInstance = NULL;
 };
 
 typedef ofx::OscPublisher ofxOscPublisher;
