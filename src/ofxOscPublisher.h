@@ -193,7 +193,7 @@ typedef T type; \
         }
         
         template <typename T>
-        void publish(const string &ip, int port, const string &address, const T &value, bool whenValueIsChanged = false) {
+        void publish(const string &ip, int port, const string &address, T &value, bool whenValueIsChanged = false) {
             ParameterRef p;
             if(whenValueIsChanged) p = ParameterRef(new Parameter<T, true>(value));
             else                   p = ParameterRef(new Parameter<T, false>(value));
@@ -271,7 +271,7 @@ typedef T type; \
 typedef ofx::OscPublisher ofxOscPublisher;
 
 template <typename T>
-inline void ofxPublishOsc(const string &ip, int port, const string &address, const T &value, bool whenValueIsChanged = false) {
+inline void ofxPublishOsc(const string &ip, int port, const string &address, T &value, bool whenValueIsChanged = false) {
     ofxOscPublisher::getSharedInstance().publish(ip, port, address, value, whenValueIsChanged);
 }
 
