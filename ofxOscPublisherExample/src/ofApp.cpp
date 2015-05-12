@@ -8,6 +8,7 @@ public:
     void setup() {
         ofSetWindowPosition(100, 100);
         ofxPublishOsc("localhost", 9005, "/cursor", p);
+        ofxPublishOsc("localhost", 9005, "/fps", &ofGetFrameRate);
     }
     
     void update() {
