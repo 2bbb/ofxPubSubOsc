@@ -1,2 +1,2 @@
 ofxOsc
-ofxOscSubscriber
+ofxPubSubOsc
