@@ -15,16 +15,16 @@ public:
     }
     
     void update() {
-
+        
     }
     void draw() {
         ofBackground(0);
         ofSetColor(255);
         ofDrawBitmapString("Publisher fps: " + ofToString(fps), 10, 30);
         ofDrawBitmapString("Subscriber fps: " + ofToString(ofGetFrameRate()), 10, 50);
-
+        
         m.drawVertices();
-
+        
         ofCircle(p, 3);
     }
     
