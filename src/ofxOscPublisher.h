@@ -259,10 +259,10 @@ typedef T type; \
             }
         }
         OscPublisher() {
-            ofAddListener(ofEvents().update, this, &OscPublisher::update, OF_EVENT_ORDER_BEFORE_APP);
+            ofAddListener(ofEvents().update, this, &OscPublisher::update, OF_EVENT_ORDER_AFTER_APP);
         }
         virtual ~OscPublisher() {
-            ofRemoveListener(ofEvents().update, this, &OscPublisher::update, OF_EVENT_ORDER_BEFORE_APP);
+            ofRemoveListener(ofEvents().update, this, &OscPublisher::update, OF_EVENT_ORDER_AFTER_APP);
         }
         TargetsMap targetsMap;
     };
