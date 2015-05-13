@@ -45,9 +45,9 @@ public:
 
 ```
 
-## <a name="API"> API
+## <a name="API">API</a>
 
-### <a name="API_ofxSubscribeOsc"> ofxSubscribeOsc
+### <a name="API_ofxSubscribeOsc">ofxSubscribeOsc</a>
 
 * template \<typename T\> ofxSubscribeOsc(int _port_, const string &_address_, T &_value_);
 * ofxSubscribeOsc(int _port_, const string &_address_, void (*callback)(ofxOscMessage &));
@@ -66,7 +66,7 @@ unbind OSC message has _address_ incoming from _port_.
 
 unbind all OSC messages incoming from _port_.
 
-### <a name="API_ofxPublishOsc"> ofxPublishOsc
+### <a name="API_ofxPublishOsc">ofxPublishOsc</a>
 
 * template \<typename T\> ofxPublishOsc(const string &_ip_, int _port_, const string &_address_, T &_value_);
 * template \<typename T\> ofxPublishOsc(const string &_ip_, int _port_, const string &_address_, T (*_getter_)());
@@ -83,9 +83,9 @@ unpublish OSC message has _address_ is send to _ip:port_.
 
 unpublish all OSC messages is send to _ip:port_.
 
-## <a name="SupportedTypes"> Supported types :
+## <a name="SupportedTypes">Supported types</a>
 
-### <a name="SupportedTypes_Arithmetic"> Arithmetic (Int32, Int64, Float)
+### <a name="SupportedTypes_Arithmetic">Arithmetic (Int32, Int64, Float)</a>
 * **bool**
 * (**unsigned**) **char**
 * (**unsigned**) **short**
@@ -94,10 +94,10 @@ unpublish all OSC messages is send to _ip:port_.
 * **float**
 * **double**
 
-### <a name="SupportedTypes_String"> String (String)
+### <a name="SupportedTypes_String">String (String)</a>
 * **string**
 
-### <a name="SupportedTypes_ofBasic"> openframeworks basic types
+### <a name="SupportedTypes_ofBasic">openframeworks basic types</a>
 
 #### Arithmetic\[2\]
 * **ofVec2f**
@@ -122,14 +122,14 @@ unpublish all OSC messages is send to _ip:port_.
 #### Blob
 * **ofBuffer** (_now subscribe only_)
 
-### <a name="SupportedTypes_ArrayVector"> array/vector of supported types
+### <a name="SupportedTypes_ArrayVector">array/vector of supported types</a>
 
-### <a name="SupportedTypes_Callback"> Callback
+### <a name="SupportedTypes_Callback">Callback</a>
 * **T (\*callback)(ofxOscMessage &)**;
 * pair of **U &that**, **T (U::\*callback)(ofxOscMessage &)**;
 * pair of **U \*that**, **T (U::\*callback)(ofxOscMessage &)**;
 
-## <a name="UpdateHistory"> Update history
+## <a name="UpdateHistory">Update history</a>
 
 ### 2015/05/11 ver 0.04 release
 
@@ -147,23 +147,23 @@ unpublish all OSC messages is send to _ip:port_.
 
 ### 2015/05/09 ver 0.01 release
 
-## <a name="License"> License
+## <a name="License">License</a>
 
 MIT License.
 
-## <a name="Author"> Author
+## <a name="Author">Author</a>
 
 * ISHII 2bit [bufferRenaiss co., ltd.]
 * ishii[at]buffer-renaiss.com
 
-## <a name="SpecialThanks"> Special Thanks
+## <a name="SpecialThanks">Special Thanks</a>
 
 * [HIGA Satoru](http://github.com/satoruhiga)
 * [SHIMIZU Motoi](http://github.com/motoishmz)
 * [IWATANI Nariaki](http://github.com/nariakiiwatani)
 * [HIEDA Naoto](http://github.com/micuat)
 
-## <a name="AtTheLast"> At the last
+## <a name="AtTheLast">At the last</a>
 
 Please create new issue, if there is a problem.
 And please throw pull request, if you have a cool idea!!
