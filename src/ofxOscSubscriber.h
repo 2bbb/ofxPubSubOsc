@@ -327,47 +327,55 @@ namespace ofx {
 
 typedef ofx::OscSubscriber ofxOscSubscriber;
 
-inline ofxOscSubscriber &getOscSubscriber() {
+inline ofxOscSubscriber &ofxGetOscSubscriber() {
     return ofxOscSubscriber::getSharedInstance();
 }
 
+#pragma mark interface about subscribe
+
 template <typename T>
 inline void ofxSubscribeOsc(int port, const string &address, T &value) {
-    ofxOscSubscriber::getSharedInstance().subscribe(port, address, value);
+    ofxGetOscSubscriber().subscribe(port, address, value);
 }
 
 inline void ofxSubscribeOsc(int port, const string &address, void (*callback)(ofxOscMessage &)) {
-    ofxOscSubscriber::getSharedInstance().subscribe(port, address, callback);
+    ofxGetOscSubscriber().subscribe(port, address, callback);
 }
 
 template <typename T>
 inline void ofxSubscribeOsc(int port, const string &address, T &that, void (T::*callback)(ofxOscMessage &)) {
-    ofxOscSubscriber::getSharedInstance().subscribe(port, address, that, callback);
+    ofxGetOscSubscriber().subscribe(port, address, that, callback);
 }
 
 template <typename T>
 inline void ofxSubscribeOsc(int port, const string &address, T *that, void (T::*callback)(ofxOscMessage &)) {
-    ofxOscSubscriber::getSharedInstance().subscribe(port, address, that, callback);
-}
-
-inline void ofxPickupLeakedOsc(int port, void (*callback)(ofxOscMessage &)) {
-    ofxOscSubscriber::getSharedInstance().setLeakPicker(port, callback);
-}
-
-template <typename T>
-inline void ofxPickupLeakedOsc(int port, T *that, void (T::*callback)(ofxOscMessage &)) {
-    ofxOscSubscriber::getSharedInstance().setLeakPicker(port, that, callback);
-}
-
-template <typename T>
-inline void ofxPickupLeakedOsc(int port, T &that, void (T::*callback)(ofxOscMessage &)) {
-    ofxOscSubscriber::getSharedInstance().setLeakPicker(port, that, callback);
+    ofxGetOscSubscriber().subscribe(port, address, that, callback);
 }
 
 inline void ofxUnsubscribeOsc(int port, const string &address) {
-    ofxOscSubscriber::getSharedInstance().unsubscribe(port, address);
+    ofxGetOscSubscriber().unsubscribe(port, address);
 }
 
 inline void ofxUnsubscribeOsc(int port) {
-    ofxOscSubscriber::getSharedInstance().unsubscribe(port);
+    ofxGetOscSubscriber().unsubscribe(port);
+}
+
+#pragma mark interface about leaked osc
+
+inline void ofxSetLeakedOscPicker(int port, void (*callback)(ofxOscMessage &)) {
+    ofxGetOscSubscriber().setLeakPicker(port, callback);
+}
+
+template <typename T>
+inline void ofxSetLeakedOscPicker(int port, T *that, void (T::*callback)(ofxOscMessage &)) {
+    ofxGetOscSubscriber().setLeakPicker(port, that, callback);
+}
+
+template <typename T>
+inline void ofxSetLeakedOscPicker(int port, T &that, void (T::*callback)(ofxOscMessage &)) {
+    ofxGetOscSubscriber().setLeakPicker(port, that, callback);
+}
+
+inline void ofxRemoveLeakedOscPicker(int port) {
+    ofxGetOscSubscriber().removeLeakPicker(port);
 }
