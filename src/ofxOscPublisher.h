@@ -148,10 +148,12 @@ namespace ofx {
         template <typename T, bool isCheckValue>
         struct GetterFunctionParameter : Parameter<T, isCheckValue> {
             typedef T (*GetterFunction)();
-            GetterFunctionParameter(GetterFunction getter) : Parameter<T, isCheckValue>(dummy), getter(getter) {}
+            GetterFunctionParameter(GetterFunction getter)
+            : Parameter<T, isCheckValue>(dummy)
+            , getter(getter) {}
             
         protected:
-            virtual TypeRef(T) get() { return getter(); }
+            virtual TypeRef(T) get() { return dummy = getter(); }
         private:
             GetterFunction getter;
             T dummy;
@@ -160,14 +162,22 @@ namespace ofx {
         template <typename T, typename U, bool isCheckValue>
         struct GetterParameter : Parameter<T, isCheckValue> {
             typedef T (U::*Getter)();
-            GetterParameter(U *that, Getter getter) : getter(getter), that(*that) {}
-            GetterParameter(U &that, Getter getter) : getter(getter), that(that) {}
+            GetterParameter(U *that, Getter getter)
+            : Parameter<T, isCheckValue>(dummy)
+            , getter(getter)
+            , that(*that) {}
+            
+            GetterParameter(U &that, Getter getter)
+            : Parameter<T, isCheckValue>(dummy)
+            , getter(getter)
+            , that(that) {}
             
         protected:
-            virtual TypeRef(T) get() { return (that.*getter)(); }
+            virtual TypeRef(T) get() { return dummy = (that.*getter)(); }
         private:
             Getter getter;
             U &that;
+            T dummy;
         };
         
         typedef shared_ptr<AbstractParameter> ParameterRef;
