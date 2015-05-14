@@ -15,15 +15,11 @@
 namespace ofx {
     class OscSubscriber {
         struct AbstractParameter {
-            virtual void set(ofxOscMessage &message) {}
+            virtual void read(ofxOscMessage &message) {}
         };
         
-        template <typename T>
-        struct Parameter : AbstractParameter {
-            Parameter(T &t) : t(t) {}
-            virtual void set(ofxOscMessage &message) { set(message, t); }
-        
-        private:
+        struct SetImplementation {
+        protected:
 #define define_set_arithmetic(type) \
             inline void set(ofxOscMessage &m, type &v, size_t offset = 0) { \
                 if(m.getArgType(offset) == OFXOSC_TYPE_INT32) v = m.getArgAsInt32(offset); \
@@ -33,9 +29,10 @@ namespace ofx {
             define_set_arithmetic(bool);
             define_set_arithmetic(char);
             define_set_arithmetic(unsigned char);
+            define_set_arithmetic(short);
+            define_set_arithmetic(unsigned short);
             define_set_arithmetic(int);
             define_set_arithmetic(unsigned int);
-            
             define_set_arithmetic(long);
             define_set_arithmetic(unsigned long);
             
@@ -52,8 +49,9 @@ namespace ofx {
             }
             
             inline void set(ofxOscMessage &m, ofColor &v, size_t offset = 0)      { setColor<unsigned char>(m, v, 255, offset); }
-            inline void set(ofxOscMessage &m, ofShortColor &v, size_t offset = 0) { setColor<short>(m, v, 65535, offset); }
+            inline void set(ofxOscMessage &m, ofShortColor &v, size_t offset = 0) { setColor<unsigned short>(m, v, 65535, offset); }
             inline void set(ofxOscMessage &m, ofFloatColor &v, size_t offset = 0) { setColor<float>(m, v, 1.0f, offset); }
+            
             template <typename U>
             inline void setColor(ofxOscMessage &m, ofColor_<U> &v, U defaultValue, size_t offset = 0) {
                 if(m.getNumArgs() == 1) {
@@ -114,35 +112,39 @@ namespace ofx {
                     set(m, v[i], offset + i * ofx_type_traits<U>::size);
                 }
             }
+        };
+        
+        template <typename T>
+        struct Parameter : AbstractParameter, SetImplementation {
+            Parameter(T &t) : t(t) {}
+            virtual void read(ofxOscMessage &message) { set(message, t); }
+        
+        private:
             
             T &t;
         };
         
-        struct CallbackParameter : AbstractParameter {
+        struct CallbackParameter : AbstractParameter, SetImplementation {
         public:
             typedef void (*Callback)(ofxOscMessage &);
             CallbackParameter(Callback callback)
             : callback(callback) {}
             
-            virtual void set(ofxOscMessage &message) {
-                callback(message);
-            }
+            virtual void read(ofxOscMessage &message) {callback(message); }
 
         private:
             Callback callback;
         };
 
         template <typename T>
-        struct MethodCallbackParameter : AbstractParameter {
+        struct MethodCallbackParameter : AbstractParameter, SetImplementation {
             typedef void (T::*Callback)(ofxOscMessage &);
             MethodCallbackParameter(T &that, Callback callback)
             : that(that), callback(callback) {}
             MethodCallbackParameter(T *that, Callback callback)
             : that(*that), callback(callback) {}
             
-            virtual void set(ofxOscMessage &message) {
-                (that.*callback)(message);
-            }
+            virtual void read(ofxOscMessage &message) { (that.*callback)(message); }
             
         private:
             Callback callback;
@@ -301,10 +303,10 @@ namespace ofx {
                     receiver->getNextMessage(&m);
                     const string &address = m.getAddress();
                     if(targets.find(address) != targets.end()) {
-                        targets[address]->set(m);
+                        targets[address]->read(m);
                     } else {
                         if(leakPicker) {
-                            leakPicker->set(m);
+                            leakPicker->read(m);
                         } else {
                             leakedOscMessages[port].push_back(m);
                         }
