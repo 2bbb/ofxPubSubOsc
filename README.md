@@ -164,6 +164,12 @@ TODO
 
 ## <a name="UpdateHistory">Update history</a>
 
+### 2015/05/15 ver 0.05 release
+
+* add system about pick up leaked OSC messages
+* some bugfix
+* add examples
+
 ### 2015/05/11 ver 0.04 release
 
 * support ofMatrix3x3/4x4, ofQuaternion, ofBuffer (only subscribe now), vector<ofXXX>, ofXXX[]
