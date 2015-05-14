@@ -13,7 +13,7 @@
 #include "details/ofx_type_traits.h"
 
 namespace ofx {
-    class OscSubscriber {
+    class OscSubscriberManager {
         struct AbstractParameter {
             virtual void read(ofxOscMessage &message) {}
         };
@@ -155,9 +155,9 @@ namespace ofx {
         typedef shared_ptr<ofxOscReceiver> OscReceiverRef;
         typedef map<string, ParameterRef> Targets;
     public:
-        class ConnectionManager {
+        class OscSubscriber {
         public:
-            ConnectionManager(int port)
+            OscSubscriber(int port)
             : port(port) {
                 receiver.setup(port);
             }
@@ -268,7 +268,7 @@ namespace ofx {
                 }
             }
             
-            typedef shared_ptr<ConnectionManager> Ref;
+            typedef shared_ptr<OscSubscriber> Ref;
         private:
             int port;
             ofxOscReceiver receiver;
@@ -278,42 +278,43 @@ namespace ofx {
             
         };
         
-        static OscSubscriber &getSharedInstance() {
-            static OscSubscriber *sharedInstance = new OscSubscriber;
+        static OscSubscriberManager &getSharedInstance() {
+            static OscSubscriberManager *sharedInstance = new OscSubscriberManager;
             return *sharedInstance;
         }
         
-        static ConnectionManager::Ref getConnectionManager(int port) {
-            ConnectionManagers &managers = getSharedInstance().managers;
+        static OscSubscriber::Ref getOscSubscriber(int port) {
+            OscSubscribers &managers = getSharedInstance().managers;
             if(managers.find(port) == managers.end()) {
-                managers.insert(make_pair(port, ConnectionManager::Ref(new ConnectionManager(port))));
+                managers.insert(make_pair(port, OscSubscriber::Ref(new OscSubscriber(port))));
             }
             return managers[port];
         }
         
     private:
-        typedef map<int, ConnectionManager::Ref> ConnectionManagers;
+        typedef map<int, OscSubscriber::Ref> OscSubscribers;
         void update(ofEventArgs &args) {
-            for(ConnectionManagers::iterator it = managers.begin(); it != managers.end(); ++it) {
+            for(OscSubscribers::iterator it = managers.begin(); it != managers.end(); ++it) {
                 it->second->update();
             }
         }
         
-        OscSubscriber() {
-            ofAddListener(ofEvents().update, this, &OscSubscriber::update, OF_EVENT_ORDER_BEFORE_APP);
+        OscSubscriberManager() {
+            ofAddListener(ofEvents().update, this, &OscSubscriberManager::update, OF_EVENT_ORDER_BEFORE_APP);
         }
         
-        virtual ~OscSubscriber() {
-            ofRemoveListener(ofEvents().update, this, &OscSubscriber::update, OF_EVENT_ORDER_BEFORE_APP);
+        virtual ~OscSubscriberManager() {
+            ofRemoveListener(ofEvents().update, this, &OscSubscriberManager::update, OF_EVENT_ORDER_BEFORE_APP);
         }
-        ConnectionManagers managers;
+        OscSubscribers managers;
     };
 };
 
-typedef ofx::OscSubscriber ofxOscSubscriber;
+typedef ofx::OscSubscriberManager ofxOscSubscriberManager;
+typedef ofxOscSubscriberManager::OscSubscriber ofxOscSubscriber;
 
-inline ofxOscSubscriber::ConnectionManager &ofxGetOscSubscriber(int port) {
-    return *(ofxOscSubscriber::getConnectionManager(port).get());
+inline ofxOscSubscriber &ofxGetOscSubscriber(int port) {
+    return *(ofxOscSubscriberManager::getOscSubscriber(port).get());
 }
 
 #pragma mark interface about subscribe
