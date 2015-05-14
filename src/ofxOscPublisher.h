@@ -18,10 +18,10 @@ namespace ofx {
         };
         
 #define define_add_reference_if_non_arithmetic(T) \
-template <> \
-struct add_reference_if_non_arithmetic<T> { \
-typedef T type; \
-};
+        template <> \
+            struct add_reference_if_non_arithmetic<T> { \
+            typedef T type; \
+        };
         define_add_reference_if_non_arithmetic(bool);
         define_add_reference_if_non_arithmetic(short);
         define_add_reference_if_non_arithmetic(unsigned short);
@@ -148,10 +148,12 @@ typedef T type; \
         template <typename T, bool isCheckValue>
         struct GetterFunctionParameter : Parameter<T, isCheckValue> {
             typedef T (*GetterFunction)();
-            GetterFunctionParameter(GetterFunction getter) : Parameter<T, isCheckValue>(dummy), getter(getter) {}
+            GetterFunctionParameter(GetterFunction getter)
+            : Parameter<T, isCheckValue>(dummy)
+            , getter(getter) {}
             
         protected:
-            virtual TypeRef(T) get() { return getter(); }
+            virtual TypeRef(T) get() { return dummy = getter(); }
         private:
             GetterFunction getter;
             T dummy;
@@ -160,14 +162,22 @@ typedef T type; \
         template <typename T, typename U, bool isCheckValue>
         struct GetterParameter : Parameter<T, isCheckValue> {
             typedef T (U::*Getter)();
-            GetterParameter(U *that, Getter getter) : getter(getter), that(*that) {}
-            GetterParameter(U &that, Getter getter) : getter(getter), that(that) {}
+            GetterParameter(U *that, Getter getter)
+            : Parameter<T, isCheckValue>(dummy)
+            , getter(getter)
+            , that(*that) {}
+            
+            GetterParameter(U &that, Getter getter)
+            : Parameter<T, isCheckValue>(dummy)
+            , getter(getter)
+            , that(that) {}
             
         protected:
-            virtual TypeRef(T) get() { return (that.*getter)(); }
+            virtual TypeRef(T) get() { return dummy = (that.*getter)(); }
         private:
             Getter getter;
             U &that;
+            T dummy;
         };
         
         typedef shared_ptr<AbstractParameter> ParameterRef;
@@ -266,6 +276,7 @@ typedef T type; \
         }
         TargetsMap targetsMap;
     };
+#undef TypeRef
 };
 
 typedef ofx::OscPublisher ofxOscPublisher;
