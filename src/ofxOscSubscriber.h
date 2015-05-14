@@ -241,10 +241,16 @@ namespace ofx {
                 Targets &targets = _->second.second;
                 ofxOscReceiver *receiver = _->second.first.get();
                 ofxOscMessage m;
+                ParameterRef leakPicker;
+                LeakPickers::iterator it = leakPickers.find(_->first);
+                if(it != leakPickers.end()) {
+                    leakPicker = it->second;
+                }
                 while(receiver->hasWaitingMessages()) {
                     receiver->getNextMessage(&m);
                     const string &address = m.getAddress();
                     if(targets.find(address) != targets.end()) { targets[address]->set(m); }
+                    else if(leakPicker) { leakPicker->set(m); }
                 }
             }
         }
