@@ -153,59 +153,89 @@ namespace ofx {
         typedef shared_ptr<ofxOscReceiver> OscReceiverRef;
         typedef map<string, ParameterRef> Targets;
         typedef map<int, pair<OscReceiverRef, Targets> > TargetsMap;
-        
+        typedef map<int, ParameterRef> LeakPickers;
+        typedef map<int, vector<ofxOscMessage> > LeakedOscMessages;
     public:
         static OscSubscriber &getSharedInstance() {
             static OscSubscriber *sharedInstance = new OscSubscriber;
             return *sharedInstance;
         }
         
-        template <typename T>
-        void subscribe(int port, const string &address, T &value) {
+        inline void subscribe(int port, const string &address, ParameterRef ref) {
+            LeakedOscMessages::iterator _ = leakedOscMessages.find(port);
+            if(_ == leakedOscMessages.end()) {
+                leakedOscMessages.insert(make_pair(port, vector<ofxOscMessage>()));
+            }
+
             if(targetsMap.find(port) == targetsMap.end()) {
                 OscReceiverRef receiver(new ofxOscReceiver);
                 receiver->setup(port);
                 targetsMap.insert(make_pair(port, make_pair(receiver, Targets())));
             }
-            targetsMap[port].second.insert(make_pair(address, ParameterRef(new Parameter<T>(value))));
+            
+            Targets::iterator it = targetsMap[port].second.find(address);
+            if(it == targetsMap[port].second.end()) {
+                targetsMap[port].second.insert(make_pair(address, ref));
+            } else {
+                it->second = ref;
+            }
         }
         
-        void subscribe(int port, const string &address, void (*callback)(ofxOscMessage &)) {
-            if(targetsMap.find(port) == targetsMap.end()) {
-                OscReceiverRef receiver(new ofxOscReceiver);
-                receiver->setup(port);
-                targetsMap.insert(make_pair(port, make_pair(receiver, Targets())));
-            }
-            targetsMap[port].second.insert(make_pair(address, ParameterRef(new CallbackParameter(callback))));
+        template <typename T>
+        inline void subscribe(int port, const string &address, T &value) {
+            subscribe(port, address, ParameterRef(new Parameter<T>(value)));
+        }
+        
+        inline void subscribe(int port, const string &address, void (*callback)(ofxOscMessage &)) {
+            subscribe(port, address, ParameterRef(new CallbackParameter(callback)));
         }
         
         template <typename T>
-        void subscribe(int port, const string &address, T &that, void (T::*callback)(ofxOscMessage &)) {
-            if(targetsMap.find(port) == targetsMap.end()) {
-                OscReceiverRef receiver(new ofxOscReceiver);
-                receiver->setup(port);
-                targetsMap.insert(make_pair(port, make_pair(receiver, Targets())));
-            }
-            targetsMap[port].second.insert(make_pair(address, ParameterRef(new MethodCallbackParameter<T>(that, callback))));
+        inline void subscribe(int port, const string &address, T &that, void (T::*callback)(ofxOscMessage &)) {
+            subscribe(port, address, ParameterRef(new MethodCallbackParameter<T>(that, callback)));
         }
 
         template <typename T>
-        void subscribe(int port, const string &address, T *that, void (T::*callback)(ofxOscMessage &)) {
-            if(targetsMap.find(port) == targetsMap.end()) {
-                OscReceiverRef receiver(new ofxOscReceiver);
-                receiver->setup(port);
-                targetsMap.insert(make_pair(port, make_pair(receiver, Targets())));
-            }
-            targetsMap[port].second.insert(make_pair(address, ParameterRef(new MethodCallbackParameter<T>(that, callback))));
+        inline void subscribe(int port, const string &address, T *that, void (T::*callback)(ofxOscMessage &)) {
+            subscribe(port, address, ParameterRef(new MethodCallbackParameter<T>(that, callback)));
         }
         
-        void unsubscribe(int port, const string &address) {
+        inline void unsubscribe(int port, const string &address) {
             if(targetsMap.find(port) == targetsMap.end()) return;
             targetsMap[port].second.erase(address);
         }
         
-        void unsubscribe(int port) {
+        inline void unsubscribe(int port) {
             targetsMap.erase(port);
+        }
+        
+        inline void setLeakPicker(int port, ParameterRef ref) {
+            LeakPickers::iterator it = leakPickers.find(port);
+            if(it == leakPickers.end()) {
+                leakPickers.insert(make_pair(port, ref));
+            } else {
+                it->second = ref;
+            }
+        }
+        
+        inline void setLeakPicker(int port, void (*callback)(ofxOscMessage &)) {
+            setLeakPicker(port, ParameterRef(new CallbackParameter(callback)));
+        }
+        
+        template <typename T>
+        inline void setLeakPicker(int port, T &that, void (T::*callback)(ofxOscMessage &)) {
+            setLeakPicker(port, ParameterRef(new MethodCallbackParameter<T>(that, callback)));
+        }
+        
+        template <typename T>
+        inline void setLeakPicker(int port, T *that, void (T::*callback)(ofxOscMessage &)) {
+            setLeakPicker(port, ParameterRef(new MethodCallbackParameter<T>(that, callback)));
+        }
+        
+        inline void removeLeakPicker(int port) {
+            if(isLeakedOscCovered(port)) {
+                leakPickers.erase(port);
+            }
         }
         
         inline bool isSubscribed(int port) const {
@@ -216,16 +246,69 @@ namespace ofx {
             return isSubscribed(port) && (targetsMap.at(port).second.find(address) != targetsMap.at(port).second.end());
         }
         
+        inline bool isLeakedOscCovered(int port) const {
+            return leakPickers.find(port) != leakPickers.end();
+        }
+        
+        void clearLeakedOscMessages() {
+            LeakedOscMessages::iterator it;
+            for(it = leakedOscMessages.begin(); it != leakedOscMessages.end(); it++) {
+                it->second.clear();
+            }
+        }
+        
+        void clearLeakedOscMessages(int port) {
+            LeakedOscMessages::iterator it = leakedOscMessages.find(port);
+            if(it != leakedOscMessages.end()) {
+                it->second.clear();
+            }
+        }
+        
+        inline bool hasWaitingLeakedOscMessages(int port) const {
+            if(isLeakedOscCovered(port)) {
+                return false;
+            } else {
+                LeakedOscMessages::const_iterator it = leakedOscMessages.find(port);
+                if(it == leakedOscMessages.end()) return false;
+                return 0 < it->second.size();
+            }
+        }
+        
+        inline bool getNextLeakedOscMessage(int port, ofxOscMessage &m) {
+            if(hasWaitingLeakedOscMessages(port)) {
+                m.copy(leakedOscMessages[port].back());
+                leakedOscMessages[port].pop_back();
+                return true;
+            } else {
+                return false;
+            }
+        }
+        
     private:
         void update(ofEventArgs &args) {
+            clearLeakedOscMessages();
             for(TargetsMap::iterator _ = targetsMap.begin(); _ != targetsMap.end(); _++) {
+                int port = _->first;
                 Targets &targets = _->second.second;
                 ofxOscReceiver *receiver = _->second.first.get();
                 ofxOscMessage m;
+                ParameterRef leakPicker;
+                LeakPickers::iterator it = leakPickers.find(port);
+                if(it != leakPickers.end()) {
+                    leakPicker = it->second;
+                }
                 while(receiver->hasWaitingMessages()) {
                     receiver->getNextMessage(&m);
                     const string &address = m.getAddress();
-                    if(targets.find(address) != targets.end()) { targets[address]->set(m); }
+                    if(targets.find(address) != targets.end()) {
+                        targets[address]->set(m);
+                    } else {
+                        if(leakPicker) {
+                            leakPicker->set(m);
+                        } else {
+                            leakedOscMessages[port].push_back(m);
+                        }
+                    }
                 }
             }
         }
@@ -237,10 +320,16 @@ namespace ofx {
             ofRemoveListener(ofEvents().update, this, &OscSubscriber::update, OF_EVENT_ORDER_BEFORE_APP);
         }
         TargetsMap targetsMap;
+        LeakPickers leakPickers;
+        LeakedOscMessages leakedOscMessages;
     };
 };
 
 typedef ofx::OscSubscriber ofxOscSubscriber;
+
+inline ofxOscSubscriber &getOscSubscriber() {
+    return ofxOscSubscriber::getSharedInstance();
+}
 
 template <typename T>
 inline void ofxSubscribeOsc(int port, const string &address, T &value) {
@@ -259,6 +348,20 @@ inline void ofxSubscribeOsc(int port, const string &address, T &that, void (T::*
 template <typename T>
 inline void ofxSubscribeOsc(int port, const string &address, T *that, void (T::*callback)(ofxOscMessage &)) {
     ofxOscSubscriber::getSharedInstance().subscribe(port, address, that, callback);
+}
+
+inline void ofxPickupLeakedOsc(int port, void (*callback)(ofxOscMessage &)) {
+    ofxOscSubscriber::getSharedInstance().setLeakPicker(port, callback);
+}
+
+template <typename T>
+inline void ofxPickupLeakedOsc(int port, T *that, void (T::*callback)(ofxOscMessage &)) {
+    ofxOscSubscriber::getSharedInstance().setLeakPicker(port, that, callback);
+}
+
+template <typename T>
+inline void ofxPickupLeakedOsc(int port, T &that, void (T::*callback)(ofxOscMessage &)) {
+    ofxOscSubscriber::getSharedInstance().setLeakPicker(port, that, callback);
 }
 
 inline void ofxUnsubscribeOsc(int port, const string &address) {
