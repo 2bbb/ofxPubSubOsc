@@ -9,11 +9,14 @@ public:
         ofSetWindowPosition(300, 100);
         ofxSubscribeOsc(9005, "/cursor", p);
         ofxSubscribeOsc(9005, "/fps", fps);
+        ofxSubscribeOsc(9005, "/windowPosition/x", windowPosition.x);
+        ofxSubscribeOsc(9005, "/windowPosition/y", windowPosition.y);
     }
     
     void update() {
-        
+        ofSetWindowPosition(windowPosition.x + 200, windowPosition.y);
     }
+    
     void draw() {
         ofBackground(0);
         ofSetColor(255);
@@ -26,6 +29,7 @@ public:
 private:
     ofPoint p;
     float fps;
+    ofPoint windowPosition;
 };
 
 int main() {

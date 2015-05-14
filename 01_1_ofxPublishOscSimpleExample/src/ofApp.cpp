@@ -9,12 +9,15 @@ public:
         ofSetWindowPosition(100, 100);
         ofxPublishOsc("localhost", 9005, "/cursor", p);
         ofxPublishOsc("localhost", 9005, "/fps", &ofGetFrameRate);
+        ofxPublishOsc("localhost", 9005, "/windowPosition/x", &ofGetWindowPositionX);
+        ofxPublishOsc("localhost", 9005, "/windowPosition/y", &ofGetWindowPositionY);
     }
     
     void update() {
         p.x = ofGetMouseX();
         p.y = ofGetMouseY();
     }
+    
     void draw() {
         ofBackground(255);
         ofSetColor(0);
