@@ -207,7 +207,11 @@ namespace ofx {
                 sender->setup(ip, port);
                 targetsMap.insert(make_pair(key, make_pair(OscSenderRef(sender), Targets())));
             }
-            targetsMap[key].second.insert(make_pair(address, ref));
+            if(targetsMap[key].second.find(address) == targetsMap[key].second.end()) {
+                targetsMap[key].second.insert(make_pair(address, ref));
+            } else {
+                targetsMap[key].second[address] = ref;
+            }
         }
         
         template <typename T>
