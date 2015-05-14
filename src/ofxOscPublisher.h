@@ -33,6 +33,16 @@ namespace ofx {
         define_add_reference_if_non_arithmetic(double);
 #undef define_add_reference_if_non_arithmetic
 #define TypeRef(T) typename add_reference_if_non_arithmetic<T>::type
+        
+        template <typename T>
+        struct remove_reference {
+            typedef T type;
+        };
+        template <typename T>
+        struct remove_reference<T &> {
+            typedef T type;
+        };
+#define RemoveRef(T) typename remove_reference<T>::type
     };
     
     class OscPublisher {
@@ -120,7 +130,7 @@ namespace ofx {
 
         template <typename T>
         struct Parameter<T, true> : AbstractParameter, SetImplementation {
-            Parameter(T &t) : t(t), old(t) {}
+            Parameter(T &t) : t(t) {}
             virtual void send(ofxOscSender &sender, const string &address) {
                 if(!isChanged()) return;
                 ofxOscMessage m;
@@ -154,9 +164,8 @@ namespace ofx {
             
         protected:
             virtual TypeRef(T) get() { return dummy = getter(); }
-        private:
             GetterFunction getter;
-            T dummy;
+            RemoveRef(T) dummy;
         };
         
         template <typename T, typename U, bool isCheckValue>
@@ -174,10 +183,9 @@ namespace ofx {
             
         protected:
             virtual TypeRef(T) get() { return dummy = (that.*getter)(); }
-        private:
             Getter getter;
             U &that;
-            T dummy;
+            RemoveRef(T) dummy;
         };
         
         typedef shared_ptr<AbstractParameter> ParameterRef;
