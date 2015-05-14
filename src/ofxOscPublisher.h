@@ -18,10 +18,10 @@ namespace ofx {
         };
         
 #define define_add_reference_if_non_arithmetic(T) \
-template <> \
-struct add_reference_if_non_arithmetic<T> { \
-typedef T type; \
-};
+        template <> \
+            struct add_reference_if_non_arithmetic<T> { \
+            typedef T type; \
+        };
         define_add_reference_if_non_arithmetic(bool);
         define_add_reference_if_non_arithmetic(short);
         define_add_reference_if_non_arithmetic(unsigned short);
@@ -266,6 +266,7 @@ typedef T type; \
         }
         TargetsMap targetsMap;
     };
+#undef TypeRef
 };
 
 typedef ofx::OscPublisher ofxOscPublisher;
