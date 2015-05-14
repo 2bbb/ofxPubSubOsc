@@ -164,27 +164,33 @@ TODO
 
 ## <a name="UpdateHistory">Update history</a>
 
-### 2015/05/15 ver 0.05 release
+### 2015/05/15 ver 0.0.5 release
 
 * add system about pick up leaked OSC messages
 * some bugfix
 * add examples
 
-### 2015/05/11 ver 0.04 release
+### 2015/05/11 ver 0.0.4 release
 
 * support ofMatrix3x3/4x4, ofQuaternion, ofBuffer (only subscribe now), vector<ofXXX>, ofXXX[]
 * bugfix for Visual Studio
 
-### 2015/05/11 ver 0.03 release
+### 2015/05/11 ver 0.0.3 release
 
 * add subscribe with callback
 
-### 2015/05/11 ver 0.02 release
+### 2015/05/11 ver 0.0.2 release
 
 * rename from ofxOscSubscriber
 * add ofxOscPublisher
 
-### 2015/05/09 ver 0.01 release
+### 2015/05/09 ver 0.0.1 release
+
+* initial
+
+#### \* about Versioning
+
+ofxPubSubOsc uses Mood Versioning. maybe, 1.0.0. will not come.
 
 ## <a name="License">License</a>
 
