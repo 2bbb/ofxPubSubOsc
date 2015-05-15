@@ -45,7 +45,7 @@ namespace ofx {
 #define RemoveRef(T) typename remove_reference<T>::type
     };
     
-    class OscPublisher {
+    class OscPublisherManager {
         struct AbstractParameter {
             virtual void send(ofxOscSender &sender, const string &address) {}
         };
@@ -189,126 +189,138 @@ namespace ofx {
         };
         
         typedef shared_ptr<AbstractParameter> ParameterRef;
-        typedef shared_ptr<ofxOscSender> OscSenderRef;
         typedef pair<string, int> SenderKey;
         typedef map<string, ParameterRef> Targets;
-        typedef map<SenderKey, pair<OscSenderRef, Targets> > TargetsMap;
-        
     public:
-        static OscPublisher &getSharedInstance() {
-            static OscPublisher *sharedInstance = new OscPublisher;
+        class OscPublisher {
+        public:
+            OscPublisher(const SenderKey &key) : key(key) {
+                sender.setup(key.first, key.second);
+            }
+            inline void publish(const string &address, ParameterRef ref) {
+                if(targets.find(address) == targets.end()) {
+                    targets.insert(make_pair(address, ref));
+                } else {
+                    targets[address] = ref;
+                }
+            }
+            
+            template <typename T>
+            void publish(const string &address, T &value, bool whenValueIsChanged = true) {
+                ParameterRef p;
+                if(whenValueIsChanged) p = ParameterRef(new Parameter<T, true>(value));
+                else                   p = ParameterRef(new Parameter<T, false>(value));
+                publish(address, p);
+            }
+            
+            template <typename T>
+            void publish(const string &address, T (*getter)(), bool whenValueIsChanged = true) {
+                ParameterRef p;
+                if(whenValueIsChanged) p = ParameterRef(new GetterFunctionParameter<T, true>(getter));
+                else                   p = ParameterRef(new GetterFunctionParameter<T, false>(getter));
+                publish(address, p);
+            }
+
+            template <typename T, typename U>
+            void publish(const string &address, U *that, T (U::*getter)(), bool whenValueIsChanged = true) {
+                ParameterRef p;
+                if(whenValueIsChanged) p = ParameterRef(new GetterParameter<T, U, true>(that, getter));
+                else                   p = ParameterRef(new GetterParameter<T, U, false>(that, getter));
+                publish(address, p);
+            }
+
+            template <typename T, typename U>
+            void publish(const string &address, U &that, T (U::*getter)(), bool whenValueIsChanged = true) {
+                ParameterRef p;
+                if(whenValueIsChanged) p = ParameterRef(new GetterParameter<T, U, true>(that, getter));
+                else                   p = ParameterRef(new GetterParameter<T, U, false>(that, getter));
+                publish(address, p);
+            }
+            
+            void unsubscribe(const string &address) {
+                if(targets.find(address) == targets.end()) targets.erase(address);
+            }
+            
+            void unsubscribe() {
+                targets.clear();
+            }
+
+            inline bool isPublished() const {
+                return !targets.empty();
+            }
+
+            inline bool isPublished(const string &address) const {
+                return isPublished() && (targets.find(address) != targets.end());
+            }
+            
+            void update() {
+                for(Targets::iterator it = targets.begin(); it != targets.end(); it++) {
+                    it->second->send(sender, it->first);
+                }
+            }
+            
+            typedef shared_ptr<OscPublisher> Ref;
+        private:
+            SenderKey key;
+            ofxOscSender sender;
+            Targets targets;
+        };
+        
+        static OscPublisherManager &getSharedInstance() {
+            static OscPublisherManager *sharedInstance = new OscPublisherManager;
             return *sharedInstance;
         }
         
-        inline void publish(const string &ip, int port, const string &address, ParameterRef ref) {
+        static OscPublisher::Ref getOscPublisher(const string &ip, int port) {
+            OscPublishers &publishers = getSharedInstance().publishers;
             SenderKey key(ip, port);
-            if(!isPublished(key)) {
-                ofxOscSender *sender = new ofxOscSender;
-                sender->setup(ip, port);
-                targetsMap.insert(make_pair(key, make_pair(OscSenderRef(sender), Targets())));
+            if(publishers.find(key) == publishers.end()) {
+                publishers.insert(make_pair(key, OscPublisher::Ref(new OscPublisher(key))));
             }
-            if(targetsMap[key].second.find(address) == targetsMap[key].second.end()) {
-                targetsMap[key].second.insert(make_pair(address, ref));
-            } else {
-                targetsMap[key].second[address] = ref;
-            }
+            return publishers[key];
         }
         
-        template <typename T>
-        void publish(const string &ip, int port, const string &address, T &value, bool whenValueIsChanged = true) {
-            ParameterRef p;
-            if(whenValueIsChanged) p = ParameterRef(new Parameter<T, true>(value));
-            else                   p = ParameterRef(new Parameter<T, false>(value));
-            publish(ip, port, address, p);
-        }
-        
-        template <typename T>
-        void publish(const string &ip, int port, const string &address, T (*getter)(), bool whenValueIsChanged = true) {
-            ParameterRef p;
-            if(whenValueIsChanged) p = ParameterRef(new GetterFunctionParameter<T, true>(getter));
-            else                   p = ParameterRef(new GetterFunctionParameter<T, false>(getter));
-            publish(ip, port, address, p);
-        }
-
-        template <typename T, typename U>
-        void publish(const string &ip, int port, const string &address, U *that, T (U::*getter)(), bool whenValueIsChanged = true) {
-            ParameterRef p;
-            if(whenValueIsChanged) p = ParameterRef(new GetterParameter<T, U, true>(that, getter));
-            else                   p = ParameterRef(new GetterParameter<T, U, false>(that, getter));
-            publish(ip, port, address, p);
-        }
-
-        template <typename T, typename U>
-        void publish(const string &ip, int port, const string &address, U &that, T (U::*getter)(), bool whenValueIsChanged = true) {
-            ParameterRef p;
-            if(whenValueIsChanged) p = ParameterRef(new GetterParameter<T, U, true>(that, getter));
-            else                   p = ParameterRef(new GetterParameter<T, U, false>(that, getter));
-            publish(ip, port, address, p);
-        }
-        
-        void unsubscribe(const string &ip, int port, const string &address) {
-            SenderKey key(ip, port);
-            if(targetsMap.find(key) == targetsMap.end()) return;
-            targetsMap[key].second.erase(address);
-        }
-        
-        void unsubscribe(const string &ip, int port) {
-            SenderKey key(ip, port);
-            targetsMap.erase(key);
-        }
-
-        inline bool isPublished(const string &ip, int port) const {
-            return isPublished(SenderKey(ip, port));
-        }
-
-        inline bool isPublished(const SenderKey &key) const {
-            return targetsMap.find(key) != targetsMap.end();
-        }
-
-        inline bool isPublished(const string &ip, int port, const string &address) const {
-            SenderKey key(ip, port);
-            return isPublished(key) && (targetsMap.at(key).second.find(address) != targetsMap.at(key).second.end());
-        }
-
     private:
+        typedef map<SenderKey, OscPublisher::Ref> OscPublishers;
         void update(ofEventArgs &args) {
-            for(TargetsMap::iterator _ = targetsMap.begin(); _ != targetsMap.end(); _++) {
-                Targets &targets = _->second.second;
-                ofxOscSender *sender = _->second.first.get();
-                for(Targets::iterator it = targets.begin(); it != targets.end(); it++) {
-                    it->second->send(*sender, it->first);
-                }
+            for(OscPublishers::iterator it = publishers.begin(); it != publishers.end(); ++it) {
+                it->second->update();
             }
         }
-        OscPublisher() {
-            ofAddListener(ofEvents().update, this, &OscPublisher::update, OF_EVENT_ORDER_AFTER_APP);
+        OscPublisherManager() {
+            ofAddListener(ofEvents().update, this, &OscPublisherManager::update, OF_EVENT_ORDER_AFTER_APP);
         }
-        virtual ~OscPublisher() {
-            ofRemoveListener(ofEvents().update, this, &OscPublisher::update, OF_EVENT_ORDER_AFTER_APP);
+        virtual ~OscPublisherManager() {
+            ofRemoveListener(ofEvents().update, this, &OscPublisherManager::update, OF_EVENT_ORDER_AFTER_APP);
         }
-        TargetsMap targetsMap;
+        OscPublishers publishers;
     };
 #undef TypeRef
 };
 
-typedef ofx::OscPublisher ofxOscPublisher;
+typedef ofx::OscPublisherManager ofxOscPublisherManager;
+typedef ofxOscPublisherManager::OscPublisher ofxOscPublisher;
+
+inline ofxOscPublisher &ofxGetOscPublisher(const string &ip, int port) {
+    return *(ofxOscPublisherManager::getOscPublisher(ip, port));
+}
 
 template <typename T>
 inline void ofxPublishOsc(const string &ip, int port, const string &address, T &value, bool whenValueIsChanged = true) {
-    ofxOscPublisher::getSharedInstance().publish(ip, port, address, value, whenValueIsChanged);
+    ofxGetOscPublisher(ip, port).publish(address, value, whenValueIsChanged);
 }
 
 template <typename T>
 inline void ofxPublishOsc(const string &ip, int port, const string &address, T (*getter)(), bool whenValueIsChanged = true) {
-    ofxOscPublisher::getSharedInstance().publish(ip, port, address, getter, whenValueIsChanged);
+    ofxGetOscPublisher(ip, port).publish(address, getter, whenValueIsChanged);
 }
 
 template <typename T, typename U>
 inline void ofxPublishOsc(const string &ip, int port, const string &address, U *that, T (U::*getter)(), bool whenValueIsChanged = true) {
-    ofxOscPublisher::getSharedInstance().publish(ip, port, address, that, getter, whenValueIsChanged);
+    ofxGetOscPublisher(ip, port).publish(address, that, getter, whenValueIsChanged);
 }
 
 template <typename T, typename U>
 inline void ofxPublishOsc(const string &ip, int port, const string &address, U &that, T (U::*getter)(), bool whenValueIsChanged = true) {
-    ofxOscPublisher::getSharedInstance().publish(ip, port, address, that, getter, whenValueIsChanged);
+    ofxGetOscPublisher(ip, port).publish(address, that, getter, whenValueIsChanged);
 }
