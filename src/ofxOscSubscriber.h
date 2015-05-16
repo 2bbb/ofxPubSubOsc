@@ -283,12 +283,12 @@ namespace ofx {
             return *sharedInstance;
         }
         
-        static OscSubscriber::Ref getOscSubscriber(int port) {
+        static OscSubscriber &getOscSubscriber(int port) {
             OscSubscribers &managers = getSharedInstance().managers;
             if(managers.find(port) == managers.end()) {
                 managers.insert(make_pair(port, OscSubscriber::Ref(new OscSubscriber(port))));
             }
-            return managers[port];
+            return *(managers[port].get());
         }
         
     private:
@@ -314,7 +314,7 @@ typedef ofx::OscSubscriberManager ofxOscSubscriberManager;
 typedef ofxOscSubscriberManager::OscSubscriber ofxOscSubscriber;
 
 inline ofxOscSubscriber &ofxGetOscSubscriber(int port) {
-    return *(ofxOscSubscriberManager::getOscSubscriber(port).get());
+    return ofxOscSubscriberManager::getOscSubscriber(port);
 }
 
 #pragma mark interface about subscribe

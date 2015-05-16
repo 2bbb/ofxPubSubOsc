@@ -281,13 +281,13 @@ namespace ofx {
             return *sharedInstance;
         }
         
-        static OscPublisher::Ref getOscPublisher(const string &ip, int port) {
+        static OscPublisher &getOscPublisher(const string &ip, int port) {
             OscPublishers &publishers = getSharedInstance().publishers;
             SenderKey key(ip, port);
             if(publishers.find(key) == publishers.end()) {
                 publishers.insert(make_pair(key, OscPublisher::Ref(new OscPublisher(key))));
             }
-            return publishers[key];
+            return *(publishers[key].get());
         }
         
     private:
@@ -312,7 +312,7 @@ typedef ofx::OscPublisherManager ofxOscPublisherManager;
 typedef ofxOscPublisherManager::OscPublisher ofxOscPublisher;
 
 inline ofxOscPublisher &ofxGetOscPublisher(const string &ip, int port) {
-    return *(ofxOscPublisherManager::getOscPublisher(ip, port));
+    return ofxOscPublisherManager::getOscPublisher(ip, port);
 }
 
 template <typename T>
