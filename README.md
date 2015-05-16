@@ -5,10 +5,9 @@ publish/subscribe OSC message.
 ## TOC
 
 * [How to use](#HowToUse)
-* [API](#API)
-	* [ofxSubscribeOsc](#API_ofxSubscribeOsc)
-	* [ofxSetLeakedOscPicker](#API_ofxSetLeakedOscPicker)
-	* [ofxPublishOsc](#API_ofxPublishOsc)
+* [Simple API Reference](#SimpleAPI)
+	* [ofxSubscribeOsc](#SimpleAPI_ofxSubscribeOsc)
+	* [ofxPublishOsc](#SimpleAPI_ofxPublishOsc)
 * [Supported types](#SupportedTypes)
 	* [Arithmetic](#SupportedTypes_Arithmetic)
 	* [String](#SupportedTypes_String)
@@ -46,18 +45,17 @@ public:
 
 ```
 
-## <a name="API">API</a>
+## <a name="SimpleAPI">Simple API Reference</a>
 
-### <a name="API_ofxSubscribeOsc">ofxSubscribeOsc</a>
+#### If you want to use more advance, See [Advanced](https://github.com/2bbb/ofxPubSubOsc/blob/master/README.md)
 
-* template \<typename T\> ofxSubscribeOsc(int _port_, const string &_address_, T &_value_);
-* ofxSubscribeOsc(int _port_, const string &_address_, void (*callback)(ofxOscMessage &));
-* template \<typename T\> ofxSubscribeOsc(int _port_, const string &_address_, T &_that_, void (T::*_callback_)(ofxOscMessage &));
-* template \<typename T\> ofxSubscribeOsc(int _port_, const string &_address_, T * _that_, void (T::*_callback_)(ofxOscMessage &));
+### <a name="SimpleAPI_ofxSubscribeOsc">ofxSubscribeOsc</a>
 
-bind value/function/method to OSC message has _address_ incoming from _port_.
+* template \<typename T\> void ofxSubscribeOsc(int _port_, const string &_address_, T &_value_);
 
-if use function/method, then call `callback(mess)` or `(that.*callback)(mess)` when receive OSC message `mess`.
+bind value to OSC message has _address_ incoming from _port_.
+
+#### See [more ofxSubscribeOsc](https://github.com/2bbb/ofxPubSubOsc/blob/master/README.md#API_ofxSubscribeOsc)
 
 * ofxUnsubscribeOSC(int _port_, const string &_address_);
 
@@ -67,62 +65,27 @@ unbind OSC message has _address_ incoming from _port_.
 
 unbind all OSC messages incoming from _port_.
 
-#### See [class ofxOscSubscriberManager](#Advanced_ofxOscSubscriberManager), [class ofxOscSubscriber](#Advanced_ofxOscSubscriber)
+* if you pick the OSCs aren't hit subscribed address, see [ofxSetLeadkedOscPicker](https://github.com/2bbb/ofxPubSubOsc/blob/master/README.md#API_ofxSetLeadkedOscPicker)
 
-### <a name="API_ofxSetLeakedOscPicker">ofxSetLeakedOscPicker</a>
+#### See [class ofxOscSubscriberManager](https://github.com/2bbb/ofxPubSubOsc/blob/master/README.md#Advanced_ofxOscSubscriberManager), [class ofxOscSubscriber](https://github.com/2bbb/ofxPubSubOsc/blob/master/README.md#Advanced_ofxOscSubscriber)
 
-* void ofxSetLeakedOscPicker(int _port_, void (\*_callback_)(ofxOscMessage &))
-* template \<typename T\> void ofxSetLeakedOscPicker(int _port_, T \*_that_, void (T::\*_callback_)(ofxOscMessage &)) 
-* template \<typename T\> void ofxSetLeakedOscPicker(int _port_, T &_that_, void (T::\*_callback_)(ofxOscMessage &)) 
+### <a name="SimpleAPI_ofxPublishOsc">ofxPublishOsc</a>
 
-set callback for port. this callback is kick when receive OSC message has not binded address.
+* template \<typename T\> void ofxPublishOsc(const string &_ip_, int _port_, const string &_address_, T &_value_, bool _whenValueIsChanged_ = **true**);
 
-* void ofxRemoveLeakedOscPicker(int _port_)
+publish _value_ to OSC message has _address_ to _ip:port_. if _whenValueIsChanged_ is set to **false**, then we send binded value **every frame** after `App::update`.
 
-remove callback.
+#### See [more ofxPublishOsc](https://github.com/2bbb/ofxPubSubOsc/blob/master/README.md#API_ofxPublishOsc)
 
-#### See [Legacy style pick up leaked OSC](#Advanced_LegacyStylePickUpLeakedOSCMessage)
-
-### <a name="API_ofxPublishOsc">ofxPublishOsc</a>
-
-* template \<typename T\> ofxPublishOsc(const string &_ip_, int _port_, const string &_address_, T &_value_, bool _whenValueIsChanged_ = **true**);
-* template \<typename T\> ofxPublishOsc(const string &_ip_, int _port_, const string &_address_, T (*_getter_)(), bool _whenValueIsChanged_ = **true**);
-* template \<typename T, typename U\> ofxPublishOsc(const string &_ip_, int _port_, const string &_address_, U \*_that_, T (U::*_getter_)(), bool _whenValueIsChanged_ = **true**);
-
-publish _value_ / _getter()_ / _(that.*getter)()_ to OSC message has _address_ to _ip:port_. if _whenValueIsChanged_ is set to **false**, then we send binded value **every frame** after `App::update`.
-
-
-* ofxUnpublishOSC(const string &_ip_, int _port_, const string &_address_);
+* void ofxUnpublishOSC(const string &_ip_, int _port_, const string &_address_);
 
 unpublish OSC message has _address_ is send to _ip:port_.
 
-* ofxUnpublishOSC(const string &_ip_, int _port_);
+* void ofxUnpublishOSC(const string &_ip_, int _port_);
 
 unpublish all OSC messages is send to _ip:port_.
 
-#### See [class ofxOscPublisherManager](#Advanced_ofxOscPublisherManager), [class ofxOscPublisher](#Advanced_ofxOscPublisher)
-
-## <a name="AdvancedAPI">Advanced API</a>
-
-### <a name="Advanced_ofxOscSubscriberManager">class ofxOscSubscriberManager</a>
-
-TODO
-
-### <a name="Advanced_ofxOscSubscriber">class ofxOscSubscriber</a>
-
-TODO
-
-#### <a name="Advanced_LegacyStylePickUpLeakedOSCMessage">How to "Legacy style pick up leaked OSC"</a>
-
-TODO
-
-### <a name="Advanced_ofxOscPublisherManager">class ofxOscPublisherManager</a>
-
-TODO
-
-### <a name="Advanced_ofxOscPublisher">class ofxOscPublisher</a>
-
-TODO
+#### See [class ofxOscPublisherManager](https://github.com/2bbb/ofxPubSubOsc/blob/master/README.md#Advanced_ofxOscPublisherManager), [class ofxOscPublisher](https://github.com/2bbb/ofxPubSubOsc/blob/master/README.md#Advanced_ofxOscPublisher)
 
 ## <a name="SupportedTypes">Supported types</a>
 
