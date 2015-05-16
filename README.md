@@ -67,7 +67,7 @@ unbind OSC message has _address_ incoming from _port_.
 
 unbind all OSC messages incoming from _port_.
 
-#### See [class ofxOscSubscriber](#Advanced_ofxOscSubscriber)
+#### See [class ofxOscSubscriberManager](#Advanced_ofxOscSubscriberManager), [class ofxOscSubscriber](#Advanced_ofxOscSubscriber)
 
 ### <a name="API_ofxSetLeakedOscPicker">ofxSetLeakedOscPicker</a>
 
@@ -100,15 +100,23 @@ unpublish OSC message has _address_ is send to _ip:port_.
 
 unpublish all OSC messages is send to _ip:port_.
 
-#### See [class ofxOscPublisher](#Advanced_ofxOscPublisher)
+#### See [class ofxOscPublisherManager](#Advanced_ofxOscPublisherManager), [class ofxOscPublisher](#Advanced_ofxOscPublisher)
 
 ## <a name="AdvancedAPI">Advanced API</a>
+
+### <a name="Advanced_ofxOscSubscriberManager">class ofxOscSubscriberManager</a>
+
+TODO
 
 ### <a name="Advanced_ofxOscSubscriber">class ofxOscSubscriber</a>
 
 TODO
 
 #### <a name="Advanced_LegacyStylePickUpLeakedOSCMessage">How to "Legacy style pick up leaked OSC"</a>
+
+TODO
+
+### <a name="Advanced_ofxOscPublisherManager">class ofxOscPublisherManager</a>
 
 TODO
 
@@ -153,7 +161,7 @@ TODO
 * **ofMatrix4x4**
 
 #### Blob
-* **ofBuffer** (_now subscribe only_)
+* **ofBuffer**
 
 ### <a name="SupportedTypes_ArrayVector">array/vector of supported types</a>
 
@@ -163,6 +171,12 @@ TODO
 * pair of **U \*that**, **T (U::\*callback)(ofxOscMessage &)**;
 
 ## <a name="UpdateHistory">Update history</a>
+
+### 2015/05/17 ver 0.0.6 release
+
+* add publish ofBuffer as blob
+* some bugfix
+* big change on inner class structure
 
 ### 2015/05/15 ver 0.0.5 release
 
@@ -188,7 +202,7 @@ TODO
 
 * initial
 
-#### \* about Versioning
+#### about Versioning
 
 ofxPubSubOsc uses Mood Versioning. maybe, 1.0.0. will not come.
 
