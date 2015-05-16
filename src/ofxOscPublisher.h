@@ -43,6 +43,14 @@ namespace ofx {
             typedef T type;
         };
 #define RemoveRef(T) typename remove_reference<T>::type
+        
+        bool operator==(const ofBuffer &x, const ofBuffer &y) {
+            return (x.size() == y.size()) && (memcmp(x.getBinaryBuffer(), y.getBinaryBuffer(), x.size()) == 0);
+        }
+        
+        bool operator!=(const ofBuffer &x, const ofBuffer &y) {
+            return (x.size() != y.size()) || (memcmp(x.getBinaryBuffer(), y.getBinaryBuffer(), x.size()) != 0);
+        }
     };
     
     class OscPublisherManager {
@@ -68,6 +76,8 @@ namespace ofx {
             define_set_float(double);
 #undef define_set_float
             inline void set(ofxOscMessage &m, const string &v) const { m.addStringArg(v); }
+            inline void set(ofxOscMessage &m, const ofBuffer &v) const { m.addBlobArg(v); };
+            
             template <typename PixType>
             inline void set(ofxOscMessage &m, const ofColor_<PixType> &v) const {  setVec<4>(m, v); }
             inline void set(ofxOscMessage &m, const ofVec2f &v) const { setVec<2>(m, v); }
