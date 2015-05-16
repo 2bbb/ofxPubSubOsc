@@ -92,11 +92,11 @@ remove callback.
 publish _value_ / _getter()_ / _(that.*getter)()_ to OSC message has _address_ to _ip:port_. if _whenValueIsChanged_ is set to **false**, then we send binded value **every frame** after `App::update`.
 
 
-* ofxUnpublishOSC(int _port_, const string &_address_);
+* ofxUnpublishOSC(const string &_ip_, int _port_, const string &_address_);
 
 unpublish OSC message has _address_ is send to _ip:port_.
 
-* ofxUnpublishOSC(int _port_);
+* ofxUnpublishOSC(const string &_ip_, int _port_);
 
 unpublish all OSC messages is send to _ip:port_.
 
