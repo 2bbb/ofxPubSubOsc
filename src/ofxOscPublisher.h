@@ -124,7 +124,8 @@ namespace ofx {
         struct AbstractCondition {
             AbstractCondition() : bPublishNow(true) {};
             inline bool getCondition() { return isPublishNow() && inner_condition(); };
-            inline bool isPublishNow() { return bPublishNow; };
+            inline bool isPublishNow() const { return bPublishNow; };
+            inline void setEnablePublish(bool bEnablePublish) { this->bPublishNow = bEnablePublish; };
             virtual bool inner_condition() { return true; };
             
             typedef shared_ptr<AbstractCondition> Ref;
@@ -162,6 +163,9 @@ namespace ofx {
             AbstractParameter() : condition(new AbstractCondition) {}
             virtual void send(ofxOscSender &sender, const string &address) {}
             void setCondition(AbstractConditionRef ref) { condition = ref; };
+            
+            inline void setEnablePublish(bool bEnablePublish) { condition->setEnablePublish(bEnablePublish); };
+            inline bool isPublishNow() const { return condition->isPublishNow(); };
         protected:
             bool canPublish() {
                 return condition->getCondition();
@@ -257,6 +261,9 @@ namespace ofx {
             OscPublisher(const SenderKey &key) : key(key) {
                 sender.setup(key.first, key.second);
             }
+            
+#pragma mark publish
+            
             inline void publish(const string &address, ParameterRef ref) {
                 if(targets.find(address) == targets.end()) {
                     targets.insert(make_pair(address, ref));
@@ -296,6 +303,7 @@ namespace ofx {
             
 #pragma mark publish conditional
 #pragma mark condition is bool value ref
+            
             template <typename T>
             void publishIf(bool &condition, const string &address, T &value) {
                 ParameterRef p = ParameterRef(new Parameter<T, true>(value));
@@ -323,6 +331,7 @@ namespace ofx {
             }
 
 #pragma mark condition is function
+            
             template <typename T>
             void publishIf(bool (*condition)(), const string &address, T &value) {
                 ParameterRef p = ParameterRef(new Parameter<T, true>(value));
@@ -350,6 +359,7 @@ namespace ofx {
             }
 
 #pragma mark condition is method
+            
             template <typename T, typename C>
             void publishIf(C *condition, bool (C::*method)(), const string &address, T &value) {
                 publishIf(*condition, method, address, value);
@@ -397,6 +407,7 @@ namespace ofx {
             }
             
 #pragma mark unpublish
+            
             void unpublish(const string &address) {
                 if(targets.find(address) == targets.end()) targets.erase(address);
             }
@@ -405,6 +416,18 @@ namespace ofx {
                 targets.clear();
             }
 
+#pragma mark stop publish temporary
+            
+            void stopPublishTemporary(const string &address) {
+                if(isPublished(address)) targets[address]->setEnablePublish(false);
+            }
+            
+            void resumePublish(const string &address) {
+                if(isPublished(address)) targets[address]->setEnablePublish(true);
+            }
+            
+#pragma mark status
+            
             inline bool isPublished() const {
                 return !targets.empty();
             }
@@ -412,6 +435,12 @@ namespace ofx {
             inline bool isPublished(const string &address) const {
                 return isPublished() && (targets.find(address) != targets.end());
             }
+
+            inline bool isEnabled(const string &address) const {
+                return isPublished(address) && targets.at(address)->isPublishNow();
+            }
+
+#pragma mark update
             
             void update() {
                 for(Targets::iterator it = targets.begin(); it != targets.end(); it++) {
