@@ -233,7 +233,8 @@ namespace ofx {
             }
             
             void clearLeakedOscMessages() {
-                leakedOscMessages.clear();
+                queue<ofxOscMessage> empty;
+                swap(leakedOscMessages, empty);
             }
             
             inline bool hasWaitingLeakedOscMessages() const {
@@ -242,8 +243,8 @@ namespace ofx {
             
             inline bool getNextLeakedOscMessage(ofxOscMessage &m) {
                 if(hasWaitingLeakedOscMessages()) {
-                    m.copy(leakedOscMessages.back());
-                    leakedOscMessages.pop_back();
+                    m.copy(leakedOscMessages.front());
+                    leakedOscMessages.pop();
                     return true;
                 } else {
                     return false;
@@ -262,7 +263,7 @@ namespace ofx {
                         if(leakPicker) {
                             leakPicker->read(m);
                         } else {
-                            leakedOscMessages.push_back(m);
+                            leakedOscMessages.push(m);
                         }
                     }
                 }
@@ -274,8 +275,7 @@ namespace ofx {
             ofxOscReceiver receiver;
             Targets targets;
             ParameterRef leakPicker;
-            vector<ofxOscMessage> leakedOscMessages;
-            
+            queue<ofxOscMessage> leakedOscMessages;
         };
         
         static OscSubscriberManager &getSharedInstance() {
