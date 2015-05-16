@@ -247,11 +247,12 @@ namespace ofx {
                 publish(address, p);
             }
             
-            void unsubscribe(const string &address) {
+#pragma mark unpublish
+            void unpublish(const string &address) {
                 if(targets.find(address) == targets.end()) targets.erase(address);
             }
             
-            void unsubscribe() {
+            void unpublish() {
                 targets.clear();
             }
 
