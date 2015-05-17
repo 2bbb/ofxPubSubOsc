@@ -204,9 +204,8 @@ namespace ofx {
     public:
         class OscPublisher {
         public:
-            OscPublisher(const SenderKey &key) : key(key) {
-                sender.setup(key.first, key.second);
-            }
+            
+#pragma mark publish
             inline void publish(const string &address, ParameterRef ref) {
                 if(targets.find(address) == targets.end()) {
                     targets.insert(make_pair(address, ref));
@@ -263,6 +262,12 @@ namespace ofx {
             inline bool isPublished(const string &address) const {
                 return isPublished() && (targets.find(address) != targets.end());
             }
+
+            typedef shared_ptr<OscPublisher> Ref;
+        private:
+            OscPublisher(const SenderKey &key) : key(key) {
+                sender.setup(key.first, key.second);
+            }
             
             void update() {
                 for(Targets::iterator it = targets.begin(); it != targets.end(); it++) {
@@ -270,11 +275,10 @@ namespace ofx {
                 }
             }
             
-            typedef shared_ptr<OscPublisher> Ref;
-        private:
             SenderKey key;
             ofxOscSender sender;
             Targets targets;
+            friend class OscPublisherManager;
         };
         
         static OscPublisherManager &getSharedInstance() {
