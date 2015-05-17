@@ -180,7 +180,7 @@ namespace ofx {
             : t(t) {}
             
             virtual void send(ofxOscSender &sender, const string &address) {
-                if(canPublish()) return;
+                if(!canPublish()) return;
                 ofxOscMessage m;
                 m.setAddress(address);
                 set(m, get());
