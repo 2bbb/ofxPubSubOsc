@@ -6,6 +6,7 @@
 	* [ofxSubscribeOsc](#API_ofxSubscribeOsc)
 	* [ofxSetLeakedOscPicker](#API_ofxSetLeakedOscPicker)
 	* [ofxPublishOsc](#API_ofxPublishOsc)
+		* [ofxPublishOscIf](API_ofxPublishOscIf)
 * [Advanced API](#AdvancedAPI)
 	* [class ofxOscSubscriberManager](#Advanced_ofxOscSubscriberManager)
 	* [class ofxOscSubscriber](#Advanced_ofxOscSubscriber)
@@ -58,6 +59,14 @@ remove callback.
 
 publish _value_ / _getter()_ / _(that.*getter)()_ to OSC message has _address_ to _ip:port_. if _whenValueIsChanged_ is set to **false**, then we send binded value **every frame** after `App::update`.
 
+#### <a name="API_ofxPublishOscIf">ofxPublishOscIf</a>
+
+* template \<...\> void ofxPublishOscIf(bool &_condition_, const string &_ip_, int _port_, const string &_address_, ...);
+* template \<...\> void ofxPublishOscIf(bool (*_condition_)(), const string &_ip_, int _port_, const string &_address_, ...);
+* template \<..., typename C\> void ofxPublishOscIf(C \*_condition_, bool (C::\*_method_)(), const string &_ip_, int _port_, const string &_address_, ...);
+* template \<..., typename C\> void ofxPublishOscIf(C &_condition_, bool (C::\*_method_)(), const string &_ip_, int _port_, const string &_address_, ...);
+
+if _condition_ / _condition()_ / _(condition.*method)()_ is true then publish arguments are same pattern as _ofxPublishOsc_. (only _whenValueChanged_ is eliminated. _whenValueChanged_ is always true.)
 
 * void ofxUnpublishOSC(const string &_ip_, int _port_, const string &_address_);
 
