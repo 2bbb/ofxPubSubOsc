@@ -258,6 +258,7 @@ namespace ofx {
     public:
         class OscPublisher {
         public:
+
 #pragma mark publish
             
             inline void publish(const string &address, ParameterRef ref) {
