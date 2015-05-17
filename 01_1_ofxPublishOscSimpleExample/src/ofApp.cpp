@@ -7,7 +7,11 @@ class ofApp : public ofBaseApp {
 public:
     void setup() {
         ofSetWindowPosition(100, 100);
+        
+        // publish ofPoint
         ofxPublishOsc("localhost", 9005, "/cursor", p);
+        
+        // publish function returns float
         ofxPublishOsc("localhost", 9005, "/fps", &ofGetFrameRate);
         ofxPublishOsc("localhost", 9005, "/windowPosition/x", &ofGetWindowPositionX);
         ofxPublishOsc("localhost", 9005, "/windowPosition/y", &ofGetWindowPositionY);

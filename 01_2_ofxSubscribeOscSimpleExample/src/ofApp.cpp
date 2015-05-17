@@ -7,7 +7,11 @@ class ofApp : public ofBaseApp {
 public:
     void setup() {
         ofSetWindowPosition(300, 100);
+        
+        // subscribe ofPoint
         ofxSubscribeOsc(9005, "/cursor", p);
+        
+        // subscribe float value
         ofxSubscribeOsc(9005, "/fps", fps);
         ofxSubscribeOsc(9005, "/windowPosition/x", windowPosition.x);
         ofxSubscribeOsc(9005, "/windowPosition/y", windowPosition.y);
