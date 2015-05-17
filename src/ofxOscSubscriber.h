@@ -157,11 +157,6 @@ namespace ofx {
     public:
         class OscSubscriber {
         public:
-            OscSubscriber(int port)
-            : port(port) {
-                receiver.setup(port);
-            }
-            
             inline void subscribe(const string &address, ParameterRef ref) {
                 Targets::iterator it = targets.find(address);
                 if(it == targets.end()) {
@@ -251,6 +246,13 @@ namespace ofx {
                 }
             }
             
+            typedef shared_ptr<OscSubscriber> Ref;
+        private:
+            OscSubscriber(int port)
+            : port(port) {
+                receiver.setup(port);
+            }
+            
             void update() {
                 clearLeakedOscMessages();
                 ofxOscMessage m;
@@ -269,13 +271,13 @@ namespace ofx {
                 }
             }
             
-            typedef shared_ptr<OscSubscriber> Ref;
-        private:
             int port;
             ofxOscReceiver receiver;
             Targets targets;
             ParameterRef leakPicker;
             queue<ofxOscMessage> leakedOscMessages;
+            
+            friend class OscSubscriberManager;
         };
         
         static OscSubscriberManager &getSharedInstance() {
