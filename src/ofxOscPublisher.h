@@ -608,10 +608,10 @@ inline void ofxPublishOscIf(C &condition, bool (C::*method)(), const string &ip,
 
 #pragma mark unpublish
 
-inline void ofxUnpublishOSC(const string &ip, int port, const string &address) {
+inline void ofxUnpublishOsc(const string &ip, int port, const string &address) {
     ofxGetOscPublisher(ip, port).unpublish(address);
 }
 
-inline void ofxUnpublishOSC(const string &ip, int port) {
+inline void ofxUnpublishOsc(const string &ip, int port) {
     ofxGetOscPublisher(ip, port).unpublish();
 }

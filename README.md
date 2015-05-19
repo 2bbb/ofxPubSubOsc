@@ -57,11 +57,11 @@ bind value to OSC message has _address_ incoming from _port_.
 
 #### See [more ofxSubscribeOsc](https://github.com/2bbb/ofxPubSubOsc/blob/master/API_Reference.md#API_ofxSubscribeOsc)
 
-* ofxUnsubscribeOSC(int _port_, const string &_address_);
+* ofxUnsubscribeOsc(int _port_, const string &_address_);
 
 unbind OSC message has _address_ incoming from _port_.
 
-* ofxUnsubscribeOSC(int _port_);
+* ofxUnsubscribeOsc(int _port_);
 
 unbind all OSC messages incoming from _port_.
 
@@ -77,11 +77,11 @@ publish _value_ to OSC message has _address_ to _ip:port_. if _whenValueIsChange
 
 #### See [more ofxPublishOsc](https://github.com/2bbb/ofxPubSubOsc/blob/master/API_Reference.md#API_ofxPublishOsc), [ofxPublishOscIf](https://github.com/2bbb/ofxPubSubOsc/blob/master/API_Reference.md#API_ofxPublishOscIf)
 
-* void ofxUnpublishOSC(const string &_ip_, int _port_, const string &_address_);
+* void ofxUnpublishOsc(const string &_ip_, int _port_, const string &_address_);
 
 unpublish OSC message has _address_ is send to _ip:port_.
 
-* void ofxUnpublishOSC(const string &_ip_, int _port_);
+* void ofxUnpublishOsc(const string &_ip_, int _port_);
 
 unpublish all OSC messages is send to _ip:port_.
 
