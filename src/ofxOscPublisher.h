@@ -500,27 +500,73 @@ inline ofxOscPublisher &ofxGetOscPublisher(const string &ip, int port) {
 
 #pragma mark publish
 
+/// \name ofxPublishOsc
+/// \{
+
+/// \brief publish reference of value.
+/// template parameter T is suggested by value
+/// \param ip target ip const string &
+/// \param port target port is types int
+/// \param address osc address as const string &
+/// \param value reference of value is types T &
+/// \param whenValueIsChanged if this value to false, then we send value every update
+/// \returns void
+
 template <typename T>
 inline void ofxPublishOsc(const string &ip, int port, const string &address, T &value, bool whenValueIsChanged = true) {
     ofxGetOscPublisher(ip, port).publish(address, value, whenValueIsChanged);
 }
+
+/// \brief publish value will be gives by function.
+/// template parameter T is suggested by value
+/// \param ip target ip const string &
+/// \param port target port as int
+/// \param address osc address as const string &
+/// \param getter this function gives value, is types T(*)()
+/// \param whenValueIsChanged if this value to false, then we send value every update
+/// \returns void
 
 template <typename T>
 inline void ofxPublishOsc(const string &ip, int port, const string &address, T (*getter)(), bool whenValueIsChanged = true) {
     ofxGetOscPublisher(ip, port).publish(address, getter, whenValueIsChanged);
 }
 
+/// \brief publish value will be gives by object and method.
+/// template parameter T is suggested by value and U is suggested by that and getter.
+/// \param ip target ip const string &
+/// \param port target port as int
+/// \param address osc address as const string &
+/// \param that this object is types U*, will bind with next parameter method. is called as (that->*getter)().
+/// \param getter this method gives value, is types T(*)()
+/// \param whenValueIsChanged if this value to false, then we send value every update
+/// \returns void
+
 template <typename T, typename U>
 inline void ofxPublishOsc(const string &ip, int port, const string &address, U *that, T (U::*getter)(), bool whenValueIsChanged = true) {
     ofxGetOscPublisher(ip, port).publish(address, that, getter, whenValueIsChanged);
 }
+
+/// \brief publish value will be gives by object and method.
+/// template parameter T is suggested by value and U is suggested by that and getter.
+/// \param ip target ip const string &
+/// \param port target port as int
+/// \param address osc address as const string &
+/// \param that this object is types U&, will bind with next parameter method. is called as (that.*getter)()
+/// \param getter this method gives value, is types T(*)()
+/// \param whenValueIsChanged if this value to false, then we send value every update
+/// \returns void
 
 template <typename T, typename U>
 inline void ofxPublishOsc(const string &ip, int port, const string &address, U &that, T (U::*getter)(), bool whenValueIsChanged = true) {
     ofxGetOscPublisher(ip, port).publish(address, that, getter, whenValueIsChanged);
 }
 
+/// \}
+
 #pragma mark publish if condition
+
+/// \name ofxPublishOscif
+/// \{
 
 template <typename T>
 inline void ofxPublishOscIf(bool &condition, const string &ip, int port, const string &address, T &value) {
@@ -606,7 +652,11 @@ inline void ofxPublishOscIf(C &condition, bool (C::*method)(), const string &ip,
     ofxGetOscPublisher(ip, port).publishIf(condition, method, address, that, getter);
 }
 
+/// \}
+
 #pragma mark unpublish
+
+/// \name ofxUnpublishOsc
 
 inline void ofxUnpublishOsc(const string &ip, int port, const string &address) {
     ofxGetOscPublisher(ip, port).unpublish(address);
@@ -615,3 +665,5 @@ inline void ofxUnpublishOsc(const string &ip, int port, const string &address) {
 inline void ofxUnpublishOsc(const string &ip, int port) {
     ofxGetOscPublisher(ip, port).unpublish();
 }
+
+/// \}
