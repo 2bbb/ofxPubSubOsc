@@ -494,6 +494,11 @@ namespace ofx {
 typedef ofx::OscPublisherManager ofxOscPublisherManager;
 typedef ofxOscPublisherManager::OscPublisher ofxOscPublisher;
 
+/// \brief get a OscPublisher.
+/// \param ip target ip is typed const string &
+/// \param port target port is typed int
+/// \returns ofxOscPublisher binded to ip & port
+
 inline ofxOscPublisher &ofxGetOscPublisher(const string &ip, int port) {
     return ofxOscPublisherManager::getOscPublisher(ip, port);
 }
@@ -505,10 +510,10 @@ inline ofxOscPublisher &ofxGetOscPublisher(const string &ip, int port) {
 
 /// \brief publish reference of value.
 /// template parameter T is suggested by value
-/// \param ip target ip const string &
-/// \param port target port is types int
-/// \param address osc address as const string &
-/// \param value reference of value is types T &
+/// \param ip target ip is typed const string &
+/// \param port target port is typed int
+/// \param address osc address is typed const string &
+/// \param value reference of value is typed T &
 /// \param whenValueIsChanged if this value to false, then we send value every update
 /// \returns void
 
@@ -519,10 +524,10 @@ inline void ofxPublishOsc(const string &ip, int port, const string &address, T &
 
 /// \brief publish value will be gives by function.
 /// template parameter T is suggested by value
-/// \param ip target ip const string &
-/// \param port target port as int
-/// \param address osc address as const string &
-/// \param getter this function gives value, is types T(*)()
+/// \param ip target ip is typed const string &
+/// \param port target port is typed int
+/// \param address osc address is typed const string &
+/// \param getter this function gives value, is typed T(*)()
 /// \param whenValueIsChanged if this value to false, then we send value every update
 /// \returns void
 
@@ -533,11 +538,11 @@ inline void ofxPublishOsc(const string &ip, int port, const string &address, T (
 
 /// \brief publish value will be gives by object and method.
 /// template parameter T is suggested by value and U is suggested by that and getter.
-/// \param ip target ip const string &
-/// \param port target port as int
-/// \param address osc address as const string &
-/// \param that this object is types U*, will bind with next parameter method. is called as (that->*getter)().
-/// \param getter this method gives value, is types T(*)()
+/// \param ip target ip is typed const string &
+/// \param port target port is typed int
+/// \param address osc address is typed const string &
+/// \param that this object is typed U*, will bind with next parameter method. is called as (that->*getter)().
+/// \param getter this method gives value, is typed T(*)()
 /// \param whenValueIsChanged if this value to false, then we send value every update
 /// \returns void
 
@@ -548,11 +553,11 @@ inline void ofxPublishOsc(const string &ip, int port, const string &address, U *
 
 /// \brief publish value will be gives by object and method.
 /// template parameter T is suggested by value and U is suggested by that and getter.
-/// \param ip target ip const string &
-/// \param port target port as int
-/// \param address osc address as const string &
-/// \param that this object is types U&, will bind with next parameter method. is called as (that.*getter)()
-/// \param getter this method gives value, is types T(*)()
+/// \param ip target ip is typed const string &
+/// \param port target port is typed int
+/// \param address osc address is typed const string &
+/// \param that this object is typed U&, will bind with next parameter method. is called as (that.*getter)()
+/// \param getter this method gives value, is typed T(*)()
 /// \param whenValueIsChanged if this value to false, then we send value every update
 /// \returns void
 
