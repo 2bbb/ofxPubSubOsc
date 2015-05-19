@@ -89,14 +89,16 @@ unpublish all OSC messages is send to _ip:port_.
 
 ## <a name="SupportedTypes">Supported types</a>
 
+* Arithmetic is any type of Int32 or Int64 or Float
+
 ### <a name="SupportedTypes_Arithmetic">Arithmetic (Int32, Int64, Float)</a>
-* **bool**
-* (**unsigned**) **char**
-* (**unsigned**) **short**
-* (**unsigned**) **int**
-* (**unsigned**) **long**
-* **float**
-* **double**
+* **bool** (publish as _Int32_)
+* (**unsigned**) **char** (publish as _Int32_)
+* (**unsigned**) **short** (publish as _Int32_)
+* (**unsigned**) **int** (publish as _Int32_)
+* (**unsigned**) **long** (publish as _Int64_)
+* **float** (publish as _Float_)
+* **double** (publish as _Float_)
 
 ### <a name="SupportedTypes_String">String (String)</a>
 * **string**
@@ -104,24 +106,24 @@ unpublish all OSC messages is send to _ip:port_.
 ### <a name="SupportedTypes_ofBasic">openframeworks basic types</a>
 
 #### Arithmetic\[2\]
-* **ofVec2f**
+* **ofVec2f** (publish as _Float_ \* 2)
 
 #### Arithmetic\[3\]
-* **ofVec3f** (= **ofPoint**)
+* **ofVec3f** (= **ofPoint**) (publish as _Float_ \* 3)
 
 #### Arithmetic\[4\]
-* **ofVec4f**
-* **ofColor**
-* **ofShortColor**
-* **ofFloatColor**
-* **ofQuaternion**
-* **ofRectangle**
+* **ofVec4f** (publish as _Float_ \* 4)
+* **ofColor** (publish as _Int32_ \* 4)
+* **ofShortColor** (publish as _Int32_ \* 4)
+* **ofFloatColor** (publish as _Float_ \* 4)
+* **ofQuaternion** (publish as _Float_ \* 4)
+* **ofRectangle** (publish as _Float_ \* 4)
 
 #### Arithmetic\[9\]
-* **ofMatrix3x3**
+* **ofMatrix3x3**  (publish as _Float_ \* 9)
 
 #### Arithmetic\[16\]
-* **ofMatrix4x4**
+* **ofMatrix4x4** (publish as _Float_ \* 16)
 
 #### Blob
 * **ofBuffer**
