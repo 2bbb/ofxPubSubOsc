@@ -75,7 +75,7 @@ unbind all OSC messages incoming from _port_.
 
 publish _value_ to OSC message has _address_ to _ip:port_. if _whenValueIsChanged_ is set to **false**, then we send binded value **every frame** after `App::update`.
 
-#### See [more ofxPublishOsc](https://github.com/2bbb/ofxPubSubOsc/blob/master/API_Reference.md#API_ofxPublishOsc)
+#### See [more ofxPublishOsc](https://github.com/2bbb/ofxPubSubOsc/blob/master/API_Reference.md#API_ofxPublishOsc), [ofxPublishOscIf](https://github.com/2bbb/ofxPubSubOsc/blob/master/API_Reference.md#API_ofxPublishOscIf)
 
 * void ofxUnpublishOSC(const string &_ip_, int _port_, const string &_address_);
 
@@ -134,6 +134,11 @@ unpublish all OSC messages is send to _ip:port_.
 * pair of **U \*that**, **T (U::\*callback)(ofxOscMessage &)**;
 
 ## <a name="UpdateHistory">Update history</a>
+
+### 2015/05/19 ver 0.0.7 release
+
+* add ofxPublishOscIf
+* some bugfix
 
 ### 2015/05/17 ver 0.0.6 release
 
