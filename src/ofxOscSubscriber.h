@@ -315,38 +315,85 @@ namespace ofx {
 typedef ofx::OscSubscriberManager ofxOscSubscriberManager;
 typedef ofxOscSubscriberManager::OscSubscriber ofxOscSubscriber;
 
+/// \brief get a OscSubscriber.
+/// \param port binded port is typed int
+/// \returns ofxOscSubscriber binded to port
+
 inline ofxOscSubscriber &ofxGetOscSubscriber(int port) {
     return ofxOscSubscriberManager::getOscSubscriber(port);
 }
 
 #pragma mark interface about subscribe
 
+/// \name ofxSubscribeOsc
+/// \{
+
+/// \brief bind a referece of value to the argument(s) of OSC messages with an address pattern address incoming to port.
+/// template parameter T is suggested by value
+/// \param port binded port is typed int
+/// \param address osc address is typed const string &
+/// \param value reference of value is typed T &
+/// \returns void
+
 template <typename T>
 inline void ofxSubscribeOsc(int port, const string &address, T &value) {
     ofxGetOscSubscriber(port).subscribe(address, value);
 }
 
+/// \brief bind a callback to the OSC messages with an address pattern address incoming to port.
+/// \param port binded port is typed int
+/// \param address osc address is typed const string &
+/// \param callback is kicked when receive a message to address
+/// \returns void
+
 inline void ofxSubscribeOsc(int port, const string &address, void (*callback)(ofxOscMessage &)) {
     ofxGetOscSubscriber(port).subscribe(address, callback);
 }
+
+/// \brief bind a callback to the OSC messages with an address pattern address incoming to port.
+/// template parameter T is suggested by that & callback
+/// \param port binded port is typed int
+/// \param address osc address is typed const string &
+/// \param that this object is typed T&, will bind with next argument of parameter method. is called as (that.*getter)() when receive a message.
+/// \returns void
 
 template <typename T>
 inline void ofxSubscribeOsc(int port, const string &address, T &that, void (T::*callback)(ofxOscMessage &)) {
     ofxGetOscSubscriber(port).subscribe(address, that, callback);
 }
 
+/// \brief bind a callback to the OSC messages with an address pattern address incoming to port.
+/// template parameter T is suggested by that & callback
+/// \param port binded port is typed int
+/// \param address osc address is typed const string &
+/// \param that this object is typed T*, will bind with next argument of parameter method. is called as (that->*getter)() when receive a message.
+/// \returns void
+
 template <typename T>
 inline void ofxSubscribeOsc(int port, const string &address, T *that, void (T::*callback)(ofxOscMessage &)) {
     ofxGetOscSubscriber(port).subscribe(address, that, callback);
 }
 
+#pragma mark unsubscribe
+
+/// \brief unbind from OSC messages with an address pattern _address_ incoming to _port_.
+/// \param port binded port is typed int
+/// \param address osc address is typed const string &
+/// \returns void
+
 inline void ofxUnsubscribeOsc(int port, const string &address) {
     ofxGetOscSubscriber(port).unsubscribe(address);
 }
 
+/// \brief unbind from OSC messages with any address patterns incoming to _port_.
+/// \param port binded port is typed int
+/// \returns void
+
 inline void ofxUnsubscribeOsc(int port) {
     ofxGetOscSubscriber(port).unsubscribe();
 }
+
+/// \}
 
 #pragma mark interface about leaked osc
 
