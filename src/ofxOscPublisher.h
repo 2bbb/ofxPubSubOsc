@@ -508,7 +508,7 @@ inline ofxOscPublisher &ofxGetOscPublisher(const string &ip, int port) {
 /// \name ofxPublishOsc
 /// \{
 
-/// \brief publish reference of value.
+/// \brief publish value as an OSC message with an address pattern address to ip:port every time the value has changed. If whenValueIsChanged is set to false, then the binded value is sent every frame after App::update.
 /// template parameter T is suggested by value
 /// \param ip target ip is typed const string &
 /// \param port target port is typed int
@@ -522,7 +522,7 @@ inline void ofxPublishOsc(const string &ip, int port, const string &address, T &
     ofxGetOscPublisher(ip, port).publish(address, value, whenValueIsChanged);
 }
 
-/// \brief publish value will be gives by function.
+/// \brief publish the value will be gave by function as an OSC message with an address pattern address to ip:port every time the value has changed. If whenValueIsChanged is set to false, then the binded value is sent every frame after App::update.
 /// template parameter T is suggested by value
 /// \param ip target ip is typed const string &
 /// \param port target port is typed int
@@ -536,7 +536,7 @@ inline void ofxPublishOsc(const string &ip, int port, const string &address, T (
     ofxGetOscPublisher(ip, port).publish(address, getter, whenValueIsChanged);
 }
 
-/// \brief publish value will be gives by object and method.
+/// \brief publish the value will be gave by function as an OSC message with an address pattern address to ip:port every time the value has changed. If whenValueIsChanged is set to false, then the binded value is sent every frame after App::update.
 /// template parameter T is suggested by value and U is suggested by that and getter.
 /// \param ip target ip is typed const string &
 /// \param port target port is typed int
@@ -551,7 +551,7 @@ inline void ofxPublishOsc(const string &ip, int port, const string &address, U *
     ofxGetOscPublisher(ip, port).publish(address, that, getter, whenValueIsChanged);
 }
 
-/// \brief publish value will be gives by object and method.
+/// \brief publish the value will be gave by function as an OSC message with an address pattern address to ip:port every time the value has changed. If whenValueIsChanged is set to false, then the binded value is sent every frame after App::update.
 /// template parameter T is suggested by value and U is suggested by that and getter.
 /// \param ip target ip is typed const string &
 /// \param port target port is typed int
