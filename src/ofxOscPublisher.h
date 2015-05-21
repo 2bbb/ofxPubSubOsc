@@ -573,10 +573,30 @@ inline void ofxPublishOsc(const string &ip, int port, const string &address, U &
 /// \name ofxPublishOscif
 /// \{
 
+/// \brief publish value as an OSC message with an address pattern address to ip:port when condition is true.
+/// template parameter T is suggested by value
+/// \param condition condition of publish typed bool &
+/// \param ip target ip is typed const string &
+/// \param port target port is typed int
+/// \param address osc address is typed const string &
+/// \param value reference of value is typed T &
+/// \param whenValueIsChanged if this value to false, then we send value every update
+/// \returns void
+
 template <typename T>
 inline void ofxPublishOscIf(bool &condition, const string &ip, int port, const string &address, T &value) {
     ofxGetOscPublisher(ip, port).publishIf(condition, address, value);
 }
+
+/// \brief publish value will be gave by function as an OSC message with an address pattern address to ip:port when condition is true.
+/// template parameter T is suggested by value
+/// \param condition condition of publish typed bool &
+/// \param ip target ip is typed const string &
+/// \param port target port is typed int
+/// \param address osc address is typed const string &
+/// \param getter this function gives value, is typed T(*)()
+/// \param whenValueIsChanged if this value to false, then we send value every update
+/// \returns void
 
 template <typename T>
 inline void ofxPublishOscIf(bool &condition, const string &ip, int port, const string &address, T (*getter)()) {
