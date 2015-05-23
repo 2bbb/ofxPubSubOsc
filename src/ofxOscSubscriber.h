@@ -80,7 +80,7 @@ namespace ofx {
             
             template <size_t n, typename U>
             inline void setVec(ofxOscMessage &m, U &v, size_t offset = 0) {
-                for(int i = 0; i < min(static_cast<size_t>(m.getNumArgs()), n); i++) {
+                for(int i = 0; i < min(static_cast<size_t>(m.getNumArgs() - offset), n); i++) {
                     set(m, v[i], offset + i);
                 }
             }
@@ -107,7 +107,7 @@ namespace ofx {
             
             template <typename U>
             inline void set(ofxOscMessage &m, vector<U> &v, size_t offset = 0) {
-                if(v.size() < m.getNumArgs() / ofx_type_traits<U>::size) { v.resize(m.getNumArgs() / ofx_type_traits<U>::size); }
+                if(v.size() < (m.getNumArgs() - offset) / ofx_type_traits<U>::size) { v.resize((m.getNumArgs() - offset) / ofx_type_traits<U>::size); }
                 for(int i = 0; i < v.size(); i++) {
                     set(m, v[i], offset + i * ofx_type_traits<U>::size);
                 }
