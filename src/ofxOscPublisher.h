@@ -219,6 +219,42 @@ namespace ofx {
             T old;
         };
 
+        template <typename Base, size_t size>
+        struct Parameter<Base[size], true> : AbstractParameter, SetImplementation {
+            typedef Base (T)[size];
+            
+            Parameter(T t) : t(t) {}
+            virtual void send(ofxOscSender &sender, const string &address) {
+                if(!canPublish() || !isChanged()) return;
+                ofxOscMessage m;
+                m.setAddress(address);
+                set(m, get());
+                sender.sendMessage(m);
+            }
+            
+        protected:
+            inline bool isChanged() {
+                bool isChange = false;
+                for(int i = 0; i < size; i++) {
+                    isChange = isChange || (old[i] == get()[i]);
+                    if(isChange) break;
+                }
+                if(isChange) {
+                    for(int i = 0; i < size; i++) {
+                        old[i] = get()[i];
+                    }
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            
+            virtual T &get() { return t; }
+        protected:
+            T t;
+            T old;
+        };
+        
         template <typename T, bool isCheckValue>
         struct GetterFunctionParameter : Parameter<T, isCheckValue> {
             typedef T (*GetterFunction)();
