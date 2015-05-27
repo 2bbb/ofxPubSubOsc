@@ -10,7 +10,7 @@
 #include "ofMain.h"
 #include "ofxOsc.h"
 
-#include "details/ofxpubsub_type_traits.h"
+#include "details/ofxpubsubosc_type_traits.h"
 
 namespace ofx {
     class OscSubscriberManager {
@@ -100,16 +100,16 @@ namespace ofx {
             
             template <typename U, size_t size>
             inline void set(ofxOscMessage &m, U v[size], size_t offset = 0) {
-                for(int i = 0; i < min(size, m.getNumArgs() / ofxpubsub_type_traits<U>::size); i++) {
-                    set(m, v[i], offset + i * ofxpubsub_type_traits<U>::size);
+                for(int i = 0; i < min(size, m.getNumArgs() / ofxpubsubosc::type_traits<U>::size); i++) {
+                    set(m, v[i], offset + i * ofxpubsubosc::type_traits<U>::size);
                 }
             }
             
             template <typename U>
             inline void set(ofxOscMessage &m, vector<U> &v, size_t offset = 0) {
-                if(v.size() < m.getNumArgs() / ofxpubsub_type_traits<U>::size) { v.resize(m.getNumArgs() / ofxpubsub_type_traits<U>::size); }
+                if(v.size() < m.getNumArgs() / ofxpubsubosc::type_traits<U>::size) { v.resize(m.getNumArgs() / ofxpubsubosc::type_traits<U>::size); }
                 for(int i = 0; i < v.size(); i++) {
-                    set(m, v[i], offset + i * ofxpubsub_type_traits<U>::size);
+                    set(m, v[i], offset + i * ofxpubsubosc::type_traits<U>::size);
                 }
             }
         };
