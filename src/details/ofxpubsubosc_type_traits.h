@@ -8,6 +8,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxpubsubosc_array_helper.h"
 
 namespace ofxpubsubosc {
     template <typename T>
@@ -77,6 +78,20 @@ namespace ofxpubsubosc {
     struct type_traits<T[array_size]> {
         typedef T inner_type;
         static const size_t size = ofxpubsubosc::type_traits<T>::size * array_size;
-        static const bool has_array_operator = false;
+        static const bool has_array_operator = true;
+    };
+    
+    template <typename T, size_t array_size>
+    struct type_traits<array_publisher<T, array_size> > {
+        typedef typename array_publisher<T, array_size>::inner_type inner_type;
+        static const size_t size = ofxpubsubosc::type_traits<T>::size * array_size;
+        static const bool has_array_operator = true;
+    };
+    
+    template <typename T, size_t array_size>
+    struct type_traits<array_buffer<T, array_size> > {
+        typedef typename array_buffer<T, array_size>::inner_type inner_type;
+        static const size_t size = ofxpubsubosc::type_traits<T>::size * array_size;
+        static const bool has_array_operator = true;
     };
 };

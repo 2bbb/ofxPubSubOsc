@@ -157,6 +157,7 @@ namespace ofx {
         };
 
         typedef AbstractCondition::Ref AbstractConditionRef;
+        
 #pragma mark Parameter
         
         struct AbstractParameter {
@@ -221,9 +222,12 @@ namespace ofx {
 
         template <typename Base, size_t size>
         struct Parameter<Base[size], true> : AbstractParameter, SetImplementation {
-            typedef Base (T)[size];
+            typedef Base (&T)[size];
             
-            Parameter(T t) : t(t) {}
+            Parameter(T t)
+            : t(t) { for(size_t i = 0; i < size; i++) old[i] = t[i]; }
+            virtual ~Parameter() { };
+            
             virtual void send(ofxOscSender &sender, const string &address) {
                 if(!canPublish() || !isChanged()) return;
                 ofxOscMessage m;
@@ -252,7 +256,7 @@ namespace ofx {
             virtual T &get() { return t; }
         protected:
             T t;
-            T old;
+            Base old[size];
         };
         
         template <typename T, bool isCheckValue>
