@@ -99,7 +99,7 @@ namespace ofx {
             }
             
             template <typename U, size_t size>
-            inline void set(ofxOscMessage &m, U v[size], size_t offset = 0) {
+            inline void set(ofxOscMessage &m, U (&v)[size], size_t offset = 0) {
                 for(int i = 0; i < min(size, m.getNumArgs() / ofx_type_traits<U>::size); i++) {
                     set(m, v[i], offset + i * ofx_type_traits<U>::size);
                 }
