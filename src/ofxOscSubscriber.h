@@ -107,8 +107,9 @@ namespace ofx {
             
             template <typename U>
             inline void set(ofxOscMessage &m, vector<U> &v, size_t offset = 0) {
-                if(v.size() < (m.getNumArgs() - offset) / ofx_type_traits<U>::size) { v.resize((m.getNumArgs() - offset) / ofx_type_traits<U>::size); }
-                for(int i = 0; i < v.size(); i++) {
+                int num = (m.getNumArgs() - offset) / ofx_type_traits<U>::size;
+                if(v.size() < num) v.resize(num);
+                for(int i = 0; i < min(num, v.size()); i++) {
                     set(m, v[i], offset + i * ofx_type_traits<U>::size);
                 }
             }
