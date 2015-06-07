@@ -64,3 +64,13 @@ typedef T type; \
         }
     };
 };
+
+template <typename T>
+bool operator==(const ofColor_<T> &x, const ofColor_<T> &y) {
+    return x == y;
+}
+
+template <typename T>
+bool operator!=(const ofColor_<T> &x, const ofColor_<T> &y) {
+    return x != y;
+}
