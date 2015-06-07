@@ -44,17 +44,7 @@ typedef T type; \
         define_add_reference_if_non_arithmetic(double);
 #undef define_add_reference_if_non_arithmetic
 #define TypeRef(T) typename add_reference_if_non_arithmetic<T>::type
-        
-        template <typename T>
-        struct remove_reference {
-            typedef T type;
-        };
-        template <typename T>
-        struct remove_reference<T &> {
-            typedef T type;
-        };
-#define RemoveRef(T) typename remove_reference<T>::type
-        
+                
         bool operator==(const ofBuffer &x, const ofBuffer &y) {
             return (x.size() == y.size()) && (memcmp(x.getBinaryBuffer(), y.getBinaryBuffer(), x.size()) == 0);
         }

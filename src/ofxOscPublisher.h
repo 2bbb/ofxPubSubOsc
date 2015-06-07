@@ -15,6 +15,16 @@
 namespace ofx {
     using namespace ofxpubsubosc;
     
+    template <typename T>
+    struct remove_reference {
+        typedef T type;
+    };
+    template <typename T>
+    struct remove_reference<T &> {
+        typedef T type;
+    };
+#define RemoveRef(T) typename ofx::remove_reference<T>::type
+
     class OscPublisherManager {
         struct SetImplementation {
         protected:
