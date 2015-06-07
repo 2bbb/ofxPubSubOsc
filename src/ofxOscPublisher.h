@@ -10,49 +10,21 @@
 #include "ofMain.h"
 #include "ofxOsc.h"
 
+#include "ofxpubsubosc_type_utils.h"
+
 namespace ofx {
-    namespace {
-        template <typename T>
-        struct add_reference_if_non_arithmetic {
-            typedef T& type;
-        };
-        
-#define define_add_reference_if_non_arithmetic(T) \
-        template <> \
-            struct add_reference_if_non_arithmetic<T> { \
-            typedef T type; \
-        };
-        define_add_reference_if_non_arithmetic(bool);
-        define_add_reference_if_non_arithmetic(short);
-        define_add_reference_if_non_arithmetic(unsigned short);
-        define_add_reference_if_non_arithmetic(int);
-        define_add_reference_if_non_arithmetic(unsigned int);
-        define_add_reference_if_non_arithmetic(long);
-        define_add_reference_if_non_arithmetic(unsigned long);
-        define_add_reference_if_non_arithmetic(float);
-        define_add_reference_if_non_arithmetic(double);
-#undef define_add_reference_if_non_arithmetic
-#define TypeRef(T) typename add_reference_if_non_arithmetic<T>::type
-        
-        template <typename T>
-        struct remove_reference {
-            typedef T type;
-        };
-        template <typename T>
-        struct remove_reference<T &> {
-            typedef T type;
-        };
-#define RemoveRef(T) typename remove_reference<T>::type
-        
-        bool operator==(const ofBuffer &x, const ofBuffer &y) {
-            return (x.size() == y.size()) && (memcmp(x.getBinaryBuffer(), y.getBinaryBuffer(), x.size()) == 0);
-        }
-        
-        bool operator!=(const ofBuffer &x, const ofBuffer &y) {
-            return (x.size() != y.size()) || (memcmp(x.getBinaryBuffer(), y.getBinaryBuffer(), x.size()) != 0);
-        }
-    };
+    using namespace ofxpubsubosc;
     
+    template <typename T>
+    struct remove_reference {
+        typedef T type;
+    };
+    template <typename T>
+    struct remove_reference<T &> {
+        typedef T type;
+    };
+#define RemoveRef(T) typename ofx::remove_reference<T>::type
+
     class OscPublisherManager {
         struct SetImplementation {
         protected:
@@ -109,7 +81,7 @@ namespace ofx {
             }
             
             template <typename U, size_t size>
-            inline void set(ofxOscMessage &m, const U v[size]) const {
+            inline void set(ofxOscMessage &m, const U (&v)[size]) const {
                 for(int i = 0; i < size; i++) { set(m, v[i]); }
             }
             
@@ -157,6 +129,7 @@ namespace ofx {
         };
 
         typedef AbstractCondition::Ref AbstractConditionRef;
+        
 #pragma mark Parameter
         
         struct AbstractParameter {
@@ -219,6 +192,44 @@ namespace ofx {
             T old;
         };
 
+        template <typename Base, size_t size>
+        struct Parameter<Base(&)[size], true> : AbstractParameter, SetImplementation {
+            Parameter(Base (&t)[size])
+            : t(t) { for(size_t i = 0; i < size; i++) old[i] = t[i]; }
+            virtual ~Parameter() { };
+            
+            virtual void send(ofxOscSender &sender, const string &address) {
+                if(!canPublish() || !isChanged()) return;
+                ofxOscMessage m;
+                m.setAddress(address);
+                set(m, get());
+                sender.sendMessage(m);
+            }
+            
+        protected:
+            inline bool isChanged() {
+                bool isChange = false;
+                for(int i = 0; i < size; i++) {
+                    isChange = isChange || (old[i] != get()[i]);
+                    if(isChange) break;
+                }
+                
+                if(isChange) {
+                    for(int i = 0; i < size; i++) {
+                        old[i] = get()[i];
+                    }
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            
+            virtual Base (&get())[size] { return t; }
+        protected:
+            Base (&t)[size];
+            Base old[size];
+        };
+        
         template <typename T, bool isCheckValue>
         struct GetterFunctionParameter : Parameter<T, isCheckValue> {
             typedef T (*GetterFunction)();
@@ -230,6 +241,24 @@ namespace ofx {
             virtual TypeRef(T) get() { return dummy = getter(); }
             GetterFunction getter;
             RemoveRef(T) dummy;
+        };
+        
+        template <typename Base, size_t size, bool isCheckValue>
+        struct GetterFunctionParameter<Base(&)[size], isCheckValue> : Parameter<Base(&)[size], isCheckValue>  {
+            typedef Base (&T)[size];
+            typedef T (*GetterFunction)();
+            GetterFunctionParameter(GetterFunction getter)
+            : Parameter<Base[size], isCheckValue>(dummy)
+            , getter(getter) {}
+            
+        protected:
+            virtual Base (&get())[size] {
+                Base (&arr)[size] = getter();
+                for(size_t i = 0; i < size; i++) dummy[i] = arr[i];
+                return dummy;
+            }
+            GetterFunction getter;
+            Base dummy[size];
         };
         
         template <typename T, typename U, bool isCheckValue>
@@ -251,7 +280,32 @@ namespace ofx {
             U &that;
             RemoveRef(T) dummy;
         };
-        
+
+        template <typename Base, size_t size, typename U, bool isCheckValue>
+        struct GetterParameter<Base(&)[size], U, isCheckValue> : Parameter<Base(&)[size], isCheckValue> {
+            typedef Base (&T)[size];
+            typedef T (U::*Getter)();
+            GetterParameter(U *that, Getter getter)
+            : Parameter<T, isCheckValue>(dummy)
+            , getter(getter)
+            , that(*that) {}
+            
+            GetterParameter(U &that, Getter getter)
+            : Parameter<T, isCheckValue>(dummy)
+            , getter(getter)
+            , that(that) {}
+            
+        protected:
+            virtual T get() {
+                T arr = (that.*getter)();
+                for(size_t i = 0; i < size; i++) dummy[i] = arr[i];
+                return dummy;
+            }
+            Getter getter;
+            U &that;
+            Base dummy[size];
+        };
+
         typedef shared_ptr<AbstractParameter> ParameterRef;
         typedef pair<string, int> SenderKey;
         typedef map<string, ParameterRef> Targets;
@@ -614,4 +668,37 @@ inline void ofxUnpublishOsc(const string &ip, int port, const string &address) {
 
 inline void ofxUnpublishOsc(const string &ip, int port) {
     ofxGetOscPublisher(ip, port).unpublish();
+}
+
+#pragma mark helper for publish array
+
+template <typename T, size_t size>
+struct array_type {
+    typedef T (&type)[size];
+    typedef type (*fun)();
+};
+
+template <typename T, size_t size, typename U>
+struct array_method {
+    typedef T (&type)[size];
+    typedef type (U::*method)();
+};
+
+template <typename T, size_t size>
+typename array_type<T, size>::type ofxPublishAsArray(T *ptr) {
+    return reinterpret_cast<T (&)[size]>(reinterpret_cast<T&>(ptr[0]));
+}
+
+template <typename T, size_t size>
+typename array_type<T, size>::fun ofxPublishAsArray(T *(*getter)()) {
+    return reinterpret_cast<typename array_type<T, size>::type (*)()>(
+        reinterpret_cast<T& (*)()>(getter)
+    );
+}
+
+template <typename T, size_t size, typename U>
+typename array_method<T, size, U>::method ofxPublishAsArray(T *(U::*getter)()) {
+    return reinterpret_cast<typename array_type<T, size>::type (U::*)()>(
+        reinterpret_cast<T& (U::*)()>(getter)
+    );
 }
