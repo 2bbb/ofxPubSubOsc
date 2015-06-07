@@ -168,7 +168,7 @@ namespace ofxpubsubosc {
         
         size_t size() const { return s; };
         operator array_t() { return get(); };
-        array_t get() { return reinterpret_cast<array_t>(v); };
+        array_t get() { return reinterpret_cast<array_t>(reinterpret_cast<T &>(v[0])); };
     protected:
         T *v;
     };
