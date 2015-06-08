@@ -82,7 +82,7 @@ namespace ofx {
             
             template <size_t n, typename U>
             inline void setVec(ofxOscMessage &m, U &v, size_t offset = 0) {
-                for(int i = 0; i < min(static_cast<size_t>(m.getNumArgs()), n); i++) {
+                for(int i = 0; i < min(static_cast<size_t>(m.getNumArgs() - offset), n); i++) {
                     set(m, v[i], offset + i);
                 }
             }
@@ -102,15 +102,16 @@ namespace ofx {
             
             template <typename U, size_t size>
             inline void set(ofxOscMessage &m, U (&v)[size], size_t offset = 0) {
-                for(int i = 0; i < min(size, m.getNumArgs() / ofxpubsubosc::type_traits<U>::size); i++) {
+                for(int i = 0; i < min(size, (m.getNumArgs() - offset) / ofxpubsubosc::type_traits<U>::size); i++) {
                     set(m, v[i], offset + i * ofxpubsubosc::type_traits<U>::size);
                 }
             }
             
             template <typename U>
             inline void set(ofxOscMessage &m, vector<U> &v, size_t offset = 0) {
-                if(v.size() < m.getNumArgs() / ofxpubsubosc::type_traits<U>::size) { v.resize(m.getNumArgs() / ofxpubsubosc::type_traits<U>::size); }
-                for(int i = 0; i < v.size(); i++) {
+                size_t num = (m.getNumArgs() - offset) / ofxpubsubosc::type_traits<U>::size;
+                if(v.size() != num) v.resize(num);
+                for(int i = 0; i < num; i++) {
                     set(m, v[i], offset + i * ofxpubsubosc::type_traits<U>::size);
                 }
             }

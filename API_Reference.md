@@ -7,6 +7,7 @@
 	* [ofxSetLeakedOscPicker](#API_ofxSetLeakedOscPicker)
 	* [ofxPublishOsc](#API_ofxPublishOsc)
 		* [ofxPublishOscIf](API_ofxPublishOscIf)
+		* [ofxPublishAsArray](API_ofxPublishAsArray)
 * [Advanced API](#AdvancedAPI)
 	* [class ofxOscSubscriberManager](#Advanced_ofxOscSubscriberManager)
 	* [class ofxOscSubscriber](#Advanced_ofxOscSubscriber)
@@ -75,6 +76,42 @@ unpublish OSC message has _address_ is send to _ip:port_.
 * void ofxUnpublishOSC(const string &_ip_, int _port_);
 
 unpublish all OSC messages is send to _ip:port_.
+
+#### <a name="API_ofxPublishAsArray">ofxPublishAsArray</a>
+
+* template <typename T, size_t size> typename array_type<T, size>::type ofxPublishAsArray(T \*ptr);
+	* where `array_type<T, size>::type` is `T (&)[size]`
+
+cast value is typed `T *` -> value is typed `T (&)[size]`
+
+* template <typename T, size_t size> typename array_type<T, size>::fun ofxPublishAsArray(T \*(\*getter)());
+	* where `array_type<T, size>::fun` is `array_type<T, size>::type (*)()`
+
+cast function returns `T *` -> function returns `T (&)[size]`
+
+* template <typename T, size_t size> typename array_method<T, size, U>::method ofxPublishAsArray(T \*(U::\*getter)());
+	* where `array_method<T, size, U>::method` is `array_type<T, size>::type (U:*)()`
+
+cast method of `U` returns `T *` -> method of `U` returns `T (&)[size]`
+
+##### Example
+
+```cpp
+struct P {
+	int *getFooPtr() { return foo; }
+private:
+	int foo[8];
+};
+
+P p;
+float *bar = new float[12];
+
+...
+
+ofxPublishOsc("localhost", 9005, "/foo", p, ofxPublishAsArray<int, 8>(&P::getFooPtr));
+ofxPublishOsc("localhost", 9005, "/bar", ofxPublishAsArray<float, 12>(bar));
+	
+```
 
 #### See [class ofxOscPublisherManager](#Advanced_ofxOscPublisherManager), [class ofxOscPublisher](#Advanced_ofxOscPublisher)
 
