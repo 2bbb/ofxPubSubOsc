@@ -45,15 +45,10 @@ typedef T type; \
 #undef define_add_reference_if_non_arithmetic
 #define TypeRef(T) typename add_reference_if_non_arithmetic<T>::type
                 
-        bool operator==(const ofBuffer &x, const ofBuffer &y) {
-            return (x.size() == y.size()) && (memcmp(x.getBinaryBuffer(), y.getBinaryBuffer(), x.size()) == 0);
-        }
-        
-        bool operator!=(const ofBuffer &x, const ofBuffer &y) {
-            return (x.size() != y.size()) || (memcmp(x.getBinaryBuffer(), y.getBinaryBuffer(), x.size()) != 0);
-        }
     };
 };
+
+#if (OF_VERSION_MAJOR == 0) && (OF_VERSION_MINOR < 9) /* ofColor will provid operator==(const ofColor &c) const from ver. 0.9.0 */
 
 template <typename T>
 bool operator==(const ofColor_<T> &x, const ofColor_<T> &y) {
@@ -64,6 +59,8 @@ template <typename T>
 bool operator!=(const ofColor_<T> &x, const ofColor_<T> &y) {
     return x != y;
 }
+
+#endif
 
 bool operator==(const ofMatrix3x3 &x, const ofMatrix3x3 &y) {
     return (x.a == y.a) && (x.b == y.b) && (x.c == y.c)
@@ -83,5 +80,13 @@ bool operator==(const ofMatrix4x4 &x, const ofMatrix4x4 &y) {
 }
 
 bool operator!=(const ofMatrix4x4 &x, const ofMatrix4x4 &y) {
+    return !operator==(x, y);
+}
+
+bool operator==(const ofBuffer &x, const ofBuffer &y) {
+    return (x.size() == y.size()) && (memcmp(x.getBinaryBuffer(), y.getBinaryBuffer(), x.size()) == 0);
+}
+
+bool operator!=(const ofBuffer &x, const ofBuffer &y) {
     return !operator==(x, y);
 }
