@@ -10,9 +10,11 @@
 #include "ofMain.h"
 #include "ofxOsc.h"
 
-#include "details/ofx_type_traits.h"
+#include "details/ofxpubsubosc_type_traits.h"
 
 namespace ofx {
+    using namespace ofxpubsubosc;
+    
     class OscSubscriberManager {
         struct AbstractParameter {
             virtual void read(ofxOscMessage &message) {}
@@ -99,18 +101,18 @@ namespace ofx {
             }
             
             template <typename U, size_t size>
-            inline void set(ofxOscMessage &m, U v[size], size_t offset = 0) {
-                for(int i = 0; i < min(size, m.getNumArgs() / ofx_type_traits<U>::size); i++) {
-                    set(m, v[i], offset + i * ofx_type_traits<U>::size);
+            inline void set(ofxOscMessage &m, U (&v)[size], size_t offset = 0) {
+                for(int i = 0; i < min(size, (m.getNumArgs() - offset) / ofxpubsubosc::type_traits<U>::size); i++) {
+                    set(m, v[i], offset + i * ofxpubsubosc::type_traits<U>::size);
                 }
             }
             
             template <typename U>
             inline void set(ofxOscMessage &m, vector<U> &v, size_t offset = 0) {
-                size_t num = (m.getNumArgs() - offset) / ofx_type_traits<U>::size;
+                size_t num = (m.getNumArgs() - offset) / ofxpubsubosc::type_traits<U>::size;
                 if(v.size() < num) v.resize(num);
                 for(int i = 0; i < min(num, v.size()); i++) {
-                    set(m, v[i], offset + i * ofx_type_traits<U>::size);
+                    set(m, v[i], offset + i * ofxpubsubosc::type_traits<U>::size);
                 }
             }
         };
@@ -131,7 +133,7 @@ namespace ofx {
             CallbackParameter(Callback callback)
             : callback(callback) {}
             
-            virtual void read(ofxOscMessage &message) {callback(message); }
+            virtual void read(ofxOscMessage &message) { callback(message); }
 
         private:
             Callback callback;
