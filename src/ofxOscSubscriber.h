@@ -16,10 +16,7 @@ namespace ofx {
     using namespace ofxpubsubosc;
     
     class OscSubscriberManager {
-        struct AbstractParameter {
-            virtual void read(ofxOscMessage &message) {}
-        };
-        
+    private:
         struct SetImplementation {
         protected:
 #define define_set_arithmetic(type) \
@@ -28,6 +25,7 @@ namespace ofx {
                 else if(m.getArgType(offset) == OFXOSC_TYPE_INT64) v = m.getArgAsInt64(offset); \
                 else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); \
             }
+            
             define_set_arithmetic(bool);
             define_set_arithmetic(char);
             define_set_arithmetic(unsigned char);
@@ -37,6 +35,8 @@ namespace ofx {
             define_set_arithmetic(unsigned int);
             define_set_arithmetic(long);
             define_set_arithmetic(unsigned long);
+            define_set_arithmetic(long long);
+            define_set_arithmetic(unsigned long long);
             
             define_set_arithmetic(float);
             define_set_arithmetic(double);
@@ -117,6 +117,12 @@ namespace ofx {
             }
         };
         
+#pragma mark Parameter
+        
+        struct AbstractParameter {
+            virtual void read(ofxOscMessage &message) {}
+        };
+        
         template <typename T>
         struct Parameter : AbstractParameter, SetImplementation {
             Parameter(T &t) : t(t) {}
@@ -157,6 +163,7 @@ namespace ofx {
         typedef shared_ptr<AbstractParameter> ParameterRef;
         typedef shared_ptr<ofxOscReceiver> OscReceiverRef;
         typedef map<string, ParameterRef> Targets;
+        
     public:
         class OscSubscriber {
         public:
@@ -318,55 +325,135 @@ namespace ofx {
 typedef ofx::OscSubscriberManager ofxOscSubscriberManager;
 typedef ofxOscSubscriberManager::OscSubscriber ofxOscSubscriber;
 
+/// \brief get a OscSubscriber.
+/// \param port binded port is typed int
+/// \returns ofxOscSubscriber binded to port
+
 inline ofxOscSubscriber &ofxGetOscSubscriber(int port) {
     return ofxOscSubscriberManager::getOscSubscriber(port);
 }
 
 #pragma mark interface about subscribe
 
+/// \name ofxSubscribeOsc
+/// \{
+
+/// \brief bind a referece of value to the argument(s) of OSC messages with an address pattern _address_ incoming to _port_.
+/// template parameter T is suggested by value
+/// \param port binded port is typed int
+/// \param address osc address is typed const string &
+/// \param value reference of value is typed T &
+/// \returns void
+
 template <typename T>
 inline void ofxSubscribeOsc(int port, const string &address, T &value) {
     ofxGetOscSubscriber(port).subscribe(address, value);
 }
 
+/// \brief bind a callback to the OSC messages with an address pattern _address_ incoming to _port_.
+/// \param port binded port is typed int
+/// \param address osc address is typed const string &
+/// \param callback is kicked when receive a message to address
+/// \returns void
+
 inline void ofxSubscribeOsc(int port, const string &address, void (*callback)(ofxOscMessage &)) {
     ofxGetOscSubscriber(port).subscribe(address, callback);
 }
+
+/// \brief bind a callback to the OSC messages with an address pattern _address_ incoming to _port_.
+/// template parameter T is suggested by that & callback
+/// \param port binded port is typed int
+/// \param address osc address is typed const string &
+/// \param that this object is typed T&, will bind with next argument of parameter method. is called as (that.*getter)(message) when receive a message.
+/// \param callback has argument ofxOscMessage &
+/// \returns void
 
 template <typename T>
 inline void ofxSubscribeOsc(int port, const string &address, T &that, void (T::*callback)(ofxOscMessage &)) {
     ofxGetOscSubscriber(port).subscribe(address, that, callback);
 }
 
+/// \brief bind a callback to the OSC messages with an address pattern _address_ incoming to _port_.
+/// template parameter T is suggested by that & callback
+/// \param port binded port is typed int
+/// \param address osc address is typed const string &
+/// \param that this object is typed T*, will bind with next argument of parameter method. is called as (that->*getter)(message) when receive a message.
+/// \param callback has argument ofxOscMessage &
+/// \returns void
+
 template <typename T>
 inline void ofxSubscribeOsc(int port, const string &address, T *that, void (T::*callback)(ofxOscMessage &)) {
     ofxGetOscSubscriber(port).subscribe(address, that, callback);
 }
 
+/// \}
+
+#pragma mark unsubscribe
+
+/// \name ofxUnsubscribeOsc
+/// \{
+
+/// \brief unbind from OSC messages with an address pattern _address_ incoming to _port_.
+/// \param port binded port is typed int
+/// \param address osc address is typed const string &
+/// \returns void
+
 inline void ofxUnsubscribeOsc(int port, const string &address) {
     ofxGetOscSubscriber(port).unsubscribe(address);
 }
+
+/// \brief unbind from OSC messages with any address patterns incoming to _port_.
+/// \param port binded port is typed int
+/// \returns void
 
 inline void ofxUnsubscribeOsc(int port) {
     ofxGetOscSubscriber(port).unsubscribe();
 }
 
+/// \}
+
 #pragma mark interface about leaked osc
+
+/// \name ofxSetLeakedOscPicker
+/// \{
+
+/// \brief bind a callback to the OSC messages with are not match other patterns incoming to port.
+/// \param port binded port is typed int
+/// \callback is kicked when receive a leaked addresses
+/// \returns void
 
 inline void ofxSetLeakedOscPicker(int port, void (*callback)(ofxOscMessage &)) {
     ofxGetOscSubscriber(port).setLeakPicker(callback);
 }
+
+/// \brief bind a callback to the OSC messages with are not match other patterns incoming to port.
+/// \param port binded port is typed int
+/// \param that this object is typed T*, will bind with next argument of parameter method. is called as (that->*getter)(message) when receive a message.
+/// \callback is kicked when receive a leaked addresses
+/// \returns void
 
 template <typename T>
 inline void ofxSetLeakedOscPicker(int port, T *that, void (T::*callback)(ofxOscMessage &)) {
     ofxGetOscSubscriber(port).setLeakPicker(that, callback);
 }
 
+/// \brief bind a callback to the OSC messages with are not match other patterns incoming to port.
+/// \param port binded port is typed int
+/// \param that this object is typed T*, will bind with next argument of parameter method. is called as (that->*getter)(message) when receive a message.
+/// \callback is kicked when receive a leaked addresses
+/// \returns void
+
 template <typename T>
 inline void ofxSetLeakedOscPicker(int port, T &that, void (T::*callback)(ofxOscMessage &)) {
     ofxGetOscSubscriber(port).setLeakPicker(that, callback);
 }
 
+/// \brief remove a callback receives messages has leaked patterns incoming to port.
+/// \param port binded port is typed int
+/// \returns void
+
 inline void ofxRemoveLeakedOscPicker(int port) {
     ofxGetOscSubscriber(port).removeLeakPicker();
 }
+
+/// \}
