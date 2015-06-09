@@ -862,6 +862,7 @@ inline void ofxPublishOscIf(C &condition, bool (C::*method)() const, const strin
 #pragma mark unpublish
 
 /// \name ofxUnpublishOsc
+/// \{
 
 inline void ofxUnpublishOsc(const string &ip, int port, const string &address) {
     ofxGetOscPublisher(ip, port).unpublish(address);
@@ -876,6 +877,7 @@ inline void ofxUnpublishOsc(const string &ip, int port) {
 #pragma mark helper for publish array
 
 /// \name helper for publish array
+/// \{
 
 template <typename T, size_t size>
 struct array_type {
@@ -891,6 +893,7 @@ struct array_method {
 /// \}
 
 /// \name ofxPublishAsArray
+/// \{
 
 template <typename T, size_t size>
 typename array_type<T, size>::type ofxPublishAsArray(T *ptr) {
