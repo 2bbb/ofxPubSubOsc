@@ -95,9 +95,14 @@ namespace ofx {
         
         struct AbstractCondition {
             AbstractCondition() : bPublishNow(true) {};
+            
             inline bool getCondition() { return isPublishNow() && inner_condition(); };
+            
             inline bool isPublishNow() const { return bPublishNow; };
             inline void setEnablePublish(bool bEnablePublish) { this->bPublishNow = bEnablePublish; };
+            inline void resumePublish() { setEnablePublish(true); };
+            inline void pausePublish() { setEnablePublish(false); };
+            
             virtual bool inner_condition() { return true; };
             
             typedef shared_ptr<AbstractCondition> Ref;
@@ -124,20 +129,25 @@ namespace ofx {
             ConditionMethod(T &that, bool (T::*getter)())
             : AbstractCondition()
             , that(that)
-            , getter(getter)
-            , const_getter(NULL) {};
+            , getter(getter) {};
             
-            ConditionMethod(T &that, bool (T::*const_getter)() const)
-            : AbstractCondition()
-            , that(that)
-            , getter(NULL)
-            , const_getter(const_getter) {};
-            
-            virtual bool inner_condition() { return (getter != NULL) ? (that.*getter)() : (that.*const_getter)(); };
+            virtual bool inner_condition() { return (that.*getter)(); };
         private:
             T &that;
             bool (T::*getter)();
-            bool (T::*const_getter)() const;
+        };
+
+        template <typename T>
+        struct ConstConditionMethod : AbstractCondition {
+            ConstConditionMethod(const T &that, bool (T::*getter)() const)
+            : AbstractCondition()
+            , that(that)
+            , getter(getter) {};
+            
+            virtual bool inner_condition() { return (that.*getter)(); };
+        private:
+            T &that;
+            bool (T::*getter)() const;
         };
 
         typedef AbstractCondition::Ref AbstractConditionRef;
@@ -276,25 +286,32 @@ namespace ofx {
         template <typename T, typename U, bool isCheckValue>
         struct GetterParameter : Parameter<T, isCheckValue> {
             typedef T (U::*Getter)();
-            typedef T (U::*ConstGetter)() const;
             
             GetterParameter(U &that, Getter getter)
             : Parameter<T, isCheckValue>(dummy)
             , getter(getter)
-            , const_getter(NULL)
-            , that(that) {}
-            
-            GetterParameter(U &that, ConstGetter const_getter)
-            : Parameter<T, isCheckValue>(dummy)
-            , getter(NULL)
-            , const_getter(const_getter)
             , that(that) {}
             
         protected:
-            virtual TypeRef(T) get() { return dummy = (getter != NULL) ? (that.*getter)() : (that.*const_getter)(); }
+            virtual TypeRef(T) get() { return dummy = (that.*getter)(); }
             Getter getter;
-            ConstGetter const_getter;
             U &that;
+            RemoveRef(T) dummy;
+        };
+
+        template <typename T, typename U, bool isCheckValue>
+        struct ConstGetterParameter : Parameter<T, isCheckValue> {
+            typedef T (U::*Getter)() const;
+            
+            ConstGetterParameter(const U &that, Getter getter)
+            : Parameter<T, isCheckValue>(dummy)
+            , getter(getter)
+            , that(that) {}
+            
+        protected:
+            virtual TypeRef(T) get() { return dummy = (that.*getter)(); }
+            Getter getter;
+            const U &that;
             RemoveRef(T) dummy;
         };
 
@@ -302,29 +319,41 @@ namespace ofx {
         struct GetterParameter<Base(&)[size], U, isCheckValue> : Parameter<Base(&)[size], isCheckValue> {
             typedef Base (&T)[size];
             typedef T (U::*Getter)();
-            typedef T (U::*ConstGetter)() const;
             
             GetterParameter(U &that, Getter getter)
             : Parameter<T, isCheckValue>(dummy)
             , getter(getter)
-            , const_getter(NULL)
-            , that(that) {}
-
-            GetterParameter(U &that, ConstGetter const_getter)
-            : Parameter<T, isCheckValue>(dummy)
-            , getter(NULL)
-            , const_getter(const_getter)
             , that(that) {}
 
         protected:
             virtual T get() {
-                T arr = (getter != NULL) ? (that.*getter)() : (that.*const_getter)();
+                T arr = (that.*getter)();
                 for(size_t i = 0; i < size; i++) dummy[i] = arr[i];
                 return dummy;
             }
             Getter getter;
-            ConstGetter const_getter;
             U &that;
+            Base dummy[size];
+        };
+        
+        template <typename Base, size_t size, typename U, bool isCheckValue>
+        struct ConstGetterParameter<Base(&)[size], U, isCheckValue> : Parameter<Base(&)[size], isCheckValue> {
+            typedef Base (&T)[size];
+            typedef T (U::*Getter)() const;
+            
+            ConstGetterParameter(const U &that, Getter getter)
+            : Parameter<T, isCheckValue>(dummy)
+            , getter(getter)
+            , that(that) {}
+            
+        protected:
+            virtual T get() {
+                T arr = (that.*getter)();
+                for(size_t i = 0; i < size; i++) dummy[i] = arr[i];
+                return dummy;
+            }
+            Getter getter;
+            const U &that;
             Base dummy[size];
         };
 
@@ -370,10 +399,10 @@ namespace ofx {
             }
             
             template <typename T, typename U>
-            void publish(const string &address, U &that, T (U::*getter)() const, bool whenValueIsChanged = true) {
+            void publish(const string &address, const U &that, T (U::*getter)() const, bool whenValueIsChanged = true) {
                 ParameterRef p;
-                if(whenValueIsChanged) p = ParameterRef(new GetterParameter<T, U, true>(that, getter));
-                else                   p = ParameterRef(new GetterParameter<T, U, false>(that, getter));
+                if(whenValueIsChanged) p = ParameterRef(new ConstGetterParameter<T, U, true>(that, getter));
+                else                   p = ParameterRef(new ConstGetterParameter<T, U, false>(that, getter));
                 publish(address, p);
             }
 
@@ -402,8 +431,8 @@ namespace ofx {
             }
 
             template <typename T, typename U>
-            void publishIf(bool &condition, const string &address, U &that, T (U::*getter)() const) {
-                ParameterRef p = ParameterRef(new GetterParameter<T, U, false>(that, getter));
+            void publishIf(bool &condition, const string &address, const U &that, T (U::*getter)() const) {
+                ParameterRef p = ParameterRef(new ConstGetterParameter<T, U, false>(that, getter));
                 p->setCondition(shared_ptr<AbstractCondition>(new ConditionRef(condition)));
                 publish(address, p);
             }
@@ -432,8 +461,8 @@ namespace ofx {
             }
 
             template <typename T, typename U>
-            void publishIf(bool (*condition)(), const string &address, U &that, T (U::*getter)() const) {
-                ParameterRef p = ParameterRef(new GetterParameter<T, U, false>(that, getter));
+            void publishIf(bool (*condition)(), const string &address, const U &that, T (U::*getter)() const) {
+                ParameterRef p = ParameterRef(new ConstGetterParameter<T, U, false>(that, getter));
                 p->setCondition(shared_ptr<AbstractCondition>(new ConditionFunction(condition)));
                 publish(address, p);
             }
@@ -462,9 +491,39 @@ namespace ofx {
             }
             
             template <typename T, typename U, typename C>
-            void publishIf(C &condition, bool (C::*method)(), const string &address, U &that, T (U::*getter)() const) {
-                ParameterRef p = ParameterRef(new GetterParameter<T, U, true>(that, getter));
+            void publishIf(C &condition, bool (C::*method)(), const string &address, const U &that, T (U::*getter)() const) {
+                ParameterRef p = ParameterRef(new ConstGetterParameter<T, U, true>(that, getter));
                 p->setCondition(shared_ptr<AbstractCondition>(new ConditionMethod<C>(condition, method)));
+                publish(address, p);
+            }
+            
+#pragma mark condition is const method
+            
+            template <typename T, typename C>
+            void publishIf(const C &condition, bool (C::*method)() const, const string &address, T &value) {
+                ParameterRef p = ParameterRef(new Parameter<T, true>(value));
+                p->setCondition(shared_ptr<AbstractCondition>(new ConstConditionMethod<C>(condition, method)));
+                publish(address, p);
+            }
+            
+            template <typename T, typename C>
+            void publishIf(const C &condition, bool (C::*method)() const, const string &address, T (*getter)()) {
+                ParameterRef p = ParameterRef(new GetterFunctionParameter<T, true>(getter));
+                p->setCondition(shared_ptr<AbstractCondition>(new ConstConditionMethod<C>(condition, method)));
+                publish(address, p);
+            }
+            
+            template <typename T, typename U, typename C>
+            void publishIf(const C &condition, bool (C::*method)() const, const string &address, U &that, T (U::*getter)()) {
+                ParameterRef p = ParameterRef(new GetterParameter<T, U, true>(that, getter));
+                p->setCondition(shared_ptr<AbstractCondition>(new ConstConditionMethod<C>(condition, method)));
+                publish(address, p);
+            }
+            
+            template <typename T, typename U, typename C>
+            void publishIf(const C &condition, bool (C::*method)() const, const string &address, const U &that, T (U::*getter)() const) {
+                ParameterRef p = ParameterRef(new ConstGetterParameter<T, U, true>(that, getter));
+                p->setCondition(shared_ptr<AbstractCondition>(new ConstConditionMethod<C>(condition, method)));
                 publish(address, p);
             }
             
@@ -620,7 +679,7 @@ inline void ofxPublishOsc(const string &ip, int port, const string &address, U *
 }
 
 template <typename T, typename U>
-inline void ofxPublishOsc(const string &ip, int port, const string &address, U *that, T (U::*getter)() const, bool whenValueIsChanged = true) {
+inline void ofxPublishOsc(const string &ip, int port, const string &address, const U * const that, T (U::*getter)() const, bool whenValueIsChanged = true) {
     ofxGetOscPublisher(ip, port).publish(address, *that, getter, whenValueIsChanged);
 }
 
@@ -641,7 +700,7 @@ inline void ofxPublishOsc(const string &ip, int port, const string &address, U &
 }
 
 template <typename T, typename U>
-inline void ofxPublishOsc(const string &ip, int port, const string &address, U &that, T (U::*getter)() const, bool whenValueIsChanged = true) {
+inline void ofxPublishOsc(const string &ip, int port, const string &address, const U &that, T (U::*getter)() const, bool whenValueIsChanged = true) {
     ofxGetOscPublisher(ip, port).publish(address, that, getter, whenValueIsChanged);
 }
 /// \}
