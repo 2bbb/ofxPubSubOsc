@@ -128,13 +128,13 @@ unpublish all OSC messages is send to _ip:port_.
 * `ofMatrix4x4` (publish as _Float_ \* 16)
 
 #### Blob
-* `ofBuffer{
+* `ofBuffer`
 
 ### <a name="SupportedTypes_ArrayVector">array/vector of supported types</a>
 
 if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving OSC messages.
 
-* NOTE: not use `vector<vector<SomeType>>`, `vector<SomeType> (&)[SomeSize]`
+* **NOTE:** not use `vector<vector<SomeType>>`, `vector<SomeType> (&)[SomeSize]`
 
 ### <a name="SupportedTypes_Callback">Callback</a>
 * `T (\*callback)(ofxOscMessage &)`;
