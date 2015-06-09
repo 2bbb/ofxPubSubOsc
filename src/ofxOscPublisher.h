@@ -888,6 +888,9 @@ struct array_method {
     typedef T (&type)[size];
     typedef type (U::*method)();
 };
+/// \}
+
+/// \name ofxPublishAsArray
 
 template <typename T, size_t size>
 typename array_type<T, size>::type ofxPublishAsArray(T *ptr) {
