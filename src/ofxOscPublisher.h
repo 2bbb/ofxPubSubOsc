@@ -131,7 +131,7 @@ namespace ofx {
             
             virtual bool inner_condition() { return (that.*getter)(); };
         private:
-            T &that;
+            T &that; // dirty!!!
             bool (T::*getter)();
         };
 
@@ -144,7 +144,7 @@ namespace ofx {
             
             virtual bool inner_condition() { return (that.*getter)(); };
         private:
-            T &that;
+            const T &that;
             bool (T::*getter)() const;
         };
 
