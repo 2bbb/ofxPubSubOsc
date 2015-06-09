@@ -70,7 +70,7 @@ unbind OSC message has _address_ incoming from _port_.
 
 unbind all OSC messages incoming from _port_.
 
-* if you pick the OSCs aren't hit subscribed address, see [ofxSetLeadkedOscPicker](https://github.com/2bbb/ofxPubSubOsc/blob/master/API_Reference.md#API_ofxSetLeadkedOscPicker)
+* if you pick the OSCs aren't hit subscribed address, see [ofxSetLeadkedOscPicker](API_Reference.md#API_ofxSetLeadkedOscPicker)
 
 #### See [class ofxOscSubscriberManager](API_Reference.md#Advanced_ofxOscSubscriberManager), [class ofxOscSubscriber](API_Reference.md#Advanced_ofxOscSubscriber)
 
