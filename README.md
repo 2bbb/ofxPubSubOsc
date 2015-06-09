@@ -47,7 +47,7 @@ public:
 
 ## <a name="SimpleAPI">Simple API Reference</a>
 
-#### If you want to use more advance, See [Advanced](https://github.com/2bbb/ofxPubSubOsc/blob/master/API_Reference.md)
+#### If you want to use more advance, See [Advanced](API_Reference.md)
 
 ### <a name="SimpleAPI_ofxSubscribeOsc">ofxSubscribeOsc</a>
 
@@ -55,7 +55,7 @@ public:
 
 bind value to OSC message has _address_ incoming from _port_.
 
-#### See [more ofxSubscribeOsc](https://github.com/2bbb/ofxPubSubOsc/blob/master/API_Reference.md#API_ofxSubscribeOsc)
+#### See [more ofxSubscribeOsc](API_Reference.md#API_ofxSubscribeOsc)
 
 * ofxUnsubscribeOsc(int _port_, const string &_address_);
 
@@ -67,7 +67,7 @@ unbind all OSC messages incoming from _port_.
 
 * if you pick the OSCs aren't hit subscribed address, see [ofxSetLeadkedOscPicker](https://github.com/2bbb/ofxPubSubOsc/blob/master/API_Reference.md#API_ofxSetLeadkedOscPicker)
 
-#### See [class ofxOscSubscriberManager](https://github.com/2bbb/ofxPubSubOsc/blob/master/API_Reference.md#Advanced_ofxOscSubscriberManager), [class ofxOscSubscriber](https://github.com/2bbb/ofxPubSubOsc/blob/master/API_Reference.md#Advanced_ofxOscSubscriber)
+#### See [class ofxOscSubscriberManager](API_Reference.md#Advanced_ofxOscSubscriberManager), [class ofxOscSubscriber](API_Reference.md#Advanced_ofxOscSubscriber)
 
 ### <a name="SimpleAPI_ofxPublishOsc">ofxPublishOsc</a>
 
@@ -75,7 +75,7 @@ unbind all OSC messages incoming from _port_.
 
 publish _value_ to OSC message has _address_ to _ip:port_. if _whenValueIsChanged_ is set to **false**, then we send binded value **every frame** after `App::update`.
 
-#### See [more ofxPublishOsc](https://github.com/2bbb/ofxPubSubOsc/blob/master/API_Reference.md#API_ofxPublishOsc), [ofxPublishOscIf](https://github.com/2bbb/ofxPubSubOsc/blob/master/API_Reference.md#API_ofxPublishOscIf)
+#### See [more ofxPublishOsc](API_Reference.md#API_ofxPublishOsc), [ofxPublishOscIf](API_Reference.md#API_ofxPublishOscIf)
 
 * void ofxUnpublishOsc(const string &_ip_, int _port_, const string &_address_);
 
@@ -85,7 +85,7 @@ unpublish OSC message has _address_ is send to _ip:port_.
 
 unpublish all OSC messages is send to _ip:port_.
 
-#### See [class ofxOscPublisherManager](https://github.com/2bbb/ofxPubSubOsc/blob/master/API_Reference.md#Advanced_ofxOscPublisherManager), [class ofxOscPublisher](https://github.com/2bbb/ofxPubSubOsc/blob/master/API_Reference.md#Advanced_ofxOscPublisher)
+#### See [class ofxOscPublisherManager](API_Reference.md#Advanced_ofxOscPublisherManager), [class ofxOscPublisher](API_Reference.md#Advanced_ofxOscPublisher)
 
 ## <a name="SupportedTypes">Supported types</a>
 
