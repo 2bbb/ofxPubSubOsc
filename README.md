@@ -100,8 +100,9 @@ unpublish all OSC messages is send to _ip:port_.
 * `bool` (publish as _Int32_)
 * `unsigned char`, `char` (publish as _Int32_)
 * `unsigned short`, `short` (publish as _Int32_)
-* `unsigned int`, `int` (publish as _Int32_)
+* `unsigned int`, `int` (publish as _Int32_ or _Int64_ (if `sizeof(int) == 8` then _Int64_))
 * `unsigned long`, `long` (publish as _Int64_)
+* `unsigned long long`, `long long` (publish as _Int64_)
 * `float` (publish as _Float_)
 * `double` (publish as _Float_)
 
