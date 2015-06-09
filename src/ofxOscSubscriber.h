@@ -28,6 +28,7 @@ namespace ofx {
                 else if(m.getArgType(offset) == OFXOSC_TYPE_INT64) v = m.getArgAsInt64(offset); \
                 else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); \
             }
+            
             define_set_arithmetic(bool);
             define_set_arithmetic(char);
             define_set_arithmetic(unsigned char);
@@ -37,6 +38,8 @@ namespace ofx {
             define_set_arithmetic(unsigned int);
             define_set_arithmetic(long);
             define_set_arithmetic(unsigned long);
+            define_set_arithmetic(long long);
+            define_set_arithmetic(unsigned long long);
             
             define_set_arithmetic(float);
             define_set_arithmetic(double);
