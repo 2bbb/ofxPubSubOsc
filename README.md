@@ -105,7 +105,7 @@ unpublish all OSC messages is send to _ip:port_.
 * `float` (publish as _Float_)
 * `double` (publish as _Float_)
 
-* **NOTE:** `long double` is not guaranteed
+**NOTE**: `long double` is not guaranteed
 
 ### <a name="SupportedTypes_String">String (String)</a>
 * `string`
@@ -137,9 +137,12 @@ unpublish all OSC messages is send to _ip:port_.
 
 ### <a name="SupportedTypes_ArrayVector">array/vector of supported types</a>
 
+* `SupportedType[size]`
+* `vector<SupportedType>`
+
 if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving OSC messages.
 
-* **NOTE:** not use `vector<vector<SomeType>>`, `vector<SomeType> (&)[SomeSize]`
+**NOTE**: not use `vector<vector<SupportedType>>`, `vector<SupportedType>[size]`
 
 ### <a name="SupportedTypes_Callback">Callback</a>
 * `T (\*callback)(ofxOscMessage &)`;
