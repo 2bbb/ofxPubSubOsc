@@ -17,6 +17,7 @@ publish/subscribe OSC message.
 * [Update history](#UpdateHistory)
 * [License](#License)
 * [Author](#Author)
+* [Supporting Contributor](#SuppotingContributor)
 * [Special Thanks](#SpecialThanks)
 * [At the last](#AtTheLast)
 
@@ -201,12 +202,15 @@ MIT License.
 * ISHII 2bit [bufferRenaiss co., ltd.]
 * ishii[at]buffer-renaiss.com
 
+## <a name="SuppotingContributor">Supporting Contributor</>
+
+* [HIEDA Naoto](http://github.com/micuat)
+
 ## <a name="SpecialThanks">Special Thanks</a>
 
 * [HIGA Satoru](http://github.com/satoruhiga)
 * [SHIMIZU Motoi](http://github.com/motoishmz)
 * [IWATANI Nariaki](http://github.com/nariakiiwatani)
-* [HIEDA Naoto](http://github.com/micuat)
 
 ## <a name="AtTheLast">At the last</a>
 
