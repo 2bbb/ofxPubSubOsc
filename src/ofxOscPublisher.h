@@ -687,7 +687,7 @@ inline void ofxPublishOscIf(bool &condition, const string &ip, int port, const s
 }
 
 template <typename T, typename U>
-inline void ofxPublishOscIf(bool &condition, const string &ip, int port, const string &address, U *that, T (U::*getter)() const) {
+inline void ofxPublishOscIf(bool &condition, const string &ip, int port, const string &address, const U * const that, T (U::*getter)() const) {
     ofxGetOscPublisher(ip, port).publishIf(condition, address, *that, getter);
 }
 
@@ -697,7 +697,7 @@ inline void ofxPublishOscIf(bool &condition, const string &ip, int port, const s
 }
 
 template <typename T, typename U>
-inline void ofxPublishOscIf(bool &condition, const string &ip, int port, const string &address, U &that, T (U::*getter)() const) {
+inline void ofxPublishOscIf(bool &condition, const string &ip, int port, const string &address, const U &that, T (U::*getter)() const) {
     ofxGetOscPublisher(ip, port).publishIf(condition, address, that, getter);
 }
 
@@ -719,7 +719,7 @@ inline void ofxPublishOscIf(bool (*condition)(), const string &ip, int port, con
 }
 
 template <typename T, typename U>
-inline void ofxPublishOscIf(bool (*condition)(), const string &ip, int port, const string &address, U *that, T (U::*getter)() const) {
+inline void ofxPublishOscIf(bool (*condition)(), const string &ip, int port, const string &address, const U * const that, T (U::*getter)() const) {
     ofxGetOscPublisher(ip, port).publishIf(condition, address, *that, getter);
 }
 
@@ -729,7 +729,7 @@ inline void ofxPublishOscIf(bool (*condition)(), const string &ip, int port, con
 }
 
 template <typename T, typename U>
-inline void ofxPublishOscIf(bool (*condition)(), const string &ip, int port, const string &address, U &that, T (U::*getter)() const) {
+inline void ofxPublishOscIf(bool (*condition)(), const string &ip, int port, const string &address, const U &that, T (U::*getter)() const) {
     ofxGetOscPublisher(ip, port).publishIf(condition, address, that, getter);
 }
 
@@ -761,7 +761,7 @@ inline void ofxPublishOscIf(C *condition, bool (C::*method)(), const string &ip,
 }
 
 template <typename T, typename U, typename C>
-inline void ofxPublishOscIf(C *condition, bool (C::*method)(), const string &ip, int port, const string &address, U *that, T (U::*getter)() const) {
+inline void ofxPublishOscIf(C *condition, bool (C::*method)(), const string &ip, int port, const string &address, const U * const that, T (U::*getter)() const) {
     ofxGetOscPublisher(ip, port).publishIf(*condition, method, address, *that, getter);
 }
 
@@ -771,7 +771,7 @@ inline void ofxPublishOscIf(C &condition, bool (C::*method)(), const string &ip,
 }
 
 template <typename T, typename U, typename C>
-inline void ofxPublishOscIf(C &condition, bool (C::*method)(), const string &ip, int port, const string &address, U *that, T (U::*getter)() const) {
+inline void ofxPublishOscIf(C &condition, bool (C::*method)(), const string &ip, int port, const string &address, const U * const that, T (U::*getter)() const) {
     ofxGetOscPublisher(ip, port).publishIf(condition, method, address, *that, getter);
 }
 
@@ -781,7 +781,7 @@ inline void ofxPublishOscIf(C *condition, bool (C::*method)(), const string &ip,
 }
 
 template <typename T, typename U, typename C>
-inline void ofxPublishOscIf(C *condition, bool (C::*method)(), const string &ip, int port, const string &address, U &that, T (U::*getter)() const) {
+inline void ofxPublishOscIf(C *condition, bool (C::*method)(), const string &ip, int port, const string &address, const U &that, T (U::*getter)() const) {
     ofxGetOscPublisher(ip, port).publishIf(*condition, method, address, that, getter);
 }
 
@@ -791,69 +791,69 @@ inline void ofxPublishOscIf(C &condition, bool (C::*method)(), const string &ip,
 }
 
 template <typename T, typename U, typename C>
-inline void ofxPublishOscIf(C &condition, bool (C::*method)(), const string &ip, int port, const string &address, U &that, T (U::*getter)() const) {
+inline void ofxPublishOscIf(C &condition, bool (C::*method)(), const string &ip, int port, const string &address, const U &that, T (U::*getter)() const) {
     ofxGetOscPublisher(ip, port).publishIf(condition, method, address, that, getter);
 }
 
 #pragma mark condition is const method
 
 template <typename T, typename C>
-inline void ofxPublishOscIf(C *condition, bool (C::*method)() const, const string &ip, int port, const string &address, T &value) {
+inline void ofxPublishOscIf(const C * const condition, bool (C::*method)() const, const string &ip, int port, const string &address, T &value) {
     ofxGetOscPublisher(ip, port).publishIf(*condition, method, address, value);
 }
 
 template <typename T, typename C>
-inline void ofxPublishOscIf(C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, T &value) {
+inline void ofxPublishOscIf(const C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, T &value) {
     ofxGetOscPublisher(ip, port).publishIf(condition, method, address, value);
 }
 
 template <typename T, typename C>
-inline void ofxPublishOscIf(C *condition, bool (C::*method)() const, const string &ip, int port, const string &address, T (*getter)()) {
+inline void ofxPublishOscIf(const C * const condition, bool (C::*method)() const, const string &ip, int port, const string &address, T (*getter)()) {
     ofxGetOscPublisher(ip, port).publishIf(*condition, method, address, getter);
 }
 
 template <typename T, typename C>
-inline void ofxPublishOscIf(C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, T (*getter)()) {
+inline void ofxPublishOscIf(const C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, T (*getter)()) {
     ofxGetOscPublisher(ip, port).publishIf(condition, method, address, getter);
 }
 
 template <typename T, typename U, typename C>
-inline void ofxPublishOscIf(C *condition, bool (C::*method)() const, const string &ip, int port, const string &address, U *that, T (U::*getter)()) {
+inline void ofxPublishOscIf(const C * const condition, bool (C::*method)() const, const string &ip, int port, const string &address, U *that, T (U::*getter)()) {
     ofxGetOscPublisher(ip, port).publishIf(*condition, method, address, *that, getter);
 }
 
 template <typename T, typename U, typename C>
-inline void ofxPublishOscIf(C *condition, bool (C::*method)() const, const string &ip, int port, const string &address, U *that, T (U::*getter)() const) {
+inline void ofxPublishOscIf(const C * const condition, bool (C::*method)() const, const string &ip, int port, const string &address, const U * const that, T (U::*getter)() const) {
     ofxGetOscPublisher(ip, port).publishIf(*condition, method, address, *that, getter);
 }
 
 template <typename T, typename U, typename C>
-inline void ofxPublishOscIf(C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, U *that, T (U::*getter)()) {
+inline void ofxPublishOscIf(const C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, U *that, T (U::*getter)()) {
     ofxGetOscPublisher(ip, port).publishIf(condition, method, address, *that, getter);
 }
 
 template <typename T, typename U, typename C>
-inline void ofxPublishOscIf(C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, U *that, T (U::*getter)() const) {
+inline void ofxPublishOscIf(const C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, const U * const that, T (U::*getter)() const) {
     ofxGetOscPublisher(ip, port).publishIf(condition, method, address, *that, getter);
 }
 
 template <typename T, typename U, typename C>
-inline void ofxPublishOscIf(C *condition, bool (C::*method)() const, const string &ip, int port, const string &address, U &that, T (U::*getter)()) {
+inline void ofxPublishOscIf(const C * const condition, bool (C::*method)() const, const string &ip, int port, const string &address, U &that, T (U::*getter)()) {
     ofxGetOscPublisher(ip, port).publishIf(*condition, method, address, that, getter);
 }
 
 template <typename T, typename U, typename C>
-inline void ofxPublishOscIf(C *condition, bool (C::*method)() const, const string &ip, int port, const string &address, U &that, T (U::*getter)() const) {
+inline void ofxPublishOscIf(const C * const condition, bool (C::*method)() const, const string &ip, int port, const string &address, const U &that, T (U::*getter)() const) {
     ofxGetOscPublisher(ip, port).publishIf(*condition, method, address, that, getter);
 }
 
 template <typename T, typename U, typename C>
-inline void ofxPublishOscIf(C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, U &that, T (U::*getter)()) {
+inline void ofxPublishOscIf(const C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, U &that, T (U::*getter)()) {
     ofxGetOscPublisher(ip, port).publishIf(condition, method, address, that, getter);
 }
 
 template <typename T, typename U, typename C>
-inline void ofxPublishOscIf(C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, U &that, T (U::*getter)() const) {
+inline void ofxPublishOscIf(const C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, const U &that, T (U::*getter)() const) {
     ofxGetOscPublisher(ip, port).publishIf(condition, method, address, that, getter);
 }
 
