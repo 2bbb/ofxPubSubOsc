@@ -100,8 +100,6 @@ namespace ofx {
             
             inline bool isPublishNow() const { return bPublishNow; };
             inline void setEnablePublish(bool bEnablePublish) { this->bPublishNow = bEnablePublish; };
-            inline void resumePublish() { setEnablePublish(true); };
-            inline void pausePublish() { setEnablePublish(false); };
             
             virtual bool inner_condition() { return true; };
             
