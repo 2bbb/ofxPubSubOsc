@@ -205,7 +205,7 @@ MIT License.
 * ISHII 2bit [bufferRenaiss co., ltd.]
 * ishii[at]buffer-renaiss.com
 
-## <a name="SuppotingContributor">Supporting Contributor</>
+## <a name="SuppotingContributor">Supporting Contributor</a>
 
 * [HIEDA Naoto](http://github.com/micuat)
 
