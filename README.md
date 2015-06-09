@@ -155,7 +155,9 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 ### 2015/06/XX ver 0.0.8 release
 
 * add ofxPublishAsArray
+* enable to use in publish `T (U::*)() const`
 * update README and [API_Reference.md](API_Reference.md)
+* add some doxygen texts
 * some bugfix
 
 ### 2015/05/19 ver 0.0.7 release
