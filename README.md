@@ -1,6 +1,6 @@
 # ofxPubSubOsc
 
-publish/subscribe OSC message.
+easy utility for publish/subscribe OSC message.
 
 ## TOC
 
