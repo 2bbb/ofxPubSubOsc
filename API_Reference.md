@@ -144,6 +144,8 @@ unbind OSC message has _address_.
 
 unbind all OSC messages.
 
+#### <a name="Advanced_setLeakPicker">setLeakPicker</a>
+
 * void setLeakPicker(void (\*_callback_)(ofxOscMessage &));
 * template \<typename T\> void setLeakPicker(T \*_that_, void (T::\*_callback_)(ofxOscMessage &));
 * template \<typename T\> void setLeakPicker(T &_that_, void (T::\*_callback_)(ofxOscMessage &));
@@ -156,8 +158,17 @@ remove callback picks leaked message.
 
 #### <a name="Advanced_LegacyStylePickUpLeakedOSCMessage">How to "Legacy style pick up leaked OSC"</a>
 
-TODO
+if you don't use [setLeakPicker](#Advanced_setLeakPicker) to a `port`, then you can pick leaked messages manually like this:
 
+```cpp
+while(ofxGetOscSubScriber(port).hasWaitingLeakedOscMessages()) {
+	ofxOscMessage m;
+	ofxGetOscSubscriber(9005).getNextLeakedOscMessage(m);
+	ofLogNotice() << m.getAddress();
+}
+```
+
+please note that argument of `getNextLeakedOscMessage` is not as address (i.e. `ofxOscMessage *`). you can pass `ofxOscMessage` and we will receive as `ofxOscMessage &` and set something.
 ### <a name="Advanced_ofxOscPublisherManager">class ofxOscPublisherManager</a>
 
 * static ofxOscPublisherManager &getSharedInstance();
