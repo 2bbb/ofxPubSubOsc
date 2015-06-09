@@ -121,11 +121,23 @@ namespace ofx {
 
         template <typename T>
         struct ConditionMethod : AbstractCondition {
-            ConditionMethod(T &that, bool (T::*getter)()) : AbstractCondition(), that(that), getter(getter) {};
-            virtual bool inner_condition() { return (that.*getter)(); };
+            ConditionMethod(T &that, bool (T::*getter)())
+            : AbstractCondition()
+            , that(that)
+            , getter(getter)
+            , const_getter(NULL) {};
+            
+            ConditionMethod(T &that, bool (T::*const_getter)() const)
+            : AbstractCondition()
+            , that(that)
+            , getter(NULL)
+            , const_getter(const_getter) {};
+            
+            virtual bool inner_condition() { return (getter != NULL) ? (that.*getter)() : (that.*const_getter)(); };
         private:
             T &that;
             bool (T::*getter)();
+            bool (T::*const_getter)() const;
         };
 
         typedef AbstractCondition::Ref AbstractConditionRef;
@@ -264,19 +276,24 @@ namespace ofx {
         template <typename T, typename U, bool isCheckValue>
         struct GetterParameter : Parameter<T, isCheckValue> {
             typedef T (U::*Getter)();
-            GetterParameter(U *that, Getter getter)
-            : Parameter<T, isCheckValue>(dummy)
-            , getter(getter)
-            , that(*that) {}
+            typedef T (U::*ConstGetter)() const;
             
             GetterParameter(U &that, Getter getter)
             : Parameter<T, isCheckValue>(dummy)
             , getter(getter)
+            , const_getter(NULL)
+            , that(that) {}
+            
+            GetterParameter(U &that, ConstGetter const_getter)
+            : Parameter<T, isCheckValue>(dummy)
+            , getter(NULL)
+            , const_getter(const_getter)
             , that(that) {}
             
         protected:
-            virtual TypeRef(T) get() { return dummy = (that.*getter)(); }
+            virtual TypeRef(T) get() { return dummy = (getter != NULL) ? (that.*getter)() : (that.*const_getter)(); }
             Getter getter;
+            ConstGetter const_getter;
             U &that;
             RemoveRef(T) dummy;
         };
@@ -285,23 +302,28 @@ namespace ofx {
         struct GetterParameter<Base(&)[size], U, isCheckValue> : Parameter<Base(&)[size], isCheckValue> {
             typedef Base (&T)[size];
             typedef T (U::*Getter)();
-            GetterParameter(U *that, Getter getter)
-            : Parameter<T, isCheckValue>(dummy)
-            , getter(getter)
-            , that(*that) {}
+            typedef T (U::*ConstGetter)() const;
             
             GetterParameter(U &that, Getter getter)
             : Parameter<T, isCheckValue>(dummy)
             , getter(getter)
+            , const_getter(NULL)
             , that(that) {}
-            
+
+            GetterParameter(U &that, ConstGetter const_getter)
+            : Parameter<T, isCheckValue>(dummy)
+            , getter(NULL)
+            , const_getter(const_getter)
+            , that(that) {}
+
         protected:
             virtual T get() {
-                T arr = (that.*getter)();
+                T arr = (getter != NULL) ? (that.*getter)() : (that.*const_getter)();
                 for(size_t i = 0; i < size; i++) dummy[i] = arr[i];
                 return dummy;
             }
             Getter getter;
+            ConstGetter const_getter;
             U &that;
             Base dummy[size];
         };
@@ -340,11 +362,6 @@ namespace ofx {
             }
 
             template <typename T, typename U>
-            void publish(const string &address, U *that, T (U::*getter)(), bool whenValueIsChanged = true) {
-                publish(address, *that, getter, whenValueIsChanged);
-            }
-
-            template <typename T, typename U>
             void publish(const string &address, U &that, T (U::*getter)(), bool whenValueIsChanged = true) {
                 ParameterRef p;
                 if(whenValueIsChanged) p = ParameterRef(new GetterParameter<T, U, true>(that, getter));
@@ -352,6 +369,14 @@ namespace ofx {
                 publish(address, p);
             }
             
+            template <typename T, typename U>
+            void publish(const string &address, U &that, T (U::*getter)() const, bool whenValueIsChanged = true) {
+                ParameterRef p;
+                if(whenValueIsChanged) p = ParameterRef(new GetterParameter<T, U, true>(that, getter));
+                else                   p = ParameterRef(new GetterParameter<T, U, false>(that, getter));
+                publish(address, p);
+            }
+
 #pragma mark publish conditional
 #pragma mark condition is bool value ref
             
@@ -370,17 +395,19 @@ namespace ofx {
             }
             
             template <typename T, typename U>
-            void publishIf(bool &condition, const string &address, U *that, T (U::*getter)()) {
-                publishIf(condition, address, *that, getter);
-            }
-            
-            template <typename T, typename U>
             void publishIf(bool &condition, const string &address, U &that, T (U::*getter)()) {
                 ParameterRef p = ParameterRef(new GetterParameter<T, U, false>(that, getter));
                 p->setCondition(shared_ptr<AbstractCondition>(new ConditionRef(condition)));
                 publish(address, p);
             }
 
+            template <typename T, typename U>
+            void publishIf(bool &condition, const string &address, U &that, T (U::*getter)() const) {
+                ParameterRef p = ParameterRef(new GetterParameter<T, U, false>(that, getter));
+                p->setCondition(shared_ptr<AbstractCondition>(new ConditionRef(condition)));
+                publish(address, p);
+            }
+            
 #pragma mark condition is function
             
             template <typename T>
@@ -398,23 +425,20 @@ namespace ofx {
             }
             
             template <typename T, typename U>
-            void publishIf(bool (*condition)(), const string &address, U *that, T (U::*getter)()) {
-                publishIf(condition, address, *that, getter);
-            }
-            
-            template <typename T, typename U>
             void publishIf(bool (*condition)(), const string &address, U &that, T (U::*getter)()) {
                 ParameterRef p = ParameterRef(new GetterParameter<T, U, false>(that, getter));
                 p->setCondition(shared_ptr<AbstractCondition>(new ConditionFunction(condition)));
                 publish(address, p);
             }
 
-#pragma mark condition is method
-            
-            template <typename T, typename C>
-            void publishIf(C *condition, bool (C::*method)(), const string &address, T &value) {
-                publishIf(*condition, method, address, value);
+            template <typename T, typename U>
+            void publishIf(bool (*condition)(), const string &address, U &that, T (U::*getter)() const) {
+                ParameterRef p = ParameterRef(new GetterParameter<T, U, false>(that, getter));
+                p->setCondition(shared_ptr<AbstractCondition>(new ConditionFunction(condition)));
+                publish(address, p);
             }
+            
+#pragma mark condition is method
             
             template <typename T, typename C>
             void publishIf(C &condition, bool (C::*method)(), const string &address, T &value) {
@@ -424,11 +448,6 @@ namespace ofx {
             }
             
             template <typename T, typename C>
-            void publishIf(C *condition, bool (C::*method)(), const string &address, T (*getter)()) {
-                publishIf(*condition, method, address, getter);
-            }
-
-            template <typename T, typename C>
             void publishIf(C &condition, bool (C::*method)(), const string &address, T (*getter)()) {
                 ParameterRef p = ParameterRef(new GetterFunctionParameter<T, true>(getter));
                 p->setCondition(shared_ptr<AbstractCondition>(new ConditionMethod<C>(condition, method)));
@@ -436,22 +455,14 @@ namespace ofx {
             }
             
             template <typename T, typename U, typename C>
-            void publishIf(C *condition, bool (C::*method)(), const string &address, U *that, T (U::*getter)()) {
-                publishIf(*condition, method, address, *that, getter);
-            }
-            
-            template <typename T, typename U, typename C>
-            void publishIf(C &condition, bool (C::*method)(), const string &address, U *that, T (U::*getter)()) {
-                publishIf(condition, method, address, *that, getter);
-            }
-            
-            template <typename T, typename U, typename C>
-            void publishIf(C *condition, bool (C::*method)(), const string &address, U &that, T (U::*getter)()) {
-                publishIf(*condition, method, address, that, getter);
-            }
-
-            template <typename T, typename U, typename C>
             void publishIf(C &condition, bool (C::*method)(), const string &address, U &that, T (U::*getter)()) {
+                ParameterRef p = ParameterRef(new GetterParameter<T, U, true>(that, getter));
+                p->setCondition(shared_ptr<AbstractCondition>(new ConditionMethod<C>(condition, method)));
+                publish(address, p);
+            }
+            
+            template <typename T, typename U, typename C>
+            void publishIf(C &condition, bool (C::*method)(), const string &address, U &that, T (U::*getter)() const) {
                 ParameterRef p = ParameterRef(new GetterParameter<T, U, true>(that, getter));
                 p->setCondition(shared_ptr<AbstractCondition>(new ConditionMethod<C>(condition, method)));
                 publish(address, p);
@@ -605,7 +616,12 @@ inline void ofxPublishOsc(const string &ip, int port, const string &address, T (
 
 template <typename T, typename U>
 inline void ofxPublishOsc(const string &ip, int port, const string &address, U *that, T (U::*getter)(), bool whenValueIsChanged = true) {
-    ofxGetOscPublisher(ip, port).publish(address, that, getter, whenValueIsChanged);
+    ofxGetOscPublisher(ip, port).publish(address, *that, getter, whenValueIsChanged);
+}
+
+template <typename T, typename U>
+inline void ofxPublishOsc(const string &ip, int port, const string &address, U *that, T (U::*getter)() const, bool whenValueIsChanged = true) {
+    ofxGetOscPublisher(ip, port).publish(address, *that, getter, whenValueIsChanged);
 }
 
 /// \brief publish the value will be gave by function as an OSC message with an address pattern address to ip:port every time the value has changed.
@@ -624,6 +640,10 @@ inline void ofxPublishOsc(const string &ip, int port, const string &address, U &
     ofxGetOscPublisher(ip, port).publish(address, that, getter, whenValueIsChanged);
 }
 
+template <typename T, typename U>
+inline void ofxPublishOsc(const string &ip, int port, const string &address, U &that, T (U::*getter)() const, bool whenValueIsChanged = true) {
+    ofxGetOscPublisher(ip, port).publish(address, that, getter, whenValueIsChanged);
+}
 /// \}
 
 #pragma mark publish if condition
@@ -663,11 +683,21 @@ inline void ofxPublishOscIf(bool &condition, const string &ip, int port, const s
 
 template <typename T, typename U>
 inline void ofxPublishOscIf(bool &condition, const string &ip, int port, const string &address, U *that, T (U::*getter)()) {
-    ofxGetOscPublisher(ip, port).publishIf(condition, address, that, getter);
+    ofxGetOscPublisher(ip, port).publishIf(condition, address, *that, getter);
+}
+
+template <typename T, typename U>
+inline void ofxPublishOscIf(bool &condition, const string &ip, int port, const string &address, U *that, T (U::*getter)() const) {
+    ofxGetOscPublisher(ip, port).publishIf(condition, address, *that, getter);
 }
 
 template <typename T, typename U>
 inline void ofxPublishOscIf(bool &condition, const string &ip, int port, const string &address, U &that, T (U::*getter)()) {
+    ofxGetOscPublisher(ip, port).publishIf(condition, address, that, getter);
+}
+
+template <typename T, typename U>
+inline void ofxPublishOscIf(bool &condition, const string &ip, int port, const string &address, U &that, T (U::*getter)() const) {
     ofxGetOscPublisher(ip, port).publishIf(condition, address, that, getter);
 }
 
@@ -689,7 +719,17 @@ inline void ofxPublishOscIf(bool (*condition)(), const string &ip, int port, con
 }
 
 template <typename T, typename U>
+inline void ofxPublishOscIf(bool (*condition)(), const string &ip, int port, const string &address, U *that, T (U::*getter)() const) {
+    ofxGetOscPublisher(ip, port).publishIf(condition, address, *that, getter);
+}
+
+template <typename T, typename U>
 inline void ofxPublishOscIf(bool (*condition)(), const string &ip, int port, const string &address, U &that, T (U::*getter)()) {
+    ofxGetOscPublisher(ip, port).publishIf(condition, address, that, getter);
+}
+
+template <typename T, typename U>
+inline void ofxPublishOscIf(bool (*condition)(), const string &ip, int port, const string &address, U &that, T (U::*getter)() const) {
     ofxGetOscPublisher(ip, port).publishIf(condition, address, that, getter);
 }
 
@@ -721,7 +761,17 @@ inline void ofxPublishOscIf(C *condition, bool (C::*method)(), const string &ip,
 }
 
 template <typename T, typename U, typename C>
+inline void ofxPublishOscIf(C *condition, bool (C::*method)(), const string &ip, int port, const string &address, U *that, T (U::*getter)() const) {
+    ofxGetOscPublisher(ip, port).publishIf(*condition, method, address, *that, getter);
+}
+
+template <typename T, typename U, typename C>
 inline void ofxPublishOscIf(C &condition, bool (C::*method)(), const string &ip, int port, const string &address, U *that, T (U::*getter)()) {
+    ofxGetOscPublisher(ip, port).publishIf(condition, method, address, *that, getter);
+}
+
+template <typename T, typename U, typename C>
+inline void ofxPublishOscIf(C &condition, bool (C::*method)(), const string &ip, int port, const string &address, U *that, T (U::*getter)() const) {
     ofxGetOscPublisher(ip, port).publishIf(condition, method, address, *that, getter);
 }
 
@@ -731,7 +781,79 @@ inline void ofxPublishOscIf(C *condition, bool (C::*method)(), const string &ip,
 }
 
 template <typename T, typename U, typename C>
+inline void ofxPublishOscIf(C *condition, bool (C::*method)(), const string &ip, int port, const string &address, U &that, T (U::*getter)() const) {
+    ofxGetOscPublisher(ip, port).publishIf(*condition, method, address, that, getter);
+}
+
+template <typename T, typename U, typename C>
 inline void ofxPublishOscIf(C &condition, bool (C::*method)(), const string &ip, int port, const string &address, U &that, T (U::*getter)()) {
+    ofxGetOscPublisher(ip, port).publishIf(condition, method, address, that, getter);
+}
+
+template <typename T, typename U, typename C>
+inline void ofxPublishOscIf(C &condition, bool (C::*method)(), const string &ip, int port, const string &address, U &that, T (U::*getter)() const) {
+    ofxGetOscPublisher(ip, port).publishIf(condition, method, address, that, getter);
+}
+
+#pragma mark condition is const method
+
+template <typename T, typename C>
+inline void ofxPublishOscIf(C *condition, bool (C::*method)() const, const string &ip, int port, const string &address, T &value) {
+    ofxGetOscPublisher(ip, port).publishIf(*condition, method, address, value);
+}
+
+template <typename T, typename C>
+inline void ofxPublishOscIf(C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, T &value) {
+    ofxGetOscPublisher(ip, port).publishIf(condition, method, address, value);
+}
+
+template <typename T, typename C>
+inline void ofxPublishOscIf(C *condition, bool (C::*method)() const, const string &ip, int port, const string &address, T (*getter)()) {
+    ofxGetOscPublisher(ip, port).publishIf(*condition, method, address, getter);
+}
+
+template <typename T, typename C>
+inline void ofxPublishOscIf(C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, T (*getter)()) {
+    ofxGetOscPublisher(ip, port).publishIf(condition, method, address, getter);
+}
+
+template <typename T, typename U, typename C>
+inline void ofxPublishOscIf(C *condition, bool (C::*method)() const, const string &ip, int port, const string &address, U *that, T (U::*getter)()) {
+    ofxGetOscPublisher(ip, port).publishIf(*condition, method, address, *that, getter);
+}
+
+template <typename T, typename U, typename C>
+inline void ofxPublishOscIf(C *condition, bool (C::*method)() const, const string &ip, int port, const string &address, U *that, T (U::*getter)() const) {
+    ofxGetOscPublisher(ip, port).publishIf(*condition, method, address, *that, getter);
+}
+
+template <typename T, typename U, typename C>
+inline void ofxPublishOscIf(C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, U *that, T (U::*getter)()) {
+    ofxGetOscPublisher(ip, port).publishIf(condition, method, address, *that, getter);
+}
+
+template <typename T, typename U, typename C>
+inline void ofxPublishOscIf(C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, U *that, T (U::*getter)() const) {
+    ofxGetOscPublisher(ip, port).publishIf(condition, method, address, *that, getter);
+}
+
+template <typename T, typename U, typename C>
+inline void ofxPublishOscIf(C *condition, bool (C::*method)() const, const string &ip, int port, const string &address, U &that, T (U::*getter)()) {
+    ofxGetOscPublisher(ip, port).publishIf(*condition, method, address, that, getter);
+}
+
+template <typename T, typename U, typename C>
+inline void ofxPublishOscIf(C *condition, bool (C::*method)() const, const string &ip, int port, const string &address, U &that, T (U::*getter)() const) {
+    ofxGetOscPublisher(ip, port).publishIf(*condition, method, address, that, getter);
+}
+
+template <typename T, typename U, typename C>
+inline void ofxPublishOscIf(C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, U &that, T (U::*getter)()) {
+    ofxGetOscPublisher(ip, port).publishIf(condition, method, address, that, getter);
+}
+
+template <typename T, typename U, typename C>
+inline void ofxPublishOscIf(C &condition, bool (C::*method)() const, const string &ip, int port, const string &address, U &that, T (U::*getter)() const) {
     ofxGetOscPublisher(ip, port).publishIf(condition, method, address, that, getter);
 }
 
