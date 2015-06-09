@@ -130,12 +130,22 @@ unpublish all OSC messages is send to _ip:port_.
 
 ### <a name="SupportedTypes_ArrayVector">array/vector of supported types</a>
 
+if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving OSC messages.
+
+* NOTE: not use `vector<vector<SomeType>>`, `vector<SomeType> (&)[SomeSize]`
+
 ### <a name="SupportedTypes_Callback">Callback</a>
 * **T (\*callback)(ofxOscMessage &)**;
 * pair of **U &that**, **T (U::\*callback)(ofxOscMessage &)**;
 * pair of **U \*that**, **T (U::\*callback)(ofxOscMessage &)**;
 
 ## <a name="UpdateHistory">Update history</a>
+
+### 2015/06/8 ver 0.0.8 release
+
+* add ofxPublishAsArray
+* update README and [API_Reference.md](API_Reference.md)
+* some bugfix
 
 ### 2015/05/19 ver 0.0.7 release
 
