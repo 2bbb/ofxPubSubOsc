@@ -143,7 +143,7 @@ unbind all the publishers sending to _ip:port_.
 
 if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving OSC messages.
 
-**NOTE**: not use `vector<vector<SupportedType>>`, `vector<SupportedType>[size]`
+**NOTE**: do NOT use `vector<vector<SupportedType>>`, `vector<SupportedType>[size]`
 
 ### <a name="SupportedTypes_Callback">Callback</a>
 * `T (\*callback)(ofxOscMessage &)`;
