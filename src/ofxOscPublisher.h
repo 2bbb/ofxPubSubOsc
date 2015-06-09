@@ -26,6 +26,7 @@ namespace ofx {
 #define RemoveRef(T) typename ofx::remove_reference<T>::type
 
     class OscPublisherManager {
+    private:
         struct SetImplementation {
         protected:
 #define define_set_int(type) inline void set(ofxOscMessage &m, type v) const { if(sizeof(type) < 8) m.addIntArg(v); else m.addInt64Arg(v); }
@@ -358,6 +359,7 @@ namespace ofx {
         typedef shared_ptr<AbstractParameter> ParameterRef;
         typedef pair<string, int> SenderKey;
         typedef map<string, ParameterRef> Targets;
+        
     public:
         class OscPublisher {
         public:

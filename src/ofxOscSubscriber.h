@@ -16,10 +16,7 @@ namespace ofx {
     using namespace ofxpubsubosc;
     
     class OscSubscriberManager {
-        struct AbstractParameter {
-            virtual void read(ofxOscMessage &message) {}
-        };
-        
+    private:
         struct SetImplementation {
         protected:
 #define define_set_arithmetic(type) \
@@ -120,6 +117,12 @@ namespace ofx {
             }
         };
         
+#pragma mark Parameter
+        
+        struct AbstractParameter {
+            virtual void read(ofxOscMessage &message) {}
+        };
+        
         template <typename T>
         struct Parameter : AbstractParameter, SetImplementation {
             Parameter(T &t) : t(t) {}
@@ -160,6 +163,7 @@ namespace ofx {
         typedef shared_ptr<AbstractParameter> ParameterRef;
         typedef shared_ptr<ofxOscReceiver> OscReceiverRef;
         typedef map<string, ParameterRef> Targets;
+        
     public:
         class OscSubscriber {
         public:
