@@ -37,6 +37,10 @@ public:
 		ofxPublishOsc("localhost", 9006, "/fps", &ofGetFrameRate);
 	}
 	
+	void update() {
+		// do NOTHING about OSC on update!!!
+	}
+	
 	void draw() {
 		ofSetColor(c);
 		ofDrawCircle(p, 5);
