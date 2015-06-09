@@ -101,7 +101,7 @@ unbind all the publishers sending to _ip:port_.
 * `unsigned char`, `char` (published as _Int32_)
 * `unsigned short`, `short` (published as _Int32_)
 * `unsigned int`, `int` (published as _Int32_ or _Int64_ (if `sizeof(int) == 8` then _Int64_))
-* `unsigned long`, `long` (published as _Int64_)
+* `unsigned long`, `long` (published as _Int64_ or _Int64_ (if `sizeof(int) == 8` then _Int64_))
 * `unsigned long long`, `long long` (published as _Int64_)
 * `float` (published as _Float_)
 * `double` (published as _Float_)
