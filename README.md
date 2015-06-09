@@ -141,7 +141,7 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 ## <a name="UpdateHistory">Update history</a>
 
-### 2015/06/8 ver 0.0.8 release
+### 2015/06/XX ver 0.0.8 release
 
 * add ofxPublishAsArray
 * update README and [API_Reference.md](API_Reference.md)
