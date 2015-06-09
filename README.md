@@ -51,7 +51,7 @@ public:
 
 ### <a name="SimpleAPI_ofxSubscribeOsc">ofxSubscribeOsc</a>
 
-* template \<typename T\> void ofxSubscribeOsc(int _port_, const string &_address_, T &_value_);
+* void ofxSubscribeOsc(int _port_, const string &_address_, [SupportedType](#SupportedTypes) &_value_);
 
 bind value to OSC message has _address_ incoming from _port_.
 
@@ -71,7 +71,7 @@ unbind all OSC messages incoming from _port_.
 
 ### <a name="SimpleAPI_ofxPublishOsc">ofxPublishOsc</a>
 
-* template \<typename T\> void ofxPublishOsc(const string &_ip_, int _port_, const string &_address_, T &_value_, bool _whenValueIsChanged_ = **true**);
+* void ofxPublishOsc(const string &_ip_, int _port_, const string &_address_, [SupportedType](#SupportedTypes) &_value_, bool _whenValueIsChanged_ = **true**);
 
 publish _value_ to OSC message has _address_ to _ip:port_. if _whenValueIsChanged_ is set to **false**, then we send binded value **every frame** after `App::update`.
 
@@ -92,41 +92,43 @@ unpublish all OSC messages is send to _ip:port_.
 * Arithmetic is any type of Int32 or Int64 or Float
 
 ### <a name="SupportedTypes_Arithmetic">Arithmetic (Int32, Int64, Float)</a>
-* **bool** (publish as _Int32_)
-* (**unsigned**) **char** (publish as _Int32_)
-* (**unsigned**) **short** (publish as _Int32_)
-* (**unsigned**) **int** (publish as _Int32_)
-* (**unsigned**) **long** (publish as _Int64_)
-* **float** (publish as _Float_)
-* **double** (publish as _Float_)
+* `bool` (publish as _Int32_)
+* `unsigned char`, `char` (publish as _Int32_)
+* `unsigned short`, `short` (publish as _Int32_)
+* `unsigned int`, `int` (publish as _Int32_)
+* `unsigned long`, `long` (publish as _Int64_)
+* `float` (publish as _Float_)
+* `double` (publish as _Float_)
+
+* **NOTE:** `long double` is not guaranteed
 
 ### <a name="SupportedTypes_String">String (String)</a>
-* **string**
+* `string`
 
 ### <a name="SupportedTypes_ofBasic">openframeworks basic types</a>
 
 #### Arithmetic\[2\]
-* **ofVec2f** (publish as _Float_ \* 2)
+* `ofVec2f` (publish as _Float_ \* 2)
 
 #### Arithmetic\[3\]
-* **ofVec3f** (= **ofPoint**) (publish as _Float_ \* 3)
+* `ofVec3f` (= `ofPoint`) (publish as _Float_ \* 3)
 
 #### Arithmetic\[4\]
-* **ofVec4f** (publish as _Float_ \* 4)
-* **ofColor** (publish as _Int32_ \* 4)
-* **ofShortColor** (publish as _Int32_ \* 4)
-* **ofFloatColor** (publish as _Float_ \* 4)
-* **ofQuaternion** (publish as _Float_ \* 4)
-* **ofRectangle** (publish as _Float_ \* 4)
+* `ofVec4f` (publish as _Float_ \* 4)
+* `ofColor` (publish as _Int32_ \* 4)
+* `ofShortColor` (publish as _Int32_ \* 4)
+* `ofFloatColor` (publish as _Float_ \* 4)
+* `ofQuaternion` (publish as _Float_ \* 4)
+* `ofRectangle` (publish as _Float_ \* 4)
 
 #### Arithmetic\[9\]
-* **ofMatrix3x3**  (publish as _Float_ \* 9)
+* `ofMatrix3x3`  (publish as _Float_ \* 9)
 
 #### Arithmetic\[16\]
-* **ofMatrix4x4** (publish as _Float_ \* 16)
+* `ofMatrix4x4` (publish as _Float_ \* 16)
 
 #### Blob
-* **ofBuffer**
+* `ofBuffer{
 
 ### <a name="SupportedTypes_ArrayVector">array/vector of supported types</a>
 
@@ -135,9 +137,9 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 * NOTE: not use `vector<vector<SomeType>>`, `vector<SomeType> (&)[SomeSize]`
 
 ### <a name="SupportedTypes_Callback">Callback</a>
-* **T (\*callback)(ofxOscMessage &)**;
-* pair of **U &that**, **T (U::\*callback)(ofxOscMessage &)**;
-* pair of **U \*that**, **T (U::\*callback)(ofxOscMessage &)**;
+* `T (\*callback)(ofxOscMessage &)`;
+* pair of `U &that`, `T (U::\*callback)(ofxOscMessage &)`;
+* pair of `U \*that`, `T (U::\*callback)(ofxOscMessage &)`;
 
 ## <a name="UpdateHistory">Update history</a>
 
