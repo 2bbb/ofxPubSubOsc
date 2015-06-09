@@ -55,10 +55,10 @@ remove callback.
 ### <a name="API_ofxPublishOsc">ofxPublishOsc</a>
 
 * template \<typename T\> void ofxPublishOsc(const string &_ip_, int _port_, const string &_address_, T &_value_, bool _whenValueIsChanged_ = **true**);
-* template \<typename T\> void ofxPublishOsc(const string &_ip_, int _port_, const string &_address_, T (*_getter_)(), bool _whenValueIsChanged_ = **true**);
-* template \<typename T, typename U\> void ofxPublishOsc(const string &_ip_, int _port_, const string &_address_, U \*_that_, T (U::*_getter_)(), bool _whenValueIsChanged_ = **true**);
+* template \<typename T\> void ofxPublishOsc(const string &_ip_, int _port_, const string &_address_, T (\*_getter_)(), bool _whenValueIsChanged_ = **true**);
+* template \<typename T, typename U\> void ofxPublishOsc(const string &_ip_, int _port_, const string &_address_, U \*_that_, T (U::\*_getter_)(), bool _whenValueIsChanged_ = **true**);
 
-publish _value_ / _getter()_ / _(that.*getter)()_ to OSC message has _address_ to _ip:port_. if _whenValueIsChanged_ is set to **false**, then we send binded value **every frame** after `App::update`.
+publish _value_ / _getter()_ / _(that.\*getter)()_ to OSC message has _address_ to _ip:port_. if _whenValueIsChanged_ is set to **false**, then we send binded value **every frame** after `App::update`.
 
 #### <a name="API_ofxPublishOscIf">ofxPublishOscIf</a>
 
@@ -79,17 +79,17 @@ unpublish all OSC messages is send to _ip:port_.
 
 #### <a name="API_ofxPublishAsArray">ofxPublishAsArray</a>
 
-* template <typename T, size_t size> typename array_type<T, size>::type ofxPublishAsArray(T \*ptr);
+* template \<typename T, size_t size\> typename array_type<T, size>::type ofxPublishAsArray(T \*ptr);
 	* where `array_type<T, size>::type` is `T (&)[size]`
 
 cast value is typed `T *` -> value is typed `T (&)[size]`
 
-* template <typename T, size_t size> typename array_type<T, size>::fun ofxPublishAsArray(T \*(\*getter)());
+* template \<typename T, size_t size\> typename array_type<T, size>::fun ofxPublishAsArray(T \*(\*getter)());
 	* where `array_type<T, size>::fun` is `array_type<T, size>::type (*)()`
 
 cast function returns `T *` -> function returns `T (&)[size]`
 
-* template <typename T, size_t size> typename array_method<T, size, U>::method ofxPublishAsArray(T \*(U::\*getter)());
+* template \<typename T, size_t size\> typename array_method<T, size, U>::method ofxPublishAsArray(T \*(U::\*getter)());
 	* where `array_method<T, size, U>::method` is `array_type<T, size>::type (U:*)()`
 
 cast method of `U` returns `T *` -> method of `U` returns `T (&)[size]`

@@ -28,17 +28,17 @@ namespace ofx {
     class OscPublisherManager {
         struct SetImplementation {
         protected:
-#define define_set_int(type) inline void set(ofxOscMessage &m, type v) const { m.addIntArg(v); }
+#define define_set_int(type) inline void set(ofxOscMessage &m, type v) const { if(sizeof(type) < 8) m.addIntArg(v); else m.addInt64Arg(v); }
             define_set_int(bool);
             define_set_int(short);
             define_set_int(unsigned short);
             define_set_int(int);
             define_set_int(unsigned int);
+            define_set_int(long);
+            define_set_int(unsigned long);
+            define_set_int(long long);
+            define_set_int(unsigned long long);
 #undef define_set_int
-#define define_set_int64(type) inline void set(ofxOscMessage &m, type v) const { m.addInt64Arg(v); }
-            define_set_int64(long);
-            define_set_int64(unsigned long);
-#undef define_set_int64
 #define define_set_float(type) inline void set(ofxOscMessage &m, type v) const { m.addFloatArg(v); }
             define_set_float(float);
             define_set_float(double);
