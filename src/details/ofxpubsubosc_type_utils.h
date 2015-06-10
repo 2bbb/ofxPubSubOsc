@@ -8,6 +8,11 @@
 #pragma once
 
 namespace ofxpubsubosc {
+    template <typename T>
+    struct is_not_ofxoscmessage { typedef void type; };
+    template <>
+    struct is_not_ofxoscmessage<ofxOscMessage &> {};
+    
     namespace {
         template <typename T>
         struct remove_const_reference {

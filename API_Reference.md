@@ -19,14 +19,48 @@
 
 ### <a name="API_ofxSubscribeOsc">ofxSubscribeOsc</a>
 
+#### Reference type
+
 * template \<typename T\> void ofxSubscribeOsc(int _port_, const string &_address_, T &_value_);
-* void ofxSubscribeOsc(int _port_, const string &_address_, void (*callback)(ofxOscMessage &));
-* template \<typename T\> void ofxSubscribeOsc(int _port_, const string &_address_, T &_that_, void (T::*_callback_)(ofxOscMessage &));
-* template \<typename T\> void ofxSubscribeOsc(int _port_, const string &_address_, T * _that_, void (T::*_callback_)(ofxOscMessage &));
+
+#### Setter Function / Method
+
+setter function
+
+* template \<typename T, typename R\> void ofxSubscribeOsc(int _port_, const string &_address_, R (*callback)(T &));
+
+setter method
+
+* template \<typename T, typename R, typename C\> void ofxSubscribeOsc(int _port_, const string &_address_, C &_that_, R (C::\*_callback_)(T));
+* template \<typename T, typename R, typename C\> void ofxSubscribeOsc(int _port_, const string &_address_, C *_that_, R (C::\*_callback_)(T));
+
+const setter method (if you don't change property)
+
+* template \<typename T, typename R, typename C\> void ofxSubscribeOsc(int _port_, const string &_address_, const C &_that_, R (C::\*_callback_)(T) const);
+* template \<typename T, typename R, typename C\> void ofxSubscribeOsc(int _port_, const string &_address_, const C *_that_, R (C::\*_callback_)(T) const);
+
+#### Callback Function / Method receive ofxOscMEssage
+
+callback function
+
+* template \<typename R\> void ofxSubscribeOsc(int _port_, const string &_address_, R (\*callback)(ofxOscMessage &));
+
+callback method
+
+* template \<typename C, typename R\> void ofxSubscribeOsc(int _port_, const string &_address_, C &_that_, R (C::\*_callback_)(ofxOscMessage &));
+* template \<typename C, typename R\> void ofxSubscribeOsc(int _port_, const string &_address_, C \*_that_, R (C::\*_callback_)(ofxOscMessage &));
+
+const callback method
+
+* template \<typename C, typename R\> void ofxSubscribeOsc(int _port_, const string * &_address_, const C &_that_, R (C::\*_callback_)(ofxOscMessage &) const);
+* template \<typename C, typename R\> void ofxSubscribeOsc(int _port_, const string &_address_, const C \*_that_, R (C::\*_callback_)(ofxOscMessage &) const);
+	* TODO
 
 bind value/function/method to OSC message has _address_ incoming from _port_.
 
-if use function/method, then call `callback(mess)` or `(that.*callback)(mess)` when receive OSC message `mess`.
+if use function/method, then call `callback(mess)` or `(that.\*callback)(mess)` or `(that->\*callback)(mess)` when receive OSC message `mess`.
+
+#### Unscribe
 
 * void ofxUnsubscribeOSC(int _port_, const string &_address_);
 
@@ -41,8 +75,10 @@ unbind all OSC messages incoming from _port_.
 ### <a name="API_ofxSetLeakedOscPicker">ofxSetLeakedOscPicker</a>
 
 * void ofxSetLeakedOscPicker(int _port_, void (\*_callback_)(ofxOscMessage &))
-* template \<typename T\> void ofxSetLeakedOscPicker(int _port_, T \*_that_, void (T::\*_callback_)(ofxOscMessage &)) 
-* template \<typename T\> void ofxSetLeakedOscPicker(int _port_, T &_that_, void (T::\*_callback_)(ofxOscMessage &)) 
+* template \<typename C, typename R\> void ofxSetLeakedOscPicker(int _port_, C \*_that_, R (C::\*_callback_)(ofxOscMessage &)) 
+* template \<typename C, typename R\> void ofxSetLeakedOscPicker(int _port_, C &_that_, R (C::\*_callback_)(ofxOscMessage &)) 
+* template \<typename C, typename R\> void ofxSetLeakedOscPicker(int _port_, const C \*_that_, R (C::\*_callback_)(ofxOscMessage &) const) 
+* template \<typename C, typename R\> void ofxSetLeakedOscPicker(int _port_, const C &_that_, R (C::\*_callback_)(ofxOscMessage &) const) 
 
 set callback for port. this callback is kick when receive OSC message has not binded address.
 
