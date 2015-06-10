@@ -133,6 +133,55 @@ namespace ofx {
             T &t;
         };
         
+        template <typename T, typename U>
+        struct SetterFunctionParameter : AbstractParameter, SetImplementation {
+            SetterFunctionParameter(U(*setter)(T)) : setter(setter) {};
+            virtual void read(ofxOscMessage &message) {
+                typename remove_const_reference<T>::type t;
+                set(message, t);
+                setter(t);
+            }
+            
+        private:
+            U(*setter)(T);
+        };
+        
+        template <typename T, typename U, typename C>
+        struct SetterMethodParameter : AbstractParameter, SetImplementation {
+            SetterMethodParameter(C &that, U(C::*setter)(T))
+            : that(that)
+            , setter(setter) {};
+            
+            virtual void read(ofxOscMessage &message) {
+                typename remove_const_reference<T>::type t;
+                set(message, t);
+                (that.*setter)(t);
+            }
+            
+        private:
+            C &that;
+            U(C::*setter)(T);
+        };
+
+        template <typename T, typename U, typename C>
+        struct ConstSetterMethodParameter : AbstractParameter, SetImplementation {
+            ConstSetterMethodParameter(const C &that, U(C::*setter)(T) const)
+            : that(that)
+            , setter(setter) {};
+            
+            virtual void read(ofxOscMessage &message) {
+                typename remove_const_reference<T>::type t;
+                set(message, t);
+                (that.*setter)(t);
+            }
+            
+        private:
+            const C &that;
+            U(C::*setter)(T) const;
+        };
+
+#pragma mark callbacks
+        
         struct CallbackParameter : AbstractParameter, SetImplementation {
         public:
             typedef void (*Callback)(ofxOscMessage &);
@@ -181,6 +230,21 @@ namespace ofx {
                 subscribe(address, ParameterRef(new Parameter<T>(value)));
             }
             
+            template <typename T, typename U>
+            inline typename is_not_ofxoscmessage<U>::type subscribe(const string &address, U (*setter)(T)) {
+                subscribe(address, ParameterRef(new SetterFunctionParameter<T, U>(setter)));
+            }
+            
+            template <typename T, typename U, typename C>
+            inline typename is_not_ofxoscmessage<U>::type subscribe(const string &address, C &that, U (C::*setter)(T)) {
+                subscribe(address, ParameterRef(new SetterMethodParameter<T, U, C>(that, setter)));
+            }
+            
+            template <typename T, typename U, typename C>
+            inline typename is_not_ofxoscmessage<U>::type subscribe(const string &address, C *that, U (C::*setter)(T)) {
+                subscribe(address, ParameterRef(new SetterMethodParameter<T, U, C>(*that, setter)));
+            }
+
             inline void subscribe(const string &address, void (*callback)(ofxOscMessage &)) {
                 subscribe(address, ParameterRef(new CallbackParameter(callback)));
             }
@@ -338,6 +402,21 @@ inline ofxOscSubscriber &ofxGetOscSubscriber(int port) {
 template <typename T>
 inline void ofxSubscribeOsc(int port, const string &address, T &value) {
     ofxGetOscSubscriber(port).subscribe(address, value);
+}
+
+template <typename T, typename U>
+inline typename ofxpubsubosc::is_not_ofxoscmessage<U>::type ofxSubscribeOsc(int port, const string &address, U (*callback)(T)) {
+    ofxGetOscSubscriber(port).subscribe(address, callback);
+}
+
+template <typename T, typename U, typename C>
+inline typename ofxpubsubosc::is_not_ofxoscmessage<U>::type ofxSubscribeOsc(int port, const string &address, C &that, U (C::*callback)(T)) {
+    ofxGetOscSubscriber(port).subscribe(address, that, callback);
+}
+
+template <typename T, typename U, typename C>
+inline typename ofxpubsubosc::is_not_ofxoscmessage<U>::type ofxSubscribeOsc(int port, const string &address, C *that, U (C::*callback)(T)) {
+    ofxGetOscSubscriber(port).subscribe(address, *that, callback);
 }
 
 /// \brief bind a callback to the OSC messages with an address pattern _address_ incoming to _port_.
