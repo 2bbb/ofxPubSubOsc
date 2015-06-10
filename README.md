@@ -157,12 +157,13 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 * add [ofxPublishAsArray](API_Reference.md#API_ofxPublishAsArray)
 * enable to use in publish `T (U::*)() const`
 * update README and [API_Reference.md](API_Reference.md)
+* add [Legacy style pick up leaked OSC](API_Reference.md#Advanced_LegacyStylePickUpLeakedOSCMessage)
 * add some doxygen texts
 * some bugfix
 
 ### 2015/05/19 ver 0.0.7 release
 
-* add ofxPublishOscIf
+* add [ofxPublishOscIf](API_Reference.md#API_ofxPublishOscIf)
 * some bugfix
 
 ### 2015/05/17 ver 0.0.6 release
@@ -173,7 +174,7 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 ### 2015/05/15 ver 0.0.5 release
 
-* add system about pick up leaked OSC messages
+* add system about [pick up leaked OSC messages](API_Reference.md#API_ofxSetLeakedOscPicker)
 * some bugfix
 * add examples
 
