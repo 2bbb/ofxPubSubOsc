@@ -152,7 +152,7 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 ## <a name="UpdateHistory">Update history</a>
 
-### 2015/06/XX ver 0.0.8 release
+### 2015/06/10 ver 0.0.8 release
 
 * add ofxPublishAsArray
 * enable to use in publish `T (U::*)() const`
