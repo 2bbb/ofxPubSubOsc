@@ -964,13 +964,13 @@ template <typename T, size_t size>
 struct array_type {
     typedef T (&type)[size];
     typedef type (*fun)();
+    template <typename U>
+    struct meth {
+        typedef type (U::*method)();
+        typedef type (U::*const_method)() const;
+    };
 };
 
-template <typename T, size_t size, typename U>
-struct array_method {
-    typedef T (&type)[size];
-    typedef type (U::*method)();
-};
 /// \}
 
 /// \name ofxPublishAsArray
@@ -989,9 +989,16 @@ typename array_type<T, size>::fun ofxPublishAsArray(T *(*getter)()) {
 }
 
 template <typename T, size_t size, typename U>
-typename array_method<T, size, U>::method ofxPublishAsArray(T *(U::*getter)()) {
-    return reinterpret_cast<typename array_type<T, size>::type (U::*)()>(
+typename array_type<T, size>::template meth<U>::method ofxPublishAsArray(T *(U::*getter)()) {
+    return reinterpret_cast<typename array_type<T, size>::template meth<U>::method>(
         reinterpret_cast<T& (U::*)()>(getter)
+    );
+}
+
+template <typename T, size_t size, typename U>
+typename array_type<T, size>::template meth<U>::const_method ofxPublishAsArray(T *(U::*getter)() const) {
+    return reinterpret_cast<typename array_type<T, size>::template meth<U>::const_method>(
+        reinterpret_cast<T& (U::*)() const>(getter)
     );
 }
 
