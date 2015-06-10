@@ -174,42 +174,34 @@ namespace ofx {
             : t(t) {}
             
             virtual void send(ofxOscSender &sender, const string &address) {
-                if(!canPublish()) return;
-                ofxOscMessage m;
-                m.setAddress(address);
-                set(m, get());
-                sender.sendMessage(m);
-            }
-
-        protected:
-            virtual TypeRef(T) get() { return t; }
-            T &t;
-        };
-
-        template <typename T>
-        struct Parameter<T, true> : AbstractParameter, SetImplementation {
-            Parameter(T &t) : t(t) {}
-            virtual void send(ofxOscSender &sender, const string &address) {
                 if(!canPublish() || !isChanged()) return;
                 ofxOscMessage m;
                 m.setAddress(address);
                 set(m, get());
                 sender.sendMessage(m);
             }
+
+        protected:
+            virtual bool isChanged() { return true; }
+            virtual TypeRef(T) get() { return t; }
+            T &t;
+        };
+
+        template <typename T>
+        struct Parameter<T, true> : Parameter<T, false> {
+            Parameter(T &t)
+            : Parameter<T, false>(t) {}
             
         protected:
-            inline bool isChanged() {
-                if(old != get()) {
-                    old = get();
+            virtual inline bool isChanged() {
+                if(old != this->get()) {
+                    old = this->get();
                     return true;
                 } else {
                     return false;
                 }
             }
             
-            virtual TypeRef(T) get() { return t; }
-        protected:
-            T &t;
             T old;
         };
 
@@ -298,22 +290,6 @@ namespace ofx {
             RemoveRef(T) dummy;
         };
 
-        template <typename T, typename C, bool isCheckValue>
-        struct ConstGetterParameter : Parameter<T, isCheckValue> {
-            typedef T (C::*Getter)() const;
-            
-            ConstGetterParameter(const C &that, Getter getter)
-            : Parameter<T, isCheckValue>(dummy)
-            , getter(getter)
-            , that(that) {}
-            
-        protected:
-            virtual TypeRef(T) get() { return dummy = (that.*getter)(); }
-            Getter getter;
-            const C &that;
-            RemoveRef(T) dummy;
-        };
-
         template <typename Base, size_t size, typename C, bool isCheckValue>
         struct GetterParameter<Base(&)[size], C, isCheckValue> : Parameter<Base(&)[size], isCheckValue> {
             typedef Base (&T)[size];
@@ -333,6 +309,22 @@ namespace ofx {
             Getter getter;
             C &that;
             Base dummy[size];
+        };
+        
+        template <typename T, typename C, bool isCheckValue>
+        struct ConstGetterParameter : Parameter<T, isCheckValue> {
+            typedef T (C::*Getter)() const;
+            
+            ConstGetterParameter(const C &that, Getter getter)
+            : Parameter<T, isCheckValue>(dummy)
+            , getter(getter)
+            , that(that) {}
+            
+        protected:
+            virtual TypeRef(T) get() { return dummy = (that.*getter)(); }
+            Getter getter;
+            const C &that;
+            RemoveRef(T) dummy;
         };
         
         template <typename Base, size_t size, typename C, bool isCheckValue>
