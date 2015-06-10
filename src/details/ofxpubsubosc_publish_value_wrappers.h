@@ -48,7 +48,7 @@ namespace ofxpubsubosc {
         
         template <typename T, typename U>
         struct const_getter_method_stream : abstract_stream<T> {
-            const_getter_method_stream(U &obj, T (U::*getter)() const)
+            const_getter_method_stream(const U &obj, T (U::*getter)() const)
             : obj(obj)
             , getter(getter) {};
             
@@ -69,7 +69,9 @@ namespace ofxpubsubosc {
         
         template <typename T>
         struct raw_pointer_stream : abstract_pointer_stream<T> {
-            raw_pointer_stream(T *ptr) : ptr(ptr) {};
+            raw_pointer_stream(T *ptr)
+            : ptr(ptr) {};
+            
             virtual T *get() { return ptr; };
         private:
             T *ptr;
@@ -77,7 +79,9 @@ namespace ofxpubsubosc {
         
         template <typename T>
         struct getter_function_pointer_stream : abstract_pointer_stream<T> {
-            getter_function_pointer_stream(T (*getter)()) : getter(getter) {};
+            getter_function_pointer_stream(T (*getter)())
+            : getter(getter) {};
+            
             virtual T *get() { return getter(); };
         private:
             T (*getter)();
@@ -85,7 +89,10 @@ namespace ofxpubsubosc {
         
         template <typename T, typename U>
         struct getter_method_pointer_stream : abstract_pointer_stream<T> {
-            getter_method_pointer_stream(U &obj, T (U::*getter)()) : obj(obj), getter(getter) {};
+            getter_method_pointer_stream(U &obj, T (U::*getter)())
+            : obj(obj)
+            , getter(getter) {};
+            
             virtual T *get() { return (obj.*getter)(); };
         private:
             U &obj;
@@ -94,7 +101,10 @@ namespace ofxpubsubosc {
         
         template <typename T, typename U>
         struct const_getter_method_pointer_stream : abstract_pointer_stream<T> {
-            const_getter_method_pointer_stream(const U &obj, T (U::*getter)() const) : obj(obj), getter(getter) {};
+            const_getter_method_pointer_stream(const U &obj, T (U::*getter)() const)
+            : obj(obj)
+            , getter(getter) {};
+            
             virtual T *get() { return (obj.*getter)(); };
         private:
             const U &obj;
@@ -132,12 +142,15 @@ namespace ofxpubsubosc {
             
             array_publisher(T *v)
             : stream(pointer_stream_factory(v)) {}
+            
             array_publisher(T (*getter)())
             : stream(pointer_stream_factory(getter)) {}
             template <typename U>
+            
             array_publisher(U &that, T (U::*getter)())
             : stream(pointer_stream_factory(that, getter)) {}
             template <typename U>
+            
             array_publisher(const U &that, T (U::*getter)() const)
             : stream(pointer_stream_factory(that, getter)) {}
             virtual ~array_publisher() { }
