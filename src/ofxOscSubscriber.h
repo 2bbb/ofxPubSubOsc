@@ -190,11 +190,6 @@ namespace ofx {
                 subscribe(address, ParameterRef(new MethodCallbackParameter<T>(that, callback)));
             }
             
-            template <typename T>
-            inline void subscribe(const string &address, T *that, void (T::*callback)(ofxOscMessage &)) {
-                subscribe(address, ParameterRef(new MethodCallbackParameter<T>(that, callback)));
-            }
-            
             inline void unsubscribe(const string &address) {
                 targets.erase(address);
             }
@@ -213,11 +208,6 @@ namespace ofx {
             
             template <typename T>
             inline void setLeakPicker(T &that, void (T::*callback)(ofxOscMessage &)) {
-                setLeakPicker(ParameterRef(new MethodCallbackParameter<T>(that, callback)));
-            }
-            
-            template <typename T>
-            inline void setLeakPicker(T *that, void (T::*callback)(ofxOscMessage &)) {
                 setLeakPicker(ParameterRef(new MethodCallbackParameter<T>(that, callback)));
             }
             
@@ -383,7 +373,7 @@ inline void ofxSubscribeOsc(int port, const string &address, T &that, void (T::*
 
 template <typename T>
 inline void ofxSubscribeOsc(int port, const string &address, T *that, void (T::*callback)(ofxOscMessage &)) {
-    ofxGetOscSubscriber(port).subscribe(address, that, callback);
+    ofxGetOscSubscriber(port).subscribe(address, *that, callback);
 }
 
 /// \}
@@ -434,7 +424,7 @@ inline void ofxSetLeakedOscPicker(int port, void (*callback)(ofxOscMessage &)) {
 
 template <typename T>
 inline void ofxSetLeakedOscPicker(int port, T *that, void (T::*callback)(ofxOscMessage &)) {
-    ofxGetOscSubscriber(port).setLeakPicker(that, callback);
+    ofxGetOscSubscriber(port).setLeakPicker(*that, callback);
 }
 
 /// \brief bind a callback to the OSC messages with are not match other patterns incoming to port.
