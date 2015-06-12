@@ -120,7 +120,7 @@ namespace ofx {
 #pragma mark Parameter
         
         struct AbstractParameter {
-            virtual void read(ofxOscMessage &message) {}
+            virtual void read(ofxOscMessage &message) = 0;
         };
         
         template <typename T>
