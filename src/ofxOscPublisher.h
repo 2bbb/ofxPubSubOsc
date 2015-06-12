@@ -24,22 +24,47 @@ namespace ofx {
         typedef T type;
     };
 #define RemoveRef(T) typename ofx::remove_reference<T>::type
-
+    
+    template <typename T> struct is_integral { static const bool value = false; };
+#define define_is_integral(T) template <> struct is_integral<T> { static const bool value = true; };
+    define_is_integral(bool);
+    define_is_integral(short);
+    define_is_integral(unsigned char);
+    define_is_integral(char);
+    define_is_integral(unsigned short);
+    define_is_integral(int);
+    define_is_integral(unsigned int);
+    define_is_integral(long);
+    define_is_integral(unsigned long);
+    define_is_integral(long long);
+    define_is_integral(unsigned long long);
+#undef define_is_integral
+    template <bool b>
+    struct enable;
+    
+    template <>
+    struct enable<true> { typedef void type; };
+    
+    template <typename T>
+    struct is_integral_and_lt_64bit {
+        static const bool value = is_integral<T>::value && (sizeof(T) < 8);
+    };
+    
+    template <typename T>
+    struct is_integral_and_geq_64bit {
+        static const bool value = is_integral<T>::value && (8 <= sizeof(T));
+    };
+    
     class OscPublisherManager {
     private:
         struct SetImplementation {
         protected:
-#define define_set_int(type) inline void set(ofxOscMessage &m, type v) const { if(sizeof(type) < 8) m.addIntArg(v); else m.addInt64Arg(v); }
-            define_set_int(bool);
-            define_set_int(short);
-            define_set_int(unsigned short);
-            define_set_int(int);
-            define_set_int(unsigned int);
-            define_set_int(long);
-            define_set_int(unsigned long);
-            define_set_int(long long);
-            define_set_int(unsigned long long);
-#undef define_set_int
+            template <typename T>
+            inline typename enable<is_integral_and_lt_64bit<T>::value>::type set(ofxOscMessage &m, T v) const { m.addIntArg(v); }
+            
+            template <typename T>
+            inline typename enable<is_integral_and_geq_64bit<T>::value>::type set(ofxOscMessage &m, T v) const { m.addInt64Arg(v); }
+            
 #define define_set_float(type) inline void set(ofxOscMessage &m, type v) const { m.addFloatArg(v); }
             define_set_float(float);
             define_set_float(double);
