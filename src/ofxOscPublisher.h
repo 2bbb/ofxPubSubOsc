@@ -31,6 +31,8 @@ namespace ofx {
         protected:
 #define define_set_int(type) inline void set(ofxOscMessage &m, type v) const { if(sizeof(type) < 8) m.addIntArg(v); else m.addInt64Arg(v); }
             define_set_int(bool);
+            define_set_int(char);
+            define_set_int(unsigned char);
             define_set_int(short);
             define_set_int(unsigned short);
             define_set_int(int);
