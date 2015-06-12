@@ -15,44 +15,49 @@
 namespace ofx {
     using namespace ofxpubsubosc;
     
-    template <typename T>
-    struct remove_reference {
-        typedef T type;
-    };
-    template <typename T>
-    struct remove_reference<T &> {
-        typedef T type;
-    };
-#define RemoveRef(T) typename ofx::remove_reference<T>::type
-    
-    template <typename T> struct is_integral { static const bool value = false; };
+    namespace {
+        template <typename T>
+        struct remove_reference {
+            typedef T type;
+        };
+        template <typename T>
+        struct remove_reference<T &> {
+            typedef T type;
+        };
+#define remove_ref(T) typename ofx::remove_reference<T>::type
+        
+        template <typename T> struct is_integral { static const bool value = false; };
 #define define_is_integral(T) template <> struct is_integral<T> { static const bool value = true; };
-    define_is_integral(bool);
-    define_is_integral(short);
-    define_is_integral(unsigned char);
-    define_is_integral(char);
-    define_is_integral(unsigned short);
-    define_is_integral(int);
-    define_is_integral(unsigned int);
-    define_is_integral(long);
-    define_is_integral(unsigned long);
-    define_is_integral(long long);
-    define_is_integral(unsigned long long);
+        define_is_integral(bool);
+        define_is_integral(short);
+        define_is_integral(unsigned char);
+        define_is_integral(char);
+        define_is_integral(unsigned short);
+        define_is_integral(int);
+        define_is_integral(unsigned int);
+        define_is_integral(long);
+        define_is_integral(unsigned long);
+        define_is_integral(long long);
+        define_is_integral(unsigned long long);
 #undef define_is_integral
-    template <bool b>
-    struct enable;
-    
-    template <>
-    struct enable<true> { typedef void type; };
-    
-    template <typename T>
-    struct is_integral_and_lt_64bit {
-        static const bool value = is_integral<T>::value && (sizeof(T) < 8);
-    };
-    
-    template <typename T>
-    struct is_integral_and_geq_64bit {
-        static const bool value = is_integral<T>::value && (8 <= sizeof(T));
+        
+#define type_ref(T) typename add_reference_if_non_arithmetic<T>::type
+
+        template <bool b>
+        struct enable;
+        
+        template <>
+        struct enable<true> { typedef void type; };
+        
+        template <typename T>
+        struct is_integral_and_lt_64bit {
+            static const bool value = is_integral<T>::value && (sizeof(T) < 8);
+        };
+        
+        template <typename T>
+        struct is_integral_and_geq_64bit {
+            static const bool value = is_integral<T>::value && (8 <= sizeof(T));
+        };
     };
     
     class OscPublisherManager {
@@ -208,7 +213,7 @@ namespace ofx {
 
         protected:
             virtual bool isChanged() { return true; }
-            virtual TypeRef(T) get() { return t; }
+            virtual type_ref(T) get() { return t; }
             T &t;
         };
 
@@ -276,9 +281,9 @@ namespace ofx {
             , getter(getter) {}
             
         protected:
-            virtual TypeRef(T) get() { return dummy = getter(); }
+            virtual type_ref(T) get() { return dummy = getter(); }
             GetterFunction getter;
-            RemoveRef(T) dummy;
+            remove_ref(T) dummy;
         };
         
         template <typename Base, size_t size, bool isCheckValue>
@@ -309,10 +314,10 @@ namespace ofx {
             , that(that) {}
             
         protected:
-            virtual TypeRef(T) get() { return dummy = (that.*getter)(); }
+            virtual type_ref(T) get() { return dummy = (that.*getter)(); }
             Getter getter;
             C &that;
-            RemoveRef(T) dummy;
+            remove_ref(T) dummy;
         };
 
         template <typename Base, size_t size, typename C, bool isCheckValue>
@@ -346,10 +351,10 @@ namespace ofx {
             , that(that) {}
             
         protected:
-            virtual TypeRef(T) get() { return dummy = (that.*getter)(); }
+            virtual type_ref(T) get() { return dummy = (that.*getter)(); }
             Getter getter;
             const C &that;
-            RemoveRef(T) dummy;
+            remove_ref(T) dummy;
         };
         
         template <typename Base, size_t size, typename C, bool isCheckValue>
@@ -625,8 +630,8 @@ namespace ofx {
         }
         OscPublishers publishers;
     };
-#undef TypeRef
 };
+#undef type_ref
 
 #pragma mark - syntax sugars
 
