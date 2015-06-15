@@ -2,6 +2,12 @@
 
 easy utility for publish/subscribe OSC message.
 
+## Dependencies
+
+* ofxOsc (maybe oF0.8.2~)
+
+this addon is tested with oF0.8.4~
+
 ## TOC
 
 * [How to use](#HowToUse)
