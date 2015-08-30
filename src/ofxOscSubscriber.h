@@ -430,27 +430,27 @@ inline void ofxSubscribeOsc(int port, const string &address, T &value) {
 #pragma mark setter function/method
 
 template <typename T, typename R>
-inline typename ofxpubsubosc::is_not_ofxoscmessage<R>::type ofxSubscribeOsc(int port, const string &address, R (*callback)(T)) {
+inline typename ofxpubsubosc::is_not_ofxoscmessage<T>::type ofxSubscribeOsc(int port, const string &address, R (*callback)(T)) {
     ofxGetOscSubscriber(port).subscribe(address, callback);
 }
 
 template <typename T, typename C, typename R>
-inline typename ofxpubsubosc::is_not_ofxoscmessage<R>::type ofxSubscribeOsc(int port, const string &address, C &that, R (C::*callback)(T)) {
+inline typename ofxpubsubosc::is_not_ofxoscmessage<T>::type ofxSubscribeOsc(int port, const string &address, C &that, R (C::*callback)(T)) {
     ofxGetOscSubscriber(port).subscribe(address, that, callback);
 }
 
 template <typename T, typename C, typename R>
-inline typename ofxpubsubosc::is_not_ofxoscmessage<R>::type ofxSubscribeOsc(int port, const string &address, C *that, R (C::*callback)(T)) {
+inline typename ofxpubsubosc::is_not_ofxoscmessage<T>::type ofxSubscribeOsc(int port, const string &address, C *that, R (C::*callback)(T)) {
     ofxGetOscSubscriber(port).subscribe(address, *that, callback);
 }
 
 template <typename T, typename C, typename R>
-inline typename ofxpubsubosc::is_not_ofxoscmessage<R>::type ofxSubscribeOsc(int port, const string &address, const C &that, R (C::*callback)(T) const) {
+inline typename ofxpubsubosc::is_not_ofxoscmessage<T>::type ofxSubscribeOsc(int port, const string &address, const C &that, R (C::*callback)(T) const) {
     ofxGetOscSubscriber(port).subscribe(address, that, callback);
 }
 
 template <typename T, typename C, typename R>
-inline typename ofxpubsubosc::is_not_ofxoscmessage<R>::type ofxSubscribeOsc(int port, const string &address, const C * const that, R (C::*callback)(T) const) {
+inline typename ofxpubsubosc::is_not_ofxoscmessage<T>::type ofxSubscribeOsc(int port, const string &address, const C * const that, R (C::*callback)(T) const) {
     ofxGetOscSubscriber(port).subscribe(address, *that, callback);
 }
 
