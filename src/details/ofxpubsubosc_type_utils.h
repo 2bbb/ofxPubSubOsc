@@ -88,7 +88,11 @@ bool operator!=(const ofMatrix4x4 &x, const ofMatrix4x4 &y) {
 }
 
 bool operator==(const ofBuffer &x, const ofBuffer &y) {
+#if OF_VERSION_MINOR < 9
     return (x.size() == y.size()) && (memcmp(x.getBinaryBuffer(), y.getBinaryBuffer(), x.size()) == 0);
+#else
+    return (x.size() == y.size()) && (memcmp(x.getData(), y.getData(), x.size()) == 0);
+#endif
 }
 
 bool operator!=(const ofBuffer &x, const ofBuffer &y) {
