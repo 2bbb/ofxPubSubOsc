@@ -162,6 +162,8 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 * `T (\*callback)(ofxOscMessage &)`;
 * pair of `U &that`, `T (U::\*callback)(ofxOscMessage &)`;
 * pair of `U \*that`, `T (U::\*callback)(ofxOscMessage &)`;
+* `std::function<void(ofxOscMessage &)>`
+	* (oF0.9.0~)
 
 ## <a name="UpdateHistory">Update history</a>
 
