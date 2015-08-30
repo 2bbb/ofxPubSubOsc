@@ -48,7 +48,6 @@ typedef T type; \
         define_add_reference_if_non_arithmetic(float);
         define_add_reference_if_non_arithmetic(double);
 #undef define_add_reference_if_non_arithmetic
-#define TypeRef(T) typename add_reference_if_non_arithmetic<T>::type
                 
     };
 };
@@ -89,7 +88,11 @@ bool operator!=(const ofMatrix4x4 &x, const ofMatrix4x4 &y) {
 }
 
 bool operator==(const ofBuffer &x, const ofBuffer &y) {
+#if OF_VERSION_MINOR < 9
     return (x.size() == y.size()) && (memcmp(x.getBinaryBuffer(), y.getBinaryBuffer(), x.size()) == 0);
+#else
+    return (x.size() == y.size()) && (memcmp(x.getData(), y.getData(), x.size()) == 0);
+#endif
 }
 
 bool operator!=(const ofBuffer &x, const ofBuffer &y) {

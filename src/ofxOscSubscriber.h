@@ -10,6 +10,13 @@
 #include "ofMain.h"
 #include "ofxOsc.h"
 
+#if OF_VERSION_MINOR < 9
+#define ENABLE_FUNCTIONAL 0
+#else
+#define ENABLE_FUNCTIONAL 1
+#endif
+
+
 #include "details/ofxpubsubosc_type_traits.h"
 
 namespace ofx {
@@ -120,7 +127,7 @@ namespace ofx {
 #pragma mark Parameter
         
         struct AbstractParameter {
-            virtual void read(ofxOscMessage &message) {}
+            virtual void read(ofxOscMessage &message) = 0;
         };
         
         template <typename T>
@@ -220,6 +227,19 @@ namespace ofx {
             const C &that;
         };
         
+#if ENABLE_FUNCTIONAL
+        struct LambdaCallbackParameter : AbstractParameter, SetImplementation {
+        public:
+            typedef std::function<void(ofxOscMessage &)> Callback;
+            LambdaCallbackParameter(Callback &callback)
+            : callback(callback) {}
+            
+            virtual void read(ofxOscMessage &message) { callback(message); }
+            
+        private:
+            Callback callback;
+        };
+#endif
         typedef shared_ptr<AbstractParameter> ParameterRef;
         typedef shared_ptr<ofxOscReceiver> OscReceiverRef;
         typedef map<string, ParameterRef> Targets;
@@ -270,6 +290,11 @@ namespace ofx {
                 subscribe(address, ParameterRef(new MethodCallbackParameter<C, R>(that, callback)));
             }
             
+#if ENABLE_FUNCTIONAL
+            inline void subscribe(const string &address, std::function<void(ofxOscMessage &)> callback) {
+                subscribe(address, ParameterRef(new LambdaCallbackParameter(callback)));
+            }
+#endif
             inline void unsubscribe(const string &address) {
                 targets.erase(address);
             }
@@ -295,6 +320,12 @@ namespace ofx {
             inline void setLeakPicker(const C &that, R (C::*callback)(ofxOscMessage &) const) {
                 setLeakPicker(ParameterRef(new ConstMethodCallbackParameter<C, R>(that, callback)));
             }
+            
+#if ENABLE_FUNCTIONAL
+            inline void setLeakPicker(std::function<void(ofxOscMessage &)> &callback) {
+                setLeakPicker(ParameterRef(new LambdaCallbackParameter(callback)));
+            }
+#endif
             
             inline void removeLeakPicker() {
                 leakPicker.reset();
@@ -342,7 +373,11 @@ namespace ofx {
                 clearLeakedOscMessages();
                 ofxOscMessage m;
                 while(receiver.hasWaitingMessages()) {
+#if OF_VERSION_MINOR < 9
                     receiver.getNextMessage(&m);
+#else
+                    receiver.getNextMessage(m);
+#endif
                     const string &address = m.getAddress();
                     if(targets.find(address) != targets.end()) {
                         targets[address]->read(m);
@@ -518,6 +553,13 @@ inline void ofxSubscribeOsc(int port, const string &address, const C *that, R (C
     ofxGetOscSubscriber(port).subscribe(address, *that, callback);
 }
 
+#if ENABLE_FUNCTIONAL
+template <typename C, typename R>
+inline void ofxSubscribeOsc(int port, const string &address, std::function<void(ofxOscMessage &)> &callback) {
+    ofxGetOscSubscriber(port).subscribe(address, callback);
+}
+#endif
+
 /// \}
 
 #pragma mark unsubscribe
@@ -602,6 +644,12 @@ template <typename C, typename R>
 inline void ofxSetLeakedOscPicker(int port, const C *that, R (C::*callback)(ofxOscMessage &) const) {
     ofxGetOscSubscriber(port).setLeakPicker(*that, callback);
 }
+
+#if ENABLE_FUNCTIONAL
+inline void ofxSetLeakedOscPicker(int port, std::function<void(ofxOscMessage &)> &callback) {
+    ofxGetOscSubscriber(port).setLeakPicker(callback);
+}
+#endif
 
 /// \brief remove a callback receives messages has leaked patterns incoming to port.
 /// \param port binded port is typed int

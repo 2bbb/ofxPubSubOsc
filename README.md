@@ -8,6 +8,8 @@ easy utility for publish/subscribe OSC message.
 
 this addon is tested with oF0.8.4~
 
+if you use oF0.9.0~, then you can use `std::function<void(ofxOscMessage &)>`! detail: [API Reference](API_Reference.md#API_lambda_callback)
+
 ## TOC
 
 * [How to use](#HowToUse)
@@ -42,6 +44,11 @@ public:
 		ofxSubscribeOsc(9005, "/p", p);
 		
 		ofxPublishOsc("localhost", 9006, "/fps", &ofGetFrameRate);
+		
+		// if you use v0.9.0~
+		ofxSubscribeOsc(9005, "/lambda", [](ofxOscMessage &m){
+			ofLogNotice() << m;
+		});
 	}
 	
 	void update() {
@@ -157,6 +164,12 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 * pair of `U \*that`, `T (U::\*callback)(ofxOscMessage &)`;
 
 ## <a name="UpdateHistory">Update history</a>
+
+### 2015/08/31 ver 0.1.0 release
+
+* add [lambda function callback](API_Reference.md#API_lambda_callback) for ofxSubscirbeOsc
+* update README and [API_Reference.md](API_Reference.md)
+* some bugfix
 
 ### 2015/06/10 ver 0.0.8 release
 
