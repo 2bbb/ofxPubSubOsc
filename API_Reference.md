@@ -39,7 +39,7 @@ const setter method (if you don't change property)
 * template \<typename T, typename R, typename C\> void ofxSubscribeOsc(int _port_, const string &_address_, const C &_that_, R (C::\*_callback_)(T) const);
 * template \<typename T, typename R, typename C\> void ofxSubscribeOsc(int _port_, const string &_address_, const C *_that_, R (C::\*_callback_)(T) const);
 
-#### Callback Function / Method receive ofxOscMEssage
+#### Callback Function / Method receive ofxOscMessage
 
 callback function
 
@@ -56,9 +56,14 @@ const callback method
 * template \<typename C, typename R\> void ofxSubscribeOsc(int _port_, const string &_address_, const C \*_that_, R (C::\*_callback_)(ofxOscMessage &) const);
 	* TODO
 
+<a name="API_lambda_callback">lambda callback</a>
+
+* void ofxSubscribeOsc(int _port_, const string &_address_, std::function<void(ofxOscMessage &)> &_callback_);
+	* **(if you use 0.9.0~)**
+
 bind value/function/method to OSC message has _address_ incoming from _port_.
 
-if use function/method, then call `callback(mess)` or `(that.\*callback)(mess)` or `(that->\*callback)(mess)` when receive OSC message `mess`.
+if use function/method, then call `callback(mess)` or `(that.\*callback)(mess)` or `(that->\*callback)(mess)`, `std::function<void(ofxOscMessage &)>` when receive OSC message `mess`.
 
 #### Unscribe
 
@@ -79,6 +84,9 @@ unbind all OSC messages incoming from _port_.
 * template \<typename C, typename R\> void ofxSetLeakedOscPicker(int _port_, C &_that_, R (C::\*_callback_)(ofxOscMessage &)) 
 * template \<typename C, typename R\> void ofxSetLeakedOscPicker(int _port_, const C \*_that_, R (C::\*_callback_)(ofxOscMessage &) const) 
 * template \<typename C, typename R\> void ofxSetLeakedOscPicker(int _port_, const C &_that_, R (C::\*_callback_)(ofxOscMessage &) const) 
+
+* void ofxSetLeakedOscPicker(int _port_, std::function<void(ofxOscMessage &)> &_callback_)
+	* **if you use 0.9.0~**
 
 set callback for port. this callback is kick when receive OSC message has not binded address.
 
