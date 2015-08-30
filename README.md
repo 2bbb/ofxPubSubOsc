@@ -8,6 +8,8 @@ easy utility for publish/subscribe OSC message.
 
 this addon is tested with oF0.8.4~
 
+if you use oF0.9.0~, then you can use `std::function<void(ofxOscMessage &)>`! detail: [API Reference](API_Reference.md#API_lambda_callback)
+
 ## TOC
 
 * [How to use](#HowToUse)
@@ -42,6 +44,11 @@ public:
 		ofxSubscribeOsc(9005, "/p", p);
 		
 		ofxPublishOsc("localhost", 9006, "/fps", &ofGetFrameRate);
+		
+		// if you use v0.9.0~
+		ofxSubscribeOsc(9005, "/lambda", [](ofxOscMessage &m){
+			ofLogNotice() << m;
+		});
 	}
 	
 	void update() {
