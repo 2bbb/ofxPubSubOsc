@@ -123,11 +123,60 @@ namespace ofx {
                 }
             }
             
+#pragma mark ofParameter<T> / ofParameterGroup
+            
             template <typename U>
             inline void set(ofxOscMessage &m, ofParameter<U> &p, size_t offset = 0) {
                 U u;
                 set(m, u, offset);
                 p.set(u);
+            }
+
+            inline void set(ofxOscMessage &m, ofAbstractParameter &p, size_t offset = 0) {
+                ofParameter<float> &pp = p.cast<float>();
+                set(m, pp, offset);
+                return;
+#define type_convert(type_) if(p.type() == typeid(ofParameter<type_>).name()) { set(m, p.cast<type_>(), offset); return; }
+                type_convert(float);
+                type_convert(double);
+                type_convert(int);
+                type_convert(unsigned int);
+                type_convert(long);
+                type_convert(unsigned long);
+                type_convert(ofColor);
+                type_convert(ofRectangle);
+                type_convert(ofVec2f);
+                type_convert(ofVec3f);
+                type_convert(ofVec4f);
+                type_convert(ofQuaternion);
+                type_convert(ofMatrix3x3);
+                type_convert(ofMatrix4x4);
+                
+                type_convert(ofFloatColor);
+                type_convert(ofShortColor);
+                
+                type_convert(bool);
+                type_convert(char);
+                type_convert(unsigned char);
+                type_convert(short);
+                type_convert(unsigned short);
+                type_convert(long long);
+                type_convert(unsigned long long);
+                
+                type_convert(ofBuffer);
+                
+                ofLogWarning("ofxOscSubscriber") << "ofAbstractParameter: Unknown type \"" << p.type() << "\", bind to " << m.getAddress() << ". we ignored.";
+#undef type_convert
+            }
+            
+            inline void set(ofxOscMessage &m, ofParameterGroup &pg, size_t offset = 0) {
+                if(m.getArgType(0) == OFXOSC_TYPE_INT32) {
+                    set(m, pg.get(m.getArgAsInt32(0)), offset + 1);
+                } else if(m.getArgType(0) == OFXOSC_TYPE_INT64) {
+                    set(m, pg.get(m.getArgAsInt64(0)), offset + 1);
+                } else if(m.getArgType(0) == OFXOSC_TYPE_STRING) {
+                    set(m, pg.get(m.getArgAsString(0)), offset + 1);
+                }
             }
         };
         
