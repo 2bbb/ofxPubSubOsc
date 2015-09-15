@@ -208,7 +208,7 @@ ofParameter<ofColor> color;
 
 float_x.setName("x");
 float_y.setName("y");
-float_y.setName("c");
+color.setName("c");
 
 group.add(float_y); // float_y has index 0 and name "y"
 group.add(float_x); // float_x has index 1 and name "x"
