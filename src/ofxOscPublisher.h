@@ -120,6 +120,13 @@ namespace ofx {
             inline void set(ofxOscMessage &m, const vector<U> &v) const {
                 for(int i = 0; i < v.size(); i++) { set(m, v[i]); }
             }
+            
+#pragma mark ofParameter<T> / ofParameterGroup
+            
+            template <typename U>
+            inline void set(ofxOscMessage &m, const ofParameter<U> &p) const {
+                set(m, p.get());
+            }
         };
         
 #pragma mark Condition
