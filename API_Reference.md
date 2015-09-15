@@ -12,6 +12,7 @@
 	* [class ofxOscSubscriberManager](#Advanced_ofxOscSubscriberManager)
 	* [class ofxOscSubscriber](#Advanced_ofxOscSubscriber)
 	* [Legacy style pick up leaked OSC](#Advanced_LegacyStylePickUpLeakedOSCMessage)
+	* [How to subscribe ofParameterGroup](#Advanced_how_to_subscribe_ofParameterGroup)
 	* [class ofxOscPublisherManager](#Advanced_ofxOscPublisherManager)
 	* [class ofxOscPublisher](#Advanced_ofxOscPublisher)
 
@@ -154,7 +155,6 @@ float *bar = new float[12];
 
 ofxPublishOsc("localhost", 9005, "/foo", p, ofxPublishAsArray<int, 8>(&P::getFooPtr));
 ofxPublishOsc("localhost", 9005, "/bar", ofxPublishAsArray<float, 12>(bar));
-	
 ```
 
 #### See [class ofxOscPublisherManager](#Advanced_ofxOscPublisherManager), [class ofxOscPublisher](#Advanced_ofxOscPublisher)
@@ -187,6 +187,74 @@ unbind OSC message has _address_.
 * void unsubscribe();
 
 unbind all OSC messages.
+
+#### <a name="Advanced_how_to_subscribe_ofParameterGroup">How to subscribe ofParameterGroup</a>
+
+to subscribing value into ofParameterGroup, is different to others.
+
+we need key for search parameter from parameter group.
+
+so, we have to add key to first argument of OSC message.
+
+for example, we setup parameter group and parameter like this:
+
+```cpp
+ofParameterGroup group;
+ofParameter<float> float_x;
+ofParameter<float> float_y;
+ofParameter<ofColor> color;
+
+...
+
+float_x.setName("x");
+float_y.setName("y");
+float_y.setName("c");
+
+group.add(float_y); // float_y has index 0 and name "y"
+group.add(float_x); // float_x has index 1 and name "x"
+group.add(color); // color has index 2 and name "c"
+
+ofxSubscribeOsc(9005, "/param_group", group);
+
+```
+
+then, we construct message like this:
+
+```cpp
+ofxOscMessage mx, my;
+
+mx.setAddress("/param_group");
+mx.addArgAsString("x");
+mx.addArgAsFloat(1.0f);
+sender.sendMessage(mx); // this value set to float_x
+
+my.setAddress("/param_group");
+my.addArgAsString("y");
+my.addArgAsFloat(2.0f);
+sender.sendMessage(my); // this value set to float_y
+
+ofxOscMessage m_0, m_1;
+
+m0.setAddress("/param_group");
+m0.addArgAsInt(0);
+m0.addArgAsFloat(1.0f);
+sender.sendMessage(m0); // !! this value set to float_y
+
+m1.setAddress("/param_group");
+m1.addArgAsInt(1);
+m1.addArgAsFloat(2.0f);
+sender.sendMessage(m1); // !! this value set to float_x 
+
+ofxOscMessage mc;
+mc.setAddress("/param_group");
+mc.addArgAsString("c");
+mc.addArgAsInt(255);
+mc.addArgAsInt(0);
+mc.addArgAsInt(0);
+mc.addArgAsInt(255);
+sender.sendMessage(mc); // color will set to red
+
+```
 
 #### <a name="Advanced_setLeakPicker">setLeakPicker</a>
 

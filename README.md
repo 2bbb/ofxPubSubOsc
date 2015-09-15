@@ -20,6 +20,7 @@ if you use oF0.9.0~, then you can use `std::function<void(ofxOscMessage &)>`! de
 	* [Arithmetic](#SupportedTypes_Arithmetic)
 	* [String](#SupportedTypes_String)
 	* [openframeworks basic types](#SupportedTypes_ofBasic)
+	* [ofParameter with supported types](#SupportedTypes_ofParameter)
 	* [array/vector of supported types](#SupportedTypes_ArrayVector)
 	* [Callback](#SupportedTypes_Callback)
 * [Update history](#UpdateHistory)
@@ -149,6 +150,12 @@ unbind all the publishers sending to _ip:port_.
 #### Blob
 * `ofBuffer`
 
+### <a name="SupportedTypes_ofParameter">ofParameter with supported types</a>
+
+* `ofParameter<SupportedType>`
+
+**NOTE**: we only support subscribing ofParameterGroup. See [How to subscribe ofParameterGroup](API_Reference.md#Advanced_how_to_subscribe_ofParameterGroup)
+
 ### <a name="SupportedTypes_ArrayVector">array/vector of supported types</a>
 
 * `SupportedType[size]`
@@ -166,6 +173,12 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 	* (oF0.9.0~)
 
 ## <a name="UpdateHistory">Update history</a>
+
+### 2015/09/xx ver 0.1.1 release
+
+* add [ofParameter](#SupportedTypes_ofParameter)
+* add [ofParameterGroup](API_Reference.md#Advanced_how_to_subscribe_ofParameterGroup) for ofxSubscirbeOsc
+* update README and [API_Reference.md](API_Reference.md)
 
 ### 2015/08/31 ver 0.1.0 release
 
