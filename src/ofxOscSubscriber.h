@@ -122,6 +122,13 @@ namespace ofx {
                     set(m, v[i], offset + i * ofxpubsubosc::type_traits<U>::size);
                 }
             }
+            
+            template <typename U>
+            inline void set(ofxOscMessage &m, ofParameter<U> &p, size_t offset = 0) {
+                U u;
+                set(m, u, offset);
+                p.set(u);
+            }
         };
         
 #pragma mark Parameter
