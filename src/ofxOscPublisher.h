@@ -623,6 +623,25 @@ namespace ofx {
                 it->second->send(sender, it->first);
             }
             
+#pragma mark unregister
+            
+            inline void unregister(const string &address) {
+                if(registeredTargets.find(address) == registeredTargets.end()) registeredTargets.erase(address);
+            }
+            
+            inline void unregister() {
+                registeredTargets.clear();
+            }
+            
+            inline bool isRegistered() const {
+                return !registeredTargets.empty();
+            }
+            
+            inline bool isRegistered(const string &address) const {
+                return isRegistered() && (registeredTargets.find(address) != registeredTargets.end());
+            }
+            
+
             typedef shared_ptr<OscPublisher> Ref;
         private:
             OscPublisher(const SenderKey &key) : key(key) {
@@ -1054,6 +1073,16 @@ inline void ofxRegisterPublishingOsc(const string &ip, int port, const string &a
 
 inline void ofxPublishRegisteredOsc(const string &ip, int port, const string &address) {
     ofxGetOscPublisher(ip, port).publishRegistered(address);
+}
+
+#pragma mark unregister
+
+inline void ofxUnregisterPublishingOsc(const string &ip, int port, const string &address) {
+    ofxGetOscPublisher(ip, port).unregister(address);
+}
+
+inline void ofxUnregisterPublishingOsc(const string &ip, int port) {
+    ofxGetOscPublisher(ip, port).unregister();
 }
 
 #pragma mark helper for publish array
