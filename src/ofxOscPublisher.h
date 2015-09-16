@@ -613,6 +613,16 @@ namespace ofx {
                 doRegister(address, ParameterRef(new ConstGetterParameter<T, C, false>(that, getter)));
             }
             
+#pragma mark publishRegistered
+            
+            inline void publishRegistered(const string &address) {
+                Targets::iterator it = registeredTargets.find(address);
+                if(it == registeredTargets.end()) {
+                    ofLogWarning("ofxPubSubOsc") << address << " is not registered.";
+                }
+                it->second->send(sender, it->first);
+            }
+            
             typedef shared_ptr<OscPublisher> Ref;
         private:
             OscPublisher(const SenderKey &key) : key(key) {
@@ -1038,6 +1048,12 @@ inline void ofxRegisterPublishingOsc(const string &ip, int port, const string &a
 template <typename T, typename C>
 inline void ofxRegisterPublishingOsc(const string &ip, int port, const string &address, const C &that, T (C::*getter)() const) {
     ofxGetOscPublisher(ip, port).doRegister(address, that, getter);
+}
+
+#pragma mark publish registered
+
+inline void ofxPublishRegisteredOsc(const string &ip, int port, const string &address) {
+    ofxGetOscPublisher(ip, port).publishRegistered(address);
 }
 
 #pragma mark helper for publish array
