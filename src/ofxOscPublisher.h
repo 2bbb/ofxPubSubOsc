@@ -569,20 +569,6 @@ namespace ofx {
                 if(isPublished(address)) targets[address]->setEnablePublish(true);
             }
             
-#pragma mark status
-            
-            inline bool isPublished() const {
-                return !targets.empty();
-            }
-
-            inline bool isPublished(const string &address) const {
-                return isPublished() && (targets.find(address) != targets.end());
-            }
-
-            inline bool isEnabled(const string &address) const {
-                return isPublished(address) && targets.at(address)->isPublishNow();
-            }
-
 #pragma mark doRegister
             
             inline void doRegister(const string &address, ParameterRef ref) {
@@ -631,6 +617,20 @@ namespace ofx {
             
             inline void unregister() {
                 registeredTargets.clear();
+            }
+            
+#pragma mark status
+            
+            inline bool isPublished() const {
+                return !targets.empty();
+            }
+            
+            inline bool isPublished(const string &address) const {
+                return isPublished() && (targets.find(address) != targets.end());
+            }
+            
+            inline bool isEnabled(const string &address) const {
+                return isPublished(address) && targets.at(address)->isPublishNow();
             }
             
             inline bool isRegistered() const {
