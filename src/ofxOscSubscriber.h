@@ -129,9 +129,6 @@ namespace ofx {
             }
 
             inline void set(ofxOscMessage &m, ofAbstractParameter &p, size_t offset = 0) {
-                ofParameter<float> &pp = p.cast<float>();
-                set(m, pp, offset);
-                return;
 #define type_convert(type_) if(p.type() == typeid(ofParameter<type_>).name()) { set(m, p.cast<type_>(), offset); return; }
                 type_convert(float);
                 type_convert(double);
