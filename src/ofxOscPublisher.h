@@ -192,7 +192,7 @@ namespace ofx {
         
         struct AbstractParameter {
             AbstractParameter() : condition(new BasicCondition) {}
-            virtual void send(ofxOscSender &sender, const string &address) = 0;
+            virtual bool setMessage(ofxOscMessage &m, const string &address) = 0;
             void setCondition(BasicConditionRef ref) { condition = ref; };
             
             inline void setEnablePublish(bool bEnablePublish) { condition->setEnablePublish(bEnablePublish); };
@@ -210,14 +210,12 @@ namespace ofx {
             Parameter(T &t)
             : t(t) {}
             
-            virtual void send(ofxOscSender &sender, const string &address) {
-                if(!canPublish() || !isChanged()) return;
-                ofxOscMessage m;
+            virtual bool setMessage(ofxOscMessage &m, const string &address) {
+                if(!canPublish() || !isChanged()) return false;
                 m.setAddress(address);
                 set(m, get());
-                sender.sendMessage(m);
+                return true;
             }
-
         protected:
             virtual bool isChanged() { return true; }
             virtual type_ref(T) get() { return t; }
@@ -230,7 +228,7 @@ namespace ofx {
             : Parameter<T, false>(t) {}
             
         protected:
-            virtual inline bool isChanged() {
+            virtual bool isChanged() {
                 if(old != this->get()) {
                     old = this->get();
                     return true;
@@ -248,16 +246,15 @@ namespace ofx {
             : t(t) { for(size_t i = 0; i < size; i++) old[i] = t[i]; }
             virtual ~Parameter() { };
             
-            virtual void send(ofxOscSender &sender, const string &address) {
-                if(!canPublish() || !isChanged()) return;
-                ofxOscMessage m;
+            virtual bool setMessage(ofxOscMessage &m, const string &address) {
+                if(!canPublish() || !isChanged()) return false;
                 m.setAddress(address);
                 set(m, get());
-                sender.sendMessage(m);
+                return true;
             }
             
         protected:
-            inline bool isChanged() {
+            virtual bool isChanged() {
                 bool isChange = false;
                 for(int i = 0; i < size; i++) {
                     isChange = isChange || (old[i] != get()[i]);
