@@ -10,13 +10,7 @@
 #include "ofMain.h"
 #include "ofxOsc.h"
 
-#if OF_VERSION_MINOR < 9
-#define ENABLE_FUNCTIONAL 0
-#else
-#define ENABLE_FUNCTIONAL 1
-#endif
-
-
+#include "details/ofxpubsubosc_settings.h"
 #include "details/ofxpubsubosc_type_traits.h"
 
 namespace ofx {
@@ -53,9 +47,11 @@ namespace ofx {
                 v = m.getArgAsString(offset);
             }
             
+#if ENABLE_OF_BUFFER
             inline void set(ofxOscMessage &m, ofBuffer &v, size_t offset = 0) {
                 v = m.getArgAsBlob(offset);
             }
+#endif
             
             inline void set(ofxOscMessage &m, ofColor &v, size_t offset = 0)      { setColor<unsigned char>(m, v, 255, offset); }
             inline void set(ofxOscMessage &m, ofShortColor &v, size_t offset = 0) { setColor<unsigned short>(m, v, 65535, offset); }
@@ -120,6 +116,75 @@ namespace ofx {
                 if(v.size() != num) v.resize(num);
                 for(int i = 0; i < num; i++) {
                     set(m, v[i], offset + i * ofxpubsubosc::type_traits<U>::size);
+                }
+            }
+            
+#pragma mark ofParameter<T> / ofParameterGroup
+            
+            template <typename U>
+            inline void set(ofxOscMessage &m, ofParameter<U> &p, size_t offset = 0) {
+                U u;
+                set(m, u, offset);
+                p.set(u);
+            }
+
+            inline void set(ofxOscMessage &m, ofAbstractParameter &p, size_t offset = 0) {
+                ofParameter<float> &pp = p.cast<float>();
+                set(m, pp, offset);
+                return;
+#define type_convert(type_) if(p.type() == typeid(ofParameter<type_>).name()) { set(m, p.cast<type_>(), offset); return; }
+                type_convert(float);
+                type_convert(double);
+                type_convert(int);
+                type_convert(unsigned int);
+                type_convert(long);
+                type_convert(unsigned long);
+                type_convert(ofColor);
+                type_convert(ofRectangle);
+                type_convert(ofVec2f);
+                type_convert(ofVec3f);
+                type_convert(ofVec4f);
+                type_convert(ofQuaternion);
+                type_convert(ofMatrix3x3);
+                type_convert(ofMatrix4x4);
+                
+                type_convert(ofFloatColor);
+                type_convert(ofShortColor);
+                
+                type_convert(bool);
+                type_convert(char);
+                type_convert(unsigned char);
+                type_convert(short);
+                type_convert(unsigned short);
+                type_convert(long long);
+                type_convert(unsigned long long);
+                
+#if ENABLE_OF_BUFFER
+                type_convert(ofBuffer);
+#endif
+                ofLogWarning("ofxOscSubscriber") << "ofAbstractParameter: Unknown type \"" << p.type() << "\", bind to " << m.getAddress() << ". we ignored.";
+#undef type_convert
+            }
+            
+            inline void set(ofxOscMessage &m, ofParameterGroup &pg, size_t offset = 0) {
+                if(m.getArgType(0) == OFXOSC_TYPE_INT32) {
+                    if(pg.size() <= m.getArgAsInt32(0)) {
+                        ofLogWarning("ofxOscSubscriber") << "ofAbstractParameterGroup: not contain index \"" << m.getArgAsInt32(0) << "\"";
+                        return;
+                    }
+                    set(m, pg.get(m.getArgAsInt32(0)), offset + 1);
+                } else if(m.getArgType(0) == OFXOSC_TYPE_INT64) {
+                    if(pg.size() <= m.getArgAsInt64(0)) {
+                        ofLogWarning("ofxOscSubscriber") << "ofAbstractParameterGroup: not contain index \"" << m.getArgAsInt64(0) << "\"";
+                        return;
+                    }
+                    set(m, pg.get(m.getArgAsInt64(0)), offset + 1);
+                } else if(m.getArgType(0) == OFXOSC_TYPE_STRING) {
+                    if(!pg.contains(m.getArgAsString(0))) {
+                        ofLogWarning("ofxOscSubscriber") << "ofAbstractParameterGroup: not contain key \"" << m.getArgAsString(0) << "\"";
+                        return;
+                    }
+                    set(m, pg.get(m.getArgAsString(0)), offset + 1);
                 }
             }
         };
