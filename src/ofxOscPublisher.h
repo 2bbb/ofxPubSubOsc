@@ -610,7 +610,9 @@ namespace ofx {
                 if(it == registeredTargets.end()) {
                     ofLogWarning("ofxPubSubOsc") << address << " is not registered.";
                 }
-                it->second->send(sender, it->first);
+                ofxOscMessage m;
+                if(it->second->setMessage(m, it->first)) sender.sendMessage(m);
+                m.clear();
             }
             
 #pragma mark unregister
@@ -645,23 +647,45 @@ namespace ofx {
                 return isRegistered() && (registeredTargets.find(address) != registeredTargets.end());
             }
             
-
             typedef shared_ptr<OscPublisher> Ref;
+            
+            static void setUseBundle(bool b) {
+                bUseBundle = b;
+            }
+            
+            static bool isUseBundle() {
+                return bUseBundle;
+            }
+            
         private:
             OscPublisher(const SenderKey &key) : key(key) {
                 sender.setup(key.first, key.second);
             }
             
             void update() {
-                for(Targets::iterator it = targets.begin(); it != targets.end(); it++) {
-                    it->second->send(sender, it->first);
+                ofxOscMessage m;
+                if(isUseBundle()) {
+                    ofxOscBundle bundle;
+                    for(Targets::iterator it = targets.begin(); it != targets.end(); it++) {
+                        if(it->second->setMessage(m, it->first)) bundle.addMessage(m);
+                        m.clear();
+                    }
+                    if(bundle.getMessageCount()) sender.sendBundle(bundle);
+                    bundle.clear();
+                    return;
                 }
+                for(Targets::iterator it = targets.begin(); it != targets.end(); it++) {
+                    if(it->second->setMessage(m, it->first)) sender.sendMessage(m);
+                    m.clear();
+                }
+                
             }
             
             SenderKey key;
             ofxOscSender sender;
             Targets targets;
             Targets registeredTargets;
+            static bool bUseBundle;
             friend class OscPublisherManager;
         };
         
@@ -694,6 +718,8 @@ namespace ofx {
         }
         OscPublishers publishers;
     };
+    
+    bool OscPublisherManager::OscPublisher::bUseBundle = false;
 };
 #undef type_ref
 
@@ -1087,6 +1113,12 @@ inline void ofxUnregisterPublishingOsc(const string &ip, int port, const string 
 
 inline void ofxUnregisterPublishingOsc(const string &ip, int port) {
     ofxGetOscPublisher(ip, port).unregister();
+}
+
+#pragma mark using bundle option
+
+inline void ofxPublisherSetUsingBundle(bool bUseBundle) {
+    ofxOscPublisher::setUseBundle(bUseBundle);
 }
 
 #pragma mark helper for publish array
