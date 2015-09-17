@@ -273,6 +273,7 @@ MIT License.
 * [HIGA Satoru](http://github.com/satoruhiga)
 * [SHIMIZU Motoi](http://github.com/motoishmz)
 * [IWATANI Nariaki](http://github.com/nariakiiwatani)
+* [USAMI Takuto](http://github.com/usm916)
 
 ## <a name="AtTheLast">At the last</a>
 
