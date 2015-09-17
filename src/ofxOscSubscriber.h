@@ -171,10 +171,22 @@ namespace ofx {
             
             inline void set(ofxOscMessage &m, ofParameterGroup &pg, size_t offset = 0) {
                 if(m.getArgType(0) == OFXOSC_TYPE_INT32) {
+                    if(pg.size() <= m.getArgAsInt32(0)) {
+                        ofLogWarning("ofxOscSubscriber") << "ofAbstractParameterGroup: not contain index \"" << m.getArgAsInt32(0) << "\"";
+                        return;
+                    }
                     set(m, pg.get(m.getArgAsInt32(0)), offset + 1);
                 } else if(m.getArgType(0) == OFXOSC_TYPE_INT64) {
+                    if(pg.size() <= m.getArgAsInt64(0)) {
+                        ofLogWarning("ofxOscSubscriber") << "ofAbstractParameterGroup: not contain index \"" << m.getArgAsInt64(0) << "\"";
+                        return;
+                    }
                     set(m, pg.get(m.getArgAsInt64(0)), offset + 1);
                 } else if(m.getArgType(0) == OFXOSC_TYPE_STRING) {
+                    if(!pg.contains(m.getArgAsString(0))) {
+                        ofLogWarning("ofxOscSubscriber") << "ofAbstractParameterGroup: not contain key \"" << m.getArgAsString(0) << "\"";
+                        return;
+                    }
                     set(m, pg.get(m.getArgAsString(0)), offset + 1);
                 }
             }
