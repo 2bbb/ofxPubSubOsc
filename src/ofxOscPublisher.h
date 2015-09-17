@@ -1117,7 +1117,7 @@ inline void ofxUnregisterPublishingOsc(const string &ip, int port) {
 
 #pragma mark using bundle option
 
-inline void ofxPublisherSetUsingBundle(bool bUseBundle) {
+inline void ofxSetPublisherUsingBundle(bool bUseBundle) {
     ofxOscPublisher::setUseBundle(bUseBundle);
 }
 
