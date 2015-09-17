@@ -576,19 +576,78 @@ namespace ofx {
                 if(isPublished(address)) targets[address]->setEnablePublish(true);
             }
             
+#pragma mark doRegister
+            
+            inline void doRegister(const string &address, ParameterRef ref) {
+                if(registeredTargets.find(address) == registeredTargets.end()) {
+                    registeredTargets.insert(make_pair(address, ref));
+                } else {
+                    registeredTargets[address] = ref;
+                }
+            }
+            
+            template <typename T>
+            void doRegister(const string &address, T &value) {
+                doRegister(address, ParameterRef(new Parameter<T, false>(value)));
+            }
+            
+            template <typename T>
+            void doRegister(const string &address, T (*getter)()) {
+                doRegister(address, ParameterRef(new GetterFunctionParameter<T, false>(getter)));
+            }
+            
+            template <typename T, typename C>
+            void doRegister(const string &address, C &that, T (C::*getter)()) {
+                doRegister(address, ParameterRef(new GetterParameter<T, C, false>(that, getter)));
+            }
+            
+            template <typename T, typename C>
+            void doRegister(const string &address, const C &that, T (C::*getter)() const) {
+                doRegister(address, ParameterRef(new ConstGetterParameter<T, C, false>(that, getter)));
+            }
+            
+#pragma mark publishRegistered
+            
+            inline void publishRegistered(const string &address) {
+                Targets::iterator it = registeredTargets.find(address);
+                if(it == registeredTargets.end()) {
+                    ofLogWarning("ofxPubSubOsc") << address << " is not registered.";
+                }
+                it->second->send(sender, it->first);
+            }
+            
+#pragma mark unregister
+            
+            inline void unregister(const string &address) {
+                if(registeredTargets.find(address) == registeredTargets.end()) registeredTargets.erase(address);
+            }
+            
+            inline void unregister() {
+                registeredTargets.clear();
+            }
+            
 #pragma mark status
             
             inline bool isPublished() const {
                 return !targets.empty();
             }
-
+            
             inline bool isPublished(const string &address) const {
                 return isPublished() && (targets.find(address) != targets.end());
             }
-
+            
             inline bool isEnabled(const string &address) const {
                 return isPublished(address) && targets.at(address)->isPublishNow();
             }
+            
+            inline bool isRegistered() const {
+                return !registeredTargets.empty();
+            }
+            
+            inline bool isRegistered(const string &address) const {
+                return isRegistered() && (registeredTargets.find(address) != registeredTargets.end());
+            }
+            
 
             typedef shared_ptr<OscPublisher> Ref;
         private:
@@ -605,6 +664,7 @@ namespace ofx {
             SenderKey key;
             ofxOscSender sender;
             Targets targets;
+            Targets registeredTargets;
             friend class OscPublisherManager;
         };
         
@@ -983,6 +1043,54 @@ inline void ofxUnpublishOsc(const string &ip, int port) {
 }
 
 /// \}
+
+#pragma mark register
+
+template <typename T>
+inline void ofxRegisterPublishingOsc(const string &ip, int port, const string &address, T &value) {
+    ofxGetOscPublisher(ip, port).doRegister(address, value);
+}
+
+template <typename T>
+inline void ofxRegisterPublishingOsc(const string &ip, int port, const string &address, T (*getter)()) {
+    ofxGetOscPublisher(ip, port).doRegister(address, getter);
+}
+
+template <typename T, typename C>
+inline void ofxRegisterPublishingOsc(const string &ip, int port, const string &address, C *that, T (C::*getter)()) {
+    ofxGetOscPublisher(ip, port).doRegister(address, *that, getter);
+}
+
+template <typename T, typename C>
+inline void ofxRegisterPublishingOsc(const string &ip, int port, const string &address, const C * const that, T (C::*getter)() const) {
+    ofxGetOscPublisher(ip, port).doRegister(address, *that, getter);
+}
+
+template <typename T, typename C>
+inline void ofxRegisterPublishingOsc(const string &ip, int port, const string &address, C &that, T (C::*getter)()) {
+    ofxGetOscPublisher(ip, port).doRegister(address, that, getter);
+}
+
+template <typename T, typename C>
+inline void ofxRegisterPublishingOsc(const string &ip, int port, const string &address, const C &that, T (C::*getter)() const) {
+    ofxGetOscPublisher(ip, port).doRegister(address, that, getter);
+}
+
+#pragma mark publish registered
+
+inline void ofxPublishRegisteredOsc(const string &ip, int port, const string &address) {
+    ofxGetOscPublisher(ip, port).publishRegistered(address);
+}
+
+#pragma mark unregister
+
+inline void ofxUnregisterPublishingOsc(const string &ip, int port, const string &address) {
+    ofxGetOscPublisher(ip, port).unregister(address);
+}
+
+inline void ofxUnregisterPublishingOsc(const string &ip, int port) {
+    ofxGetOscPublisher(ip, port).unregister();
+}
 
 #pragma mark helper for publish array
 
