@@ -16,6 +16,7 @@ if you use oF0.9.0~, then you can use `std::function<void(ofxOscMessage &)>`! de
 * [Simple API Reference](#SimpleAPI)
 	* [ofxSubscribeOsc](#SimpleAPI_ofxSubscribeOsc)
 	* [ofxPublishOsc](#SimpleAPI_ofxPublishOsc)
+	* [ofxRegisterPublishingOsc](#SimpleAPI_ofxRegisterPublishingOsc)
 * [Supported types](#SupportedTypes)
 	* [Arithmetic](#SupportedTypes_Arithmetic)
 	* [String](#SupportedTypes_String)
@@ -98,13 +99,30 @@ publish _value_ as an OSC message with an address pattern _address_ to _ip:port_
 
 * void ofxUnpublishOsc(const string &_ip_, int _port_, const string &_address_);
 
-unbind a publisher sending OSC messages with an address pattern _address_ to _ip:port_.
+unbind a publisher sending OSC message with an address pattern _address_ to _ip:port_.
 
 * void ofxUnpublishOsc(const string &_ip_, int _port_);
 
 unbind all the publishers sending to _ip:port_.
 
 #### See [class ofxOscPublisherManager](API_Reference.md#Advanced_ofxOscPublisherManager), [class ofxOscPublisher](API_Reference.md#Advanced_ofxOscPublisher)
+
+### <a name="SimpleAPI_ofxRegisterPublishingOsc">ofxRegisterPublishingOsc</a>
+
+* void ofxRegisterPublishingOsc(const string &_ip_, int _port_, const string &_address_, [SupportedType](#SupportedTypes) &_value_)
+* void ofxPublishRegisteredOsc(const string &_ip_, int _port_, const string &_address_)
+
+register value as an OSC message with an address pattern _address_ to _ip:port_. and publish when call `ofxPublishRegisteredOsc(ip, port, address)`.
+
+* void ofxUnregisterPublishingOsc(const string &_ip_, int _port_, const string &_address_)
+
+unregister OSC message with an address pattern _address_ to _ip:port_.
+
+* void ofxUnregisterPublishingOsc(const string &_ip_, int _port_)
+
+unregister all the messages sending to _ip:port_.
+
+**NOTE**: registable type is same to `ofxPublishOsc`. see [more ofxPublishOsc](API_Reference.md#API_ofxPublishOsc).
 
 ## <a name="SupportedTypes">Supported types</a>
 
@@ -178,6 +196,8 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 * add [ofParameter](#SupportedTypes_ofParameter)
 * add [ofParameterGroup](API_Reference.md#Advanced_how_to_subscribe_ofParameterGroup) for ofxSubscirbeOsc
+* add [ofxRegisterPublishingOsc](#ofxRegisterPublishingOsc)
+* add [ofxSetPublisherUsingBundle](API_Reference.md#ofxSetPublisherUsingBundle)
 * update README and [API_Reference.md](API_Reference.md)
 
 ### 2015/08/31 ver 0.1.0 release

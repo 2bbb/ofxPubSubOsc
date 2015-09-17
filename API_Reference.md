@@ -8,6 +8,7 @@
 	* [ofxPublishOsc](#API_ofxPublishOsc)
 		* [ofxPublishOscIf](API_ofxPublishOscIf)
 		* [ofxPublishAsArray](API_ofxPublishAsArray)
+		* [ofxSetPublisherUsingBundle](API_ofxSetPublisherUsingBundle)
 * [Advanced API](#AdvancedAPI)
 	* [class ofxOscSubscriberManager](#Advanced_ofxOscSubscriberManager)
 	* [class ofxOscSubscriber](#Advanced_ofxOscSubscriber)
@@ -156,6 +157,12 @@ float *bar = new float[12];
 ofxPublishOsc("localhost", 9005, "/foo", p, ofxPublishAsArray<int, 8>(&P::getFooPtr));
 ofxPublishOsc("localhost", 9005, "/bar", ofxPublishAsArray<float, 12>(bar));
 ```
+
+#### <a name="API_ofxSetPublisherUsingBundle">ofxSetPublisherUsingBundle</a>
+
+* ofxSetPublisherUsingBundle(bool _bUseBundle_)
+
+set to send messages with bundle
 
 #### See [class ofxOscPublisherManager](#Advanced_ofxOscPublisherManager), [class ofxOscPublisher](#Advanced_ofxOscPublisher)
 
