@@ -192,7 +192,7 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 ## <a name="UpdateHistory">Update history</a>
 
-### 2015/09/xx ver 0.1.1 release
+### 2015/09/17 ver 0.1.1 release
 
 * add [ofParameter](#SupportedTypes_ofParameter)
 * add [ofParameterGroup](API_Reference.md#Advanced_how_to_subscribe_ofParameterGroup) for ofxSubscirbeOsc
