@@ -10,7 +10,8 @@
 #include "ofMain.h"
 #include "ofxOsc.h"
 
-#include "ofxpubsubosc_type_utils.h"
+#include "details/ofxpubsubosc_settings.h"
+#include "details/ofxpubsubosc_type_utils.h"
 
 namespace ofx {
     using namespace ofxpubsubosc;
@@ -75,8 +76,9 @@ namespace ofx {
             define_set_float(double);
 #undef define_set_float
             inline void set(ofxOscMessage &m, const string &v) const { m.addStringArg(v); }
+#if ENABLE_OF_BUFFER
             inline void set(ofxOscMessage &m, const ofBuffer &v) const { m.addBlobArg(v); };
-            
+#endif
             template <typename PixType>
             inline void set(ofxOscMessage &m, const ofColor_<PixType> &v) const {  setVec<4>(m, v); }
             inline void set(ofxOscMessage &m, const ofVec2f &v) const { setVec<2>(m, v); }

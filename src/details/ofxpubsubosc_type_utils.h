@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "ofxpubsubosc_settings.h"
+
 namespace ofxpubsubosc {
     template <typename T>
     struct is_not_ofxoscmessage { typedef void type; };
@@ -87,6 +89,8 @@ bool operator!=(const ofMatrix4x4 &x, const ofMatrix4x4 &y) {
     return !operator==(x, y);
 }
 
+#if ENABLE_OF_BUFFER
+
 bool operator==(const ofBuffer &x, const ofBuffer &y) {
 #if OF_VERSION_MINOR < 9
     return (x.size() == y.size()) && (memcmp(x.getBinaryBuffer(), y.getBinaryBuffer(), x.size()) == 0);
@@ -98,3 +102,5 @@ bool operator==(const ofBuffer &x, const ofBuffer &y) {
 bool operator!=(const ofBuffer &x, const ofBuffer &y) {
     return !operator==(x, y);
 }
+
+#endif

@@ -10,13 +10,7 @@
 #include "ofMain.h"
 #include "ofxOsc.h"
 
-#if OF_VERSION_MINOR < 9
-#define ENABLE_FUNCTIONAL 0
-#else
-#define ENABLE_FUNCTIONAL 1
-#endif
-
-
+#include "details/ofxpubsubosc_settings.h"
 #include "details/ofxpubsubosc_type_traits.h"
 
 namespace ofx {
@@ -53,9 +47,11 @@ namespace ofx {
                 v = m.getArgAsString(offset);
             }
             
+#if ENABLE_OF_BUFFER
             inline void set(ofxOscMessage &m, ofBuffer &v, size_t offset = 0) {
                 v = m.getArgAsBlob(offset);
             }
+#endif
             
             inline void set(ofxOscMessage &m, ofColor &v, size_t offset = 0)      { setColor<unsigned char>(m, v, 255, offset); }
             inline void set(ofxOscMessage &m, ofShortColor &v, size_t offset = 0) { setColor<unsigned short>(m, v, 65535, offset); }
@@ -163,8 +159,9 @@ namespace ofx {
                 type_convert(long long);
                 type_convert(unsigned long long);
                 
+#if ENABLE_OF_BUFFER
                 type_convert(ofBuffer);
-                
+#endif
                 ofLogWarning("ofxOscSubscriber") << "ofAbstractParameter: Unknown type \"" << p.type() << "\", bind to " << m.getAddress() << ". we ignored.";
 #undef type_convert
             }
