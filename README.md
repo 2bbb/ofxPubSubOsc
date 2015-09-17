@@ -198,6 +198,7 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 * add [ofParameterGroup](API_Reference.md#Advanced_how_to_subscribe_ofParameterGroup) for ofxSubscirbeOsc
 * add [ofxRegisterPublishingOsc](#ofxRegisterPublishingOsc)
 * add [ofxSetPublisherUsingBundle](API_Reference.md#ofxSetPublisherUsingBundle)
+* support 0.8.1 (not support ofBuffer as blob)
 * update README and [API_Reference.md](API_Reference.md)
 
 ### 2015/08/31 ver 0.1.0 release
