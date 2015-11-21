@@ -424,6 +424,8 @@ namespace ofx {
                 }
             }
             
+            const Targets & getTargets() { return targets; }
+            
             typedef shared_ptr<OscSubscriber> Ref;
         private:
             OscSubscriber(int port)
