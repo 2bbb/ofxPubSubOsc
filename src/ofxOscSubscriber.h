@@ -424,7 +424,12 @@ namespace ofx {
                 }
             }
             
-            const Targets & getTargets() { return targets; }
+            void notify(ofxOscMessage & m) {
+                const string &address = m.getAddress();
+                if(targets.find(address) != targets.end()) {
+                    targets[address]->read(m);
+                }
+            }
             
             typedef shared_ptr<OscSubscriber> Ref;
         private:
