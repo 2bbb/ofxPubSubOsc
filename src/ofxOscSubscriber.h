@@ -498,6 +498,53 @@ namespace ofx {
             ofRemoveListener(ofEvents().update, this, &OscSubscriberManager::update, OF_EVENT_ORDER_BEFORE_APP);
         }
         OscSubscribers managers;
+        
+#pragma mark iterator
+    public:
+        typedef OscSubscribers::iterator iterator;
+        typedef OscSubscribers::const_iterator const_iterator;
+        typedef OscSubscribers::reverse_iterator reverse_iterator;
+        typedef OscSubscribers::const_reverse_iterator const_reverse_iterator;
+        
+        iterator begin() { return managers.begin(); }
+        iterator end() { return managers.end(); }
+        
+        const_iterator begin() const { return managers.cbegin(); }
+        const_iterator end() const { return managers.cend(); }
+        const_iterator cbegin() const {
+#if __cplusplus <= 199711L
+            return managers.begin();
+#else
+            return managers.cbegin();
+#endif
+        }
+        const_iterator cend() const {
+#if __cplusplus <= 199711L
+            return managers.end();
+#else
+            return managers.cend();
+#endif
+        }
+        
+        reverse_iterator rbegin() { return managers.rbegin(); }
+        reverse_iterator rend() { return managers.rend(); }
+        
+        const_reverse_iterator rbegin() const { return managers.crbegin(); }
+        const_reverse_iterator rend() const { return managers.crend(); }
+        const_reverse_iterator crbegin() const {
+#if __cplusplus <= 199711L
+            return managers.rbegin();
+#else
+            return managers.crbegin();
+#endif
+        }
+        const_reverse_iterator crend() const {
+#if __cplusplus <= 199711L
+            return managers.rend();
+#else
+            return managers.crend();
+#endif
+        }
     };
 };
 
@@ -659,6 +706,17 @@ inline void ofxUnsubscribeOsc(int port) {
 
 inline void ofxNotifyToSubscribedOsc(int port, ofxOscMessage &m) {
     ofxGetOscSubscriber(port).notify(m);
+}
+
+inline void ofxNotifyToSubscribedOsc(ofxOscMessage &m) {
+    ofxOscSubscriberManager &manager = ofxOscSubscriberManager::getSharedInstance();
+    for(ofxOscSubscriberManager::iterator it  = manager.begin(),
+                                          end = manager.end();
+        it != end;
+        it++)
+    {
+        it->second->notify(m);
+    }
 }
 
 #pragma mark interface about leaked osc
