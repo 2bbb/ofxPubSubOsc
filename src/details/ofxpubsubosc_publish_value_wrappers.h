@@ -114,23 +114,23 @@ namespace ofxpubsubosc {
 #pragma mark factory
         
         template <typename T>
-        shared_ptr<abstract_pointer_stream<T> > pointer_stream_factory(T *t) {
-            return shared_ptr<abstract_pointer_stream<T> >(new raw_pointer_stream<T>(t));
+        std::shared_ptr<abstract_pointer_stream<T> > pointer_stream_factory(T *t) {
+            return std::shared_ptr<abstract_pointer_stream<T> >(new raw_pointer_stream<T>(t));
         }
         
         template <typename T>
-        shared_ptr<abstract_pointer_stream<T> > pointer_stream_factory(T (*g)()) {
-            return shared_ptr<abstract_pointer_stream<T> >(new getter_function_pointer_stream<T>(g));
+        std::shared_ptr<abstract_pointer_stream<T> > pointer_stream_factory(T (*g)()) {
+            return std::shared_ptr<abstract_pointer_stream<T> >(new getter_function_pointer_stream<T>(g));
         }
         
         template <typename T, typename U>
-        shared_ptr<abstract_pointer_stream<T> > pointer_stream_factory(U &that, T (U::*g)()) {
-            return shared_ptr<abstract_pointer_stream<T> >(new getter_method_pointer_stream<T, U>(that, g));
+        std::shared_ptr<abstract_pointer_stream<T> > pointer_stream_factory(U &that, T (U::*g)()) {
+            return std::shared_ptr<abstract_pointer_stream<T> >(new getter_method_pointer_stream<T, U>(that, g));
         }
         
         template <typename T, typename U>
-        shared_ptr<abstract_pointer_stream<T> > pointer_stream_factory(const U &that, T (U::*g)() const) {
-            return shared_ptr<abstract_pointer_stream<T> >(new const_getter_method_pointer_stream<T, U>(that, g));
+        std::shared_ptr<abstract_pointer_stream<T> > pointer_stream_factory(const U &that, T (U::*g)() const) {
+            return std::shared_ptr<abstract_pointer_stream<T> >(new const_getter_method_pointer_stream<T, U>(that, g));
         }
         
 #pragma mark array publisher
@@ -161,7 +161,7 @@ namespace ofxpubsubosc {
             operator const_array_t() { return get(); };
             const_array_t get() { return reinterpret_cast<const_array_t>(stream.get()); };
         protected:
-            shared_ptr<abstract_pointer_stream<T> > stream;
+            std::shared_ptr<abstract_pointer_stream<T> > stream;
         };
         
         template <typename T, size_t s>

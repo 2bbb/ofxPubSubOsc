@@ -46,23 +46,23 @@ namespace ofxpubsubosc {
         };
         
         template <typename T>
-        shared_ptr<abstract_stream<T> > stream_factory(T &t) {
-            return shared_ptr<abstract_stream<T> >(new raw_stream<T>(t));
+        std::shared_ptr<abstract_stream<T> > stream_factory(T &t) {
+            return std::shared_ptr<abstract_stream<T> >(new raw_stream<T>(t));
         }
         
         template <typename T, typename U>
-        shared_ptr<abstract_stream<T> > stream_factory(U (*setter)(T)) {
-            return shared_ptr<abstract_stream<T> >(new setter_function_stream<T, U>(setter));
+        std::shared_ptr<abstract_stream<T> > stream_factory(U (*setter)(T)) {
+            return std::shared_ptr<abstract_stream<T> >(new setter_function_stream<T, U>(setter));
         }
         
         template <typename T, typename U, typename C>
-        shared_ptr<abstract_stream<T> > stream_factory(C &o, U (C::*setter)(T)) {
-            return shared_ptr<abstract_stream<T> >(new setter_method_stream<T, U, C>(o, setter));
+        std::shared_ptr<abstract_stream<T> > stream_factory(C &o, U (C::*setter)(T)) {
+            return std::shared_ptr<abstract_stream<T> >(new setter_method_stream<T, U, C>(o, setter));
         }
         
         template <typename T, typename U, typename C>
-        shared_ptr<abstract_stream<T> > stream_factory(C *o, U (C::*setter)(T)) {
-            return shared_ptr<abstract_stream<T> >(new setter_method_stream<T, U, C>(*o, setter));
+        std::shared_ptr<abstract_stream<T> > stream_factory(C *o, U (C::*setter)(T)) {
+            return std::shared_ptr<abstract_stream<T> >(new setter_method_stream<T, U, C>(*o, setter));
         }
     }
 };
