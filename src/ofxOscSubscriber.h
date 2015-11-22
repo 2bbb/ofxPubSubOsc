@@ -655,6 +655,12 @@ inline void ofxUnsubscribeOsc(int port) {
 
 /// \}
 
+#pragma mark notify messages manually
+
+inline void ofxNotifyToSubscribedOsc(int port, ofxOscMessage &m) {
+    ofxGetOscSubscriber(port).notify(m);
+}
+
 #pragma mark interface about leaked osc
 
 /// \name ofxSetLeakedOscPicker
