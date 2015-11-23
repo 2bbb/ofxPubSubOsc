@@ -20,4 +20,10 @@
 #   define ENABLE_FUNCTIONAL 1
 #endif
 
+#if __cplusplus <= 199711L
+#   define ENABLE_CPP11 0
+#else
+#   define ENABLE_CPP11 1
+#endif
+
 #endif
