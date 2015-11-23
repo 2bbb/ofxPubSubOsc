@@ -700,6 +700,18 @@ inline void ofxUnsubscribeOsc(int port) {
     ofxGetOscSubscriber(port).unsubscribe();
 }
 
+/// \brief unbind from all OSC messages.
+/// \returns void
+
+inline void ofxUnsubscribeOsc() {
+    ofxOscSubscriberManager &manager = ofxGetOscSubscriberManager();
+    ofxOscSubscriberManager::iterator it  = manager.begin(),
+                                      end = manager.end();
+    for(; it != end; it++) {
+        it->second->unsubscribe();
+    }
+}
+
 /// \}
 
 #pragma mark notify messages manually
