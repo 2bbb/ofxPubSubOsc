@@ -512,14 +512,14 @@ namespace ofx {
         const_iterator begin() const { return managers.cbegin(); }
         const_iterator end() const { return managers.cend(); }
         const_iterator cbegin() const {
-#if __cplusplus <= 199711L
+#if ENABLE_CPP11
             return managers.begin();
 #else
             return managers.cbegin();
 #endif
         }
         const_iterator cend() const {
-#if __cplusplus <= 199711L
+#if ENABLE_CPP11
             return managers.end();
 #else
             return managers.cend();
@@ -532,14 +532,14 @@ namespace ofx {
         const_reverse_iterator rbegin() const { return managers.crbegin(); }
         const_reverse_iterator rend() const { return managers.crend(); }
         const_reverse_iterator crbegin() const {
-#if __cplusplus <= 199711L
+#if ENABLE_CPP11
             return managers.rbegin();
 #else
             return managers.crbegin();
 #endif
         }
         const_reverse_iterator crend() const {
-#if __cplusplus <= 199711L
+#if ENABLE_CPP11
             return managers.rend();
 #else
             return managers.crend();
