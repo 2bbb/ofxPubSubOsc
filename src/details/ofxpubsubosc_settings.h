@@ -14,7 +14,7 @@
 #   define ENABLE_OF_BUFFER 1
 #endif
 
-#if (OF_VERSION_MAJOR == 0) && OF_VERSION_MINOR < 9
+#if (OF_VERSION_MAJOR == 0) && (OF_VERSION_MINOR < 9)
 #   define ENABLE_FUNCTIONAL 0
 #else
 #   define ENABLE_FUNCTIONAL 1
