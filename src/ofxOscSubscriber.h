@@ -683,6 +683,32 @@ inline void ofxSubscribeOsc(int port, const std::string &address, std::function<
 }
 #endif
 
+#if ENABLE_CPP11
+
+template <typename ... Args>
+inline void ofxSubscribeOsc(const std::initializer_list<int> &ports, const std::string &address, Args & ... args) {
+    for(auto &port : ports) {
+        ofxSubscribeOsc(port, address, args ...);
+    }
+}
+
+template <typename ... Args>
+inline void ofxSubscribeOsc(int port, const std::initializer_list<const std::string> &addresses, Args & ... args) {
+    auto &subscriber = ofxGetOscSubscriber(port);
+    for(auto &address : addresses) {
+        subscriber.subscribe(address, args ...);
+    }
+}
+
+template <typename ... Args>
+inline void ofxSubscribeOsc(const std::initializer_list<int> &ports, const std::initializer_list<const std::string> &addresses, Args & ... args) {
+    for(auto &port : ports) {
+        ofxSubscribeOsc(port, addresses, args ...);
+    }
+}
+
+#endif
+
 /// \}
 
 #pragma mark unsubscribe
