@@ -21,7 +21,7 @@ namespace ofx {
         struct SetImplementation {
         protected:
 #define define_set_arithmetic(type) \
-            inline void set(ofxOscMessage &m, type &v, size_t offset = 0) { \
+            inline void set(ofxOscMessage &m, type &v, std::size_t offset = 0) { \
                 if(m.getArgType(offset) == OFXOSC_TYPE_INT32) v = m.getArgAsInt32(offset); \
                 else if(m.getArgType(offset) == OFXOSC_TYPE_INT64) v = m.getArgAsInt64(offset); \
                 else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); \
@@ -43,22 +43,22 @@ namespace ofx {
             define_set_arithmetic(double);
 #undef define_set_arithmetic
             
-            inline void set(ofxOscMessage &m, std::string &v, size_t offset = 0) {
+            inline void set(ofxOscMessage &m, std::string &v, std::size_t offset = 0) {
                 v = m.getArgAsString(offset);
             }
             
 #if ENABLE_OF_BUFFER
-            inline void set(ofxOscMessage &m, ofBuffer &v, size_t offset = 0) {
+            inline void set(ofxOscMessage &m, ofBuffer &v, std::size_t offset = 0) {
                 v = m.getArgAsBlob(offset);
             }
 #endif
             
-            inline void set(ofxOscMessage &m, ofColor &v, size_t offset = 0)      { setColor<unsigned char>(m, v, 255, offset); }
-            inline void set(ofxOscMessage &m, ofShortColor &v, size_t offset = 0) { setColor<unsigned short>(m, v, 65535, offset); }
-            inline void set(ofxOscMessage &m, ofFloatColor &v, size_t offset = 0) { setColor<float>(m, v, 1.0f, offset); }
+            inline void set(ofxOscMessage &m, ofColor &v, std::size_t offset = 0)      { setColor<unsigned char>(m, v, 255, offset); }
+            inline void set(ofxOscMessage &m, ofShortColor &v, std::size_t offset = 0) { setColor<unsigned short>(m, v, 65535, offset); }
+            inline void set(ofxOscMessage &m, ofFloatColor &v, std::size_t offset = 0) { setColor<float>(m, v, 1.0f, offset); }
             
             template <typename U>
-            inline void setColor(ofxOscMessage &m, ofColor_<U> &v, U defaultValue, size_t offset = 0) {
+            inline void setColor(ofxOscMessage &m, ofColor_<U> &v, U defaultValue, std::size_t offset = 0) {
                 if(m.getNumArgs() == 1) {
                     set(m, v.r, offset);
                     set(m, v.g, offset);
@@ -77,42 +77,42 @@ namespace ofx {
                 }
             }
             
-            inline void set(ofxOscMessage &m, ofVec2f &v, size_t offset = 0)      { setVec<2>(m, v, offset); }
-            inline void set(ofxOscMessage &m, ofVec3f &v, size_t offset = 0)      { setVec<3>(m, v, offset); }
-            inline void set(ofxOscMessage &m, ofVec4f &v, size_t offset = 0)      { setVec<4>(m, v, offset); }
-            inline void set(ofxOscMessage &m, ofQuaternion &v, size_t offset = 0) { setVec<4>(m, v, offset); }
-            inline void set(ofxOscMessage &m, ofMatrix3x3 &v, size_t offset = 0)  { setVec<9>(m, v, offset); }
+            inline void set(ofxOscMessage &m, ofVec2f &v, std::size_t offset = 0)      { setVec<2>(m, v, offset); }
+            inline void set(ofxOscMessage &m, ofVec3f &v, std::size_t offset = 0)      { setVec<3>(m, v, offset); }
+            inline void set(ofxOscMessage &m, ofVec4f &v, std::size_t offset = 0)      { setVec<4>(m, v, offset); }
+            inline void set(ofxOscMessage &m, ofQuaternion &v, std::size_t offset = 0) { setVec<4>(m, v, offset); }
+            inline void set(ofxOscMessage &m, ofMatrix3x3 &v, std::size_t offset = 0)  { setVec<9>(m, v, offset); }
             
-            template <size_t n, typename U>
-            inline void setVec(ofxOscMessage &m, U &v, size_t offset = 0) {
-                for(int i = 0; i < min(static_cast<size_t>(m.getNumArgs() - offset), n); i++) {
+            template <std::size_t n, typename U>
+            inline void setVec(ofxOscMessage &m, U &v, std::size_t offset = 0) {
+                for(int i = 0; i < min(static_cast<std::size_t>(m.getNumArgs() - offset), n); i++) {
                     set(m, v[i], offset + i);
                 }
             }
             
-            inline void set(ofxOscMessage &m, ofMatrix4x4 &v, size_t offset = 0) {
+            inline void set(ofxOscMessage &m, ofMatrix4x4 &v, std::size_t offset = 0) {
                 for(int j = 0; j < 4; j++) for(int i = 0; i < 4; i++) {
                     set(m, v(i, j), offset + 4 * j + i);
                 }
             }
             
-            inline void set(ofxOscMessage &m, ofRectangle &v, size_t offset = 0) {
+            inline void set(ofxOscMessage &m, ofRectangle &v, std::size_t offset = 0) {
                 set(m, v.x,      offset + 0);
                 set(m, v.y,      offset + 1);
                 set(m, v.width,  offset + 2);
                 set(m, v.height, offset + 3);
             }
             
-            template <typename U, size_t size>
-            inline void set(ofxOscMessage &m, U (&v)[size], size_t offset = 0) {
+            template <typename U, std::size_t size>
+            inline void set(ofxOscMessage &m, U (&v)[size], std::size_t offset = 0) {
                 for(int i = 0; i < min(size, (m.getNumArgs() - offset) / ofxpubsubosc::type_traits<U>::size); i++) {
                     set(m, v[i], offset + i * ofxpubsubosc::type_traits<U>::size);
                 }
             }
             
             template <typename U>
-            inline void set(ofxOscMessage &m, vector<U> &v, size_t offset = 0) {
-                size_t num = (m.getNumArgs() - offset) / ofxpubsubosc::type_traits<U>::size;
+            inline void set(ofxOscMessage &m, vector<U> &v, std::size_t offset = 0) {
+                std::size_t num = (m.getNumArgs() - offset) / ofxpubsubosc::type_traits<U>::size;
                 if(v.size() != num) v.resize(num);
                 for(int i = 0; i < num; i++) {
                     set(m, v[i], offset + i * ofxpubsubosc::type_traits<U>::size);
@@ -122,13 +122,13 @@ namespace ofx {
 #pragma mark ofParameter<T> / ofParameterGroup
             
             template <typename U>
-            inline void set(ofxOscMessage &m, ofParameter<U> &p, size_t offset = 0) {
+            inline void set(ofxOscMessage &m, ofParameter<U> &p, std::size_t offset = 0) {
                 U u;
                 set(m, u, offset);
                 p.set(u);
             }
 
-            inline void set(ofxOscMessage &m, ofAbstractParameter &p, size_t offset = 0) {
+            inline void set(ofxOscMessage &m, ofAbstractParameter &p, std::size_t offset = 0) {
 #define type_convert(type_) if(p.type() == typeid(ofParameter<type_>).name()) { set(m, p.cast<type_>(), offset); return; }
                 type_convert(float);
                 type_convert(double);
@@ -163,7 +163,7 @@ namespace ofx {
 #undef type_convert
             }
             
-            inline void set(ofxOscMessage &m, ofParameterGroup &pg, size_t offset = 0) {
+            inline void set(ofxOscMessage &m, ofParameterGroup &pg, std::size_t offset = 0) {
                 if(m.getArgType(0) == OFXOSC_TYPE_INT32) {
                     if(pg.size() <= m.getArgAsInt32(0)) {
                         ofLogWarning("ofxOscSubscriber") << "ofAbstractParameterGroup: not contain index \"" << m.getArgAsInt32(0) << "\"";
