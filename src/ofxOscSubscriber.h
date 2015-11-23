@@ -709,12 +709,10 @@ inline void ofxNotifyToSubscribedOsc(int port, ofxOscMessage &m) {
 }
 
 inline void ofxNotifyToSubscribedOsc(ofxOscMessage &m) {
-    ofxOscSubscriberManager &manager = ofxOscSubscriberManager::getSharedInstance();
-    for(ofxOscSubscriberManager::iterator it  = manager.begin(),
-                                          end = manager.end();
-        it != end;
-        it++)
-    {
+    ofxOscSubscriberManager &manager = ofxGetOscSubscriberManager();
+    ofxOscSubscriberManager::iterator it  = manager.begin(),
+                                      end = manager.end();
+    for(; it != end; it++) {
         it->second->notify(m);
     }
 }
