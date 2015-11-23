@@ -790,4 +790,13 @@ inline void ofxRemoveLeakedOscPicker(int port) {
     ofxGetOscSubscriber(port).removeLeakPicker();
 }
 
+inline void ofxRemoveLeakedOscPicker() {
+    ofxOscSubscriberManager &manager = ofxGetOscSubscriberManager();
+    ofxOscSubscriberManager::iterator it  = manager.begin(),
+                                      end = manager.end();
+    for(; it != end; it++) {
+        it->second->removeLeakPicker();
+    }
+}
+
 /// \}
