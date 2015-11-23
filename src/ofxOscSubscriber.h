@@ -551,6 +551,13 @@ namespace ofx {
 typedef ofx::OscSubscriberManager ofxOscSubscriberManager;
 typedef ofxOscSubscriberManager::OscSubscriber ofxOscSubscriber;
 
+/// \brief get a OscSubscriberManager.
+/// \returns ofxOscSubscriberManager
+
+inline ofxOscSubscriberManager &ofxGetOscSubscriberManager() {
+    return ofxOscSubscriberManager::getSharedInstance();
+}
+
 /// \brief get a OscSubscriber.
 /// \param port binded port is typed int
 /// \returns ofxOscSubscriber binded to port
