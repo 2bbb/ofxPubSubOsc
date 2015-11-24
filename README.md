@@ -197,7 +197,9 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 * add iterators to [ofxOscSubscriberManager](API_Reference.md#Advanced_ofxOscSubscriberManager)
 * add all port operation to ofxUnsubscribeOsc, ofxNotifyToSubscribedOsc, ofxRemoveLeakedOscPicker
 * add ofxSetLeakedOscPickerAll (only oF0.9.0~)
-* add `ofxSubscribeOsc` with `std::initializer_list<int> port` and `std::initializer_list<std::string> addresses` (only oF0.9.0~)
+* add ofxSubscribeOsc with `std::initializer_list<int> port` and `std::initializer_list<std::string> addresses` (only oF0.9.0~)
+* add iterators to [ofxOscPublisherManager](API_Reference.md#Advanced_ofxOscPublisherManager)
+* add all port operation to ofxUnpublishOsc, ofxUnregisterPublishingOsc
 * add `std::` prefix
 
 ### 2015/09/17 ver 0.1.1 release
