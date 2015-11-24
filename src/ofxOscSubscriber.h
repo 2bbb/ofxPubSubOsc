@@ -520,8 +520,8 @@ namespace ofx {
         iterator begin() { return managers.begin(); }
         iterator end() { return managers.end(); }
         
-        const_iterator begin() const { return managers.cbegin(); }
-        const_iterator end() const { return managers.cend(); }
+        const_iterator begin() const { return managers.begin(); }
+        const_iterator end() const { return managers.end(); }
         const_iterator cbegin() const {
 #if ENABLE_CPP11
             return managers.begin();
@@ -540,8 +540,8 @@ namespace ofx {
         reverse_iterator rbegin() { return managers.rbegin(); }
         reverse_iterator rend() { return managers.rend(); }
         
-        const_reverse_iterator rbegin() const { return managers.crbegin(); }
-        const_reverse_iterator rend() const { return managers.crend(); }
+        const_reverse_iterator rbegin() const { return managers.rbegin(); }
+        const_reverse_iterator rend() const { return managers.rend(); }
         const_reverse_iterator crbegin() const {
 #if ENABLE_CPP11
             return managers.rbegin();
