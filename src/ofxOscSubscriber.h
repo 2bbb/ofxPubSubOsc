@@ -13,6 +13,8 @@
 #include "details/ofxpubsubosc_settings.h"
 #include "details/ofxpubsubosc_type_traits.h"
 
+#include <initializer_list>
+
 namespace ofx {
     using namespace ofxpubsubosc;
     
