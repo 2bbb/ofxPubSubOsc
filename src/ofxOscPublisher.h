@@ -821,6 +821,13 @@ namespace ofx {
 typedef ofx::OscPublisherManager ofxOscPublisherManager;
 typedef ofxOscPublisherManager::OscPublisher ofxOscPublisher;
 
+/// \brief get a OscPublisherManager.
+/// \returns ofxOscPublisherManager
+
+inline ofxOscPublisherManager &ofxGetOscPublisherManager() {
+    return ofxOscPublisherManager::getSharedInstance();
+}
+
 /// \brief get a OscPublisher.
 /// \param ip target ip is typed const std::string &
 /// \param port target port is typed int
@@ -1189,6 +1196,15 @@ inline void ofxUnpublishOsc(const std::string &ip, int port) {
     ofxGetOscPublisher(ip, port).unpublish();
 }
 
+inline void ofxUnpublishOsc() {
+    ofxOscPublisherManager &manager = ofxGetOscPublisherManager();
+    ofxOscPublisherManager::iterator it  = manager.begin(),
+                                     end = manager.end();
+    for(; it != end; it++) {
+        it->second->unpublish();
+    }
+}
+
 /// \}
 
 #pragma mark register
@@ -1239,6 +1255,14 @@ inline void ofxUnregisterPublishingOsc(const std::string &ip, int port) {
     ofxGetOscPublisher(ip, port).unregister();
 }
 
+inline void ofxUnregisterPublishingOsc() {
+    ofxOscPublisherManager &manager = ofxGetOscPublisherManager();
+    ofxOscPublisherManager::iterator it  = manager.begin(),
+                                     end = manager.end();
+    for(; it != end; it++) {
+        it->second->unregister();
+    }
+}
 #pragma mark using bundle option
 
 inline void ofxSetPublisherUsingBundle(bool bUseBundle) {
