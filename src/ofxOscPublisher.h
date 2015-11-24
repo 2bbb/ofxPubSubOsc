@@ -1209,6 +1209,9 @@ inline void ofxUnpublishOsc() {
 
 #pragma mark register
 
+/// \name ofxRegisterPublishingOsc
+/// \{
+
 template <typename T>
 inline void ofxRegisterPublishingOsc(const std::string &ip, int port, const std::string &address, T &value) {
     ofxGetOscPublisher(ip, port).doRegister(address, value);
@@ -1239,13 +1242,23 @@ inline void ofxRegisterPublishingOsc(const std::string &ip, int port, const std:
     ofxGetOscPublisher(ip, port).doRegister(address, that, getter);
 }
 
+/// \}
+
 #pragma mark publish registered
+
+/// \name ofxPublishRegisteredOsc
+/// \{
 
 inline void ofxPublishRegisteredOsc(const std::string &ip, int port, const std::string &address) {
     ofxGetOscPublisher(ip, port).publishRegistered(address);
 }
 
+/// \}
+
 #pragma mark unregister
+
+/// \name ofxUnregisterPublishingOsc
+/// \{
 
 inline void ofxUnregisterPublishingOsc(const std::string &ip, int port, const std::string &address) {
     ofxGetOscPublisher(ip, port).unregister(address);
@@ -1263,6 +1276,9 @@ inline void ofxUnregisterPublishingOsc() {
         it->second->unregister();
     }
 }
+
+/// \}
+
 #pragma mark using bundle option
 
 inline void ofxSetPublisherUsingBundle(bool bUseBundle) {
