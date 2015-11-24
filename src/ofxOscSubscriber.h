@@ -838,6 +838,19 @@ inline void ofxSetLeakedOscPicker(int port, std::function<void(ofxOscMessage &)>
 }
 #endif
 
+#if ENABLE_CPP11
+#pragma mark leak picking all port
+
+template <typename T, typename ... Args>
+inline typename std::enable_if<!std::is_integral<T>::value>::type ofxSetLeakedOscPickerAll(T &arg, Args & ... args) {
+    for(auto subscriber : ofxGetOscSubscriberManager()) {
+        subscriber.second->setLeakPicker(arg, args ...);
+    }
+}
+#endif
+
+#pragma mark remove leaked osc picker(s)
+
 /// \brief remove a callback receives messages has leaked patterns incoming to port.
 /// \param port binded port is typed int
 /// \returns void
