@@ -750,6 +750,29 @@ namespace ofx {
             ofRemoveListener(ofEvents().update, this, &OscPublisherManager::update, OF_EVENT_ORDER_AFTER_APP);
         }
         OscPublishers publishers;
+        
+#pragma mark iterator
+    public:
+        typedef OscPublishers::iterator iterator;
+        typedef OscPublishers::const_iterator const_iterator;
+        typedef OscPublishers::reverse_iterator reverse_iterator;
+        typedef OscPublishers::const_reverse_iterator const_reverse_iterator;
+        
+        iterator begin() { return publishers.begin(); }
+        iterator end() { return publishers.end(); }
+        
+        const_iterator begin() const { return publishers.begin(); }
+        const_iterator end() const { return publishers.end(); }
+        const_iterator cbegin() const { return publishers.begin(); }
+        const_iterator cend() const { return publishers.end(); }
+        
+        reverse_iterator rbegin() { return publishers.rbegin(); }
+        reverse_iterator rend() { return publishers.rend(); }
+        
+        const_reverse_iterator rbegin() const { return publishers.rbegin(); }
+        const_reverse_iterator rend() const { return publishers.rend(); }
+        const_reverse_iterator crbegin() const { return publishers.rbegin(); }
+        const_reverse_iterator crend() const { return publishers.crend(); }
     };
     
     bool OscPublisherManager::OscPublisher::bUseBundle = false;

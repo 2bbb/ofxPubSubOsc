@@ -522,40 +522,16 @@ namespace ofx {
         
         const_iterator begin() const { return managers.begin(); }
         const_iterator end() const { return managers.end(); }
-        const_iterator cbegin() const {
-#if ENABLE_CPP11
-            return managers.begin();
-#else
-            return managers.cbegin();
-#endif
-        }
-        const_iterator cend() const {
-#if ENABLE_CPP11
-            return managers.end();
-#else
-            return managers.cend();
-#endif
-        }
+        const_iterator cbegin() const { return managers.begin(); }
+        const_iterator cend() const { return managers.end(); }
         
         reverse_iterator rbegin() { return managers.rbegin(); }
         reverse_iterator rend() { return managers.rend(); }
         
         const_reverse_iterator rbegin() const { return managers.rbegin(); }
         const_reverse_iterator rend() const { return managers.rend(); }
-        const_reverse_iterator crbegin() const {
-#if ENABLE_CPP11
-            return managers.rbegin();
-#else
-            return managers.crbegin();
-#endif
-        }
-        const_reverse_iterator crend() const {
-#if ENABLE_CPP11
-            return managers.rend();
-#else
-            return managers.crend();
-#endif
-        }
+        const_reverse_iterator crbegin() const { return managers.rbegin(); }
+        const_reverse_iterator crend() const { return managers.crend(); }
     };
 };
 
