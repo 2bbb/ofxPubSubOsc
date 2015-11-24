@@ -33,8 +33,7 @@ if you use oF0.9.0~, then you can use `std::function<void(ofxOscMessage &)>`! de
 
 ## <a name="HowToUse">How to use</a>
 
-```
-
+```cpp
 class ofApp : public ofBaseApp {
 	int foo;
 	ofColor c;
