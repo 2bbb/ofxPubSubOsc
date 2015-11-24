@@ -191,6 +191,15 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 ## <a name="UpdateHistory">Update history</a>
 
+### 2015/XX/XX ver 0.1.2 release
+
+* add new feature [ofxNotifyToSubscribedOsc](#SimpleAPI_ofxNotifyToSubscribedOsc) (proposed by [satcy](http://github.com/satcy). thanks!!)
+* add iterators to [ofxOscSubscriberManager](API_Reference.md#Advanced_ofxOscSubscriberManager)
+* add all port operation to ofxUnsubscribeOsc, ofxNotifyToSubscribedOsc, ofxRemoveLeakedOscPicker
+* add ofxSetLeakedOscPickerAll (only oF0.9.0~)
+* add `ofxSubscribeOsc` with `std::initializer_list<int> port` and `std::initializer_list<std::string> addresses` (only oF0.9.0~)
+* add `std::` prefix
+
 ### 2015/09/17 ver 0.1.1 release
 
 * support [ofParameter](#SupportedTypes_ofParameter)
@@ -273,6 +282,7 @@ MIT License.
 * [SHIMIZU Motoi](http://github.com/motoishmz)
 * [IWATANI Nariaki](http://github.com/nariakiiwatani)
 * [USAMI Takuto](http://github.com/usm916)
+* [HORII Satoshi](http://github.com/satcy)
 
 ## <a name="AtTheLast">At the last</a>
 
