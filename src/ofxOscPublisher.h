@@ -13,6 +13,8 @@
 #include "details/ofxpubsubosc_settings.h"
 #include "details/ofxpubsubosc_type_utils.h"
 
+#include <initializer_list>
+
 namespace ofx {
     using namespace ofxpubsubosc;
     
@@ -102,6 +104,7 @@ namespace ofx {
                 set(m, v.h);
                 set(m, v.i);
             }
+            
             inline void set(ofxOscMessage &m, const ofMatrix4x4 &v) const {
                 for(int j = 0; j < 4; j++) for(int i = 0; i < 4; i++) set(m, v(i, j));
             }
@@ -391,7 +394,35 @@ namespace ofx {
     public:
         class OscPublisher {
         public:
-
+#if ENABLE_CPP11
+            struct IP {
+                IP() = delete;
+                IP(const std::string &ip)
+                : ip(ip) {}
+                const std::string ip;
+            };
+            
+            struct Target {
+                Target() = delete;
+                Target(const std::string &ip, int port)
+                : ip(ip)
+                , port(port) {}
+                const std::string ip;
+                const int port;
+            };
+            
+            struct TargetWithAddress {
+                TargetWithAddress() = delete;
+                TargetWithAddress(const std::string &ip, int port, const std::string &address)
+                : ip(ip)
+                , port(port)
+                , address(address) {}
+                const std::string ip;
+                const int port;
+                const std::string address;
+            };
+#endif
+            
 #pragma mark publish
             
             inline void publish(const std::string &address, ParameterRef ref) {
@@ -839,6 +870,39 @@ template <typename T, typename C>
 inline void ofxPublishOsc(const std::string &ip, int port, const std::string &address, const C &that, T (C::*getter)() const, bool whenValueIsChanged = true) {
     ofxGetOscPublisher(ip, port).publish(address, that, getter, whenValueIsChanged);
 }
+
+#if ENABLE_CPP11
+
+template <typename ... Args>
+inline void ofxPublishOsc(const std::string &ip, const std::initializer_list<int> ports, Args & ... args) {
+    for(auto port : ports) {
+        ofxGetOscPublisher(ip, port).publish(args ...);
+    }
+}
+
+template <typename ... Args>
+inline void ofxPublishOsc(const std::initializer_list<ofxOscPublisher::IP> &ips, Args & ... args) {
+    for(auto &ip : ips) {
+        ofxPublishOsc(ip, args ...);
+    }
+}
+
+template <typename ... Args>
+inline void ofxPublishOsc(const std::initializer_list<ofxOscPublisher::Target> &targets, Args & ... args) {
+    for(auto &target : targets) {
+        ofxPublishOsc(target.ip, target.port, args ...);
+    }
+}
+
+template <typename ... Args>
+inline void ofxPublishOsc(const std::initializer_list<ofxOscPublisher::TargetWithAddress> &targets, Args & ... args) {
+    for(auto &target : targets) {
+        ofxPublishOsc(target.ip, target.port, target.address, args ...);
+    }
+}
+
+#endif
+
 /// \}
 
 #pragma mark publish if condition
