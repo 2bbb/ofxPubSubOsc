@@ -388,41 +388,75 @@ namespace ofx {
         };
 
         typedef std::shared_ptr<AbstractParameter> ParameterRef;
-        typedef std::pair<std::string, int> SenderKey;
         typedef std::map<std::string, ParameterRef> Targets;
+
+        struct IP {
+            IP(const IP &ip)
+            : ip(ip.ip) {}
+            
+            IP(const std::string &ip)
+            : ip(ip) {}
+            
+            bool operator<(const IP &rhs) const {
+                return ip < rhs.ip;
+            }
+            
+            const std::string ip;
+        private:
+            IP();
+        };
         
+        struct Destination {
+            Destination(const Destination &destination)
+            : ip(destination.ip)
+            , port(destination.port) {}
+            
+            Destination(const std::string &ip, int port)
+            : ip(ip)
+            , port(port) {}
+            
+            inline bool operator<(const Destination &rhs) const {
+                if(ip < rhs.ip) return true;
+                return port < rhs.port;
+            }
+            
+            const std::string ip;
+            const int port;
+        private:
+            Destination();
+        };
+        
+        struct DestinationWithAddress {
+            DestinationWithAddress(const DestinationWithAddress &destination)
+            : destination(destination.destination)
+            , address(destination.address) {}
+            
+            DestinationWithAddress(const std::string &ip, int port, const std::string &address)
+            : destination(ip, port)
+            , address(address) {}
+            
+            inline bool operator<(const DestinationWithAddress &rhs) const {
+                if(destination < rhs.destination) return true;
+                return address < rhs.address;
+            }
+            
+            operator Destination() const {
+                return destination;
+            }
+
+            inline operator const Destination&() const {
+                return destination;
+            }
+            
+            const Destination destination;
+            const std::string address;
+        private:
+            DestinationWithAddress();
+        };
+
     public:
         class OscPublisher {
         public:
-#if ENABLE_CPP11
-            struct IP {
-                IP() = delete;
-                IP(const std::string &ip)
-                : ip(ip) {}
-                const std::string ip;
-            };
-            
-            struct Target {
-                Target() = delete;
-                Target(const std::string &ip, int port)
-                : ip(ip)
-                , port(port) {}
-                const std::string ip;
-                const int port;
-            };
-            
-            struct TargetWithAddress {
-                TargetWithAddress() = delete;
-                TargetWithAddress(const std::string &ip, int port, const std::string &address)
-                : ip(ip)
-                , port(port)
-                , address(address) {}
-                const std::string ip;
-                const int port;
-                const std::string address;
-            };
-#endif
-            
 #pragma mark publish
             
             inline void publish(const std::string &address, ParameterRef ref) {
@@ -691,8 +725,9 @@ namespace ofx {
             }
             
         private:
-            OscPublisher(const SenderKey &key) : key(key) {
-                sender.setup(key.first, key.second);
+            OscPublisher(const Destination &destination)
+            : destination(destination) {
+                sender.setup(destination.ip, destination.port);
             }
             
             void update() {
@@ -714,7 +749,7 @@ namespace ofx {
                 
             }
             
-            SenderKey key;
+            Destination destination;
             ofxOscSender sender;
             Targets targets;
             Targets registeredTargets;
@@ -729,15 +764,15 @@ namespace ofx {
         
         static OscPublisher &getOscPublisher(const std::string &ip, int port) {
             OscPublishers &publishers = getSharedInstance().publishers;
-            SenderKey key(ip, port);
-            if(publishers.find(key) == publishers.end()) {
-                publishers.insert(std::make_pair(key, OscPublisher::Ref(new OscPublisher(key))));
+            Destination destination(ip, port);
+            if(publishers.find(destination) == publishers.end()) {
+                publishers.insert(std::make_pair(destination, OscPublisher::Ref(new OscPublisher(destination))));
             }
-            return *(publishers[key].get());
+            return *(publishers[destination].get());
         }
         
     private:
-        typedef std::map<SenderKey, OscPublisher::Ref> OscPublishers;
+        typedef std::map<Destination, OscPublisher::Ref> OscPublishers;
         void update(ofEventArgs &args) {
             for(OscPublishers::iterator it = publishers.begin(); it != publishers.end(); ++it) {
                 it->second->update();
@@ -904,23 +939,23 @@ inline void ofxPublishOsc(const std::string &ip, const std::initializer_list<int
 }
 
 template <typename ... Args>
-inline void ofxPublishOsc(const std::initializer_list<ofxOscPublisher::IP> &ips, Args & ... args) {
+inline void ofxPublishOsc(const std::initializer_list<ofxOscPublisherManager::IP> &ips, Args & ... args) {
     for(auto &ip : ips) {
         ofxPublishOsc(ip, args ...);
     }
 }
 
 template <typename ... Args>
-inline void ofxPublishOsc(const std::initializer_list<ofxOscPublisher::Target> &targets, Args & ... args) {
+inline void ofxPublishOsc(const std::initializer_list<ofxOscPublisherManager::Destination> &targets, Args & ... args) {
     for(auto &target : targets) {
         ofxPublishOsc(target.ip, target.port, args ...);
     }
 }
 
 template <typename ... Args>
-inline void ofxPublishOsc(const std::initializer_list<ofxOscPublisher::TargetWithAddress> &targets, Args & ... args) {
+inline void ofxPublishOsc(const std::initializer_list<ofxOscPublisherManager::DestinationWithAddress> &targets, Args & ... args) {
     for(auto &target : targets) {
-        ofxPublishOsc(target.ip, target.port, target.address, args ...);
+        ofxPublishOsc(target.destination.ip, target.destination.port, target.address, args ...);
     }
 }
 
