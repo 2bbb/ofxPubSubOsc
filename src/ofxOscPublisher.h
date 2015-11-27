@@ -389,7 +389,8 @@ namespace ofx {
 
         typedef std::shared_ptr<AbstractParameter> ParameterRef;
         typedef std::map<std::string, ParameterRef> Targets;
-
+        
+        public:
         struct IP {
             IP(const IP &ip)
             : ip(ip.ip) {}
