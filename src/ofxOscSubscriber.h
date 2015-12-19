@@ -601,7 +601,6 @@ inline typename ofxpubsubosc::is_not_ofxoscmessage<T>::type ofxSubscribeOsc(int 
 
 #pragma mark callback function/method
 
-#if !ENABLE_FUNCTIONAL
 /// \brief bind a callback to the OSC messages with an address pattern _address_ incoming to _port_.
 /// \param port binded port is typed int
 /// \param address osc address is typed const std::string &
@@ -611,7 +610,6 @@ inline typename ofxpubsubosc::is_not_ofxoscmessage<T>::type ofxSubscribeOsc(int 
 inline void ofxSubscribeOsc(int port, const std::string &address, void (*callback)(ofxOscMessage &)) {
     ofxGetOscSubscriber(port).subscribe(address, callback);
 }
-#endif
 
 /// \brief bind a callback to the OSC messages with an address pattern _address_ incoming to _port_.
 /// template parameter C is suggested by that & callback
