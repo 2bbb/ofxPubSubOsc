@@ -665,7 +665,7 @@ inline void ofxSubscribeOsc(int port, const std::string &address, const C *that,
 
 #if ENABLE_FUNCTIONAL
 template <typename C, typename R>
-inline void ofxSubscribeOsc(int port, const std::string &address, std::function<void(ofxOscMessage &)> &callback) {
+inline void ofxSubscribeOsc(int port, const std::string &address, const std::function<void(ofxOscMessage &)> &callback) {
     ofxGetOscSubscriber(port).subscribe(address, callback);
 }
 #endif
