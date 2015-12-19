@@ -453,7 +453,7 @@ namespace ofx {
                 clearLeakedOscMessages();
                 ofxOscMessage m;
                 while(receiver.hasWaitingMessages()) {
-#if OF_VERSION_MINOR < 9
+#if (OF_VERSION_MAJOR == 0) && (OF_VERSION_MINOR < 9)
                     receiver.getNextMessage(&m);
 #else
                     receiver.getNextMessage(m);
