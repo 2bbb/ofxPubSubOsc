@@ -453,7 +453,7 @@ namespace ofx {
                 clearLeakedOscMessages();
                 ofxOscMessage m;
                 while(receiver.hasWaitingMessages()) {
-#if OF_VERSION_MINOR < 9
+#if (OF_VERSION_MAJOR == 0) && (OF_VERSION_MINOR < 9)
                     receiver.getNextMessage(&m);
 #else
                     receiver.getNextMessage(m);
@@ -665,7 +665,7 @@ inline void ofxSubscribeOsc(int port, const std::string &address, const C *that,
 
 #if ENABLE_FUNCTIONAL
 template <typename C, typename R>
-inline void ofxSubscribeOsc(int port, const std::string &address, std::function<void(ofxOscMessage &)> &callback) {
+inline void ofxSubscribeOsc(int port, const std::string &address, const std::function<void(ofxOscMessage &)> &callback) {
     ofxGetOscSubscriber(port).subscribe(address, callback);
 }
 #endif
