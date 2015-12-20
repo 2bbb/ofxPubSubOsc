@@ -10,8 +10,8 @@
 #include "ofxpubsubosc_settings.h"
 
 namespace ofxpubsubosc {
-    template <typename T>
-    struct is_not_ofxoscmessage { typedef void type; };
+    template <typename T, typename U = void>
+    struct is_not_ofxoscmessage { typedef U type; };
     template <>
     struct is_not_ofxoscmessage<ofxOscMessage &> {};
     
