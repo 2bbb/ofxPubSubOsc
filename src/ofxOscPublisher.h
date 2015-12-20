@@ -388,7 +388,7 @@ namespace ofx {
         };
 
         typedef std::shared_ptr<AbstractParameter> ParameterRef;
-        typedef std::map<std::string, ParameterRef> Targets;
+        typedef std::multimap<std::string, ParameterRef> Targets;
         
         public:
         struct IP {
@@ -465,11 +465,12 @@ namespace ofx {
 #pragma mark publish
             
             inline void publish(const std::string &address, ParameterRef ref) {
-                if(targets.find(address) == targets.end()) {
-                    targets.insert(std::make_pair(address, ref));
-                } else {
-                    targets[address] = ref;
-                }
+                targets.insert(std::make_pair(address, ref));
+//                if(targets.find(address) == targets.end()) {
+//                    targets.insert(std::make_pair(address, ref));
+//                } else {
+//                    targets[address] = ref;
+//                }
             }
             
             template <typename T>
@@ -710,21 +711,27 @@ namespace ofx {
 #pragma mark stop publish temporary
             
             void stopPublishTemporary(const std::string &address) {
-                if(isPublished(address)) targets[address]->setEnablePublish(false);
+                if(isPublished(address)) {
+                    Targets::iterator it = targets.find(address);
+                    for(std::size_t i = 0, size = targets.count(address); i < size; i++, ++it) {
+                        it->second->setEnablePublish(false);
+                    }
+                }
             }
             
             void resumePublish(const std::string &address) {
-                if(isPublished(address)) targets[address]->setEnablePublish(true);
+                if(isPublished(address)) {
+                    Targets::iterator it = targets.find(address);
+                    for(std::size_t i = 0, size = targets.count(address); i < size; i++, ++it) {
+                        it->second->setEnablePublish(true);
+                    }
+                }
             }
             
 #pragma mark doRegister
             
             inline void doRegister(const std::string &address, ParameterRef ref) {
-                if(registeredTargets.find(address) == registeredTargets.end()) {
-                    registeredTargets.insert(std::make_pair(address, ref));
-                } else {
-                    registeredTargets[address] = ref;
-                }
+                registeredTargets.insert(std::make_pair(address, ref));
             }
             
             template <typename T>
@@ -790,7 +797,7 @@ namespace ofx {
             }
             
             inline bool isEnabled(const std::string &address) const {
-                return isPublished(address) && targets.at(address)->isPublishNow();
+                return isPublished(address) && targets.find(address)->second->isPublishNow();
             }
             
             inline bool isRegistered() const {
@@ -821,7 +828,7 @@ namespace ofx {
                 ofxOscMessage m;
                 if(isUseBundle()) {
                     ofxOscBundle bundle;
-                    for(Targets::iterator it = targets.begin(); it != targets.end(); it++) {
+                    for(Targets::iterator it = targets.begin(); it != targets.end(); ++it) {
                         if(it->second->setMessage(m, it->first)) bundle.addMessage(m);
                         m.clear();
                     }
@@ -829,7 +836,7 @@ namespace ofx {
                     bundle.clear();
                     return;
                 }
-                for(Targets::iterator it = targets.begin(); it != targets.end(); it++) {
+                for(Targets::iterator it = targets.begin(); it != targets.end(); ++it) {
                     if(it->second->setMessage(m, it->first)) sender.sendMessage(m);
                     m.clear();
                 }

@@ -315,18 +315,13 @@ namespace ofx {
 #endif
         typedef std::shared_ptr<AbstractParameter> ParameterRef;
         typedef std::shared_ptr<ofxOscReceiver> OscReceiverRef;
-        typedef std::map<std::string, ParameterRef> Targets;
+        typedef std::multimap<std::string, ParameterRef> Targets;
         
     public:
         class OscSubscriber {
         public:
             inline void subscribe(const std::string &address, ParameterRef ref) {
-                Targets::iterator it = targets.find(address);
-                if(it == targets.end()) {
-                    targets.insert(std::make_pair(address, ref));
-                } else {
-                    it->second = ref;
-                }
+                targets.insert(std::make_pair(address, ref));
             }
             
             template <typename T>
@@ -437,8 +432,11 @@ namespace ofx {
             
             void notify(ofxOscMessage & m) {
                 const std::string &address = m.getAddress();
-                if(targets.find(address) != targets.end()) {
-                    targets[address]->read(m);
+                Targets::iterator it = targets.find(address);
+                if(it != targets.end()) {
+                    for(std::size_t i = 0; i < targets.count(address); i++, ++it) {
+                        it->second->read(m);
+                    }
                 }
             }
             
@@ -459,8 +457,11 @@ namespace ofx {
                     receiver.getNextMessage(m);
 #endif
                     const std::string &address = m.getAddress();
-                    if(targets.find(address) != targets.end()) {
-                        targets[address]->read(m);
+                    Targets::iterator it = targets.find(address);
+                    if(it != targets.end()) {
+                        for(std::size_t i = 0; i < targets.count(address); i++, ++it) {
+                            it->second->read(m);
+                        }
                     } else {
                         if(leakPicker) {
                             leakPicker->read(m);
@@ -727,7 +728,7 @@ inline void ofxUnsubscribeOsc() {
     ofxOscSubscriberManager &manager = ofxGetOscSubscriberManager();
     ofxOscSubscriberManager::iterator it  = manager.begin(),
                                       end = manager.end();
-    for(; it != end; it++) {
+    for(; it != end; ++it) {
         it->second->unsubscribe();
     }
 }
@@ -744,7 +745,7 @@ inline void ofxNotifyToSubscribedOsc(ofxOscMessage &m) {
     ofxOscSubscriberManager &manager = ofxGetOscSubscriberManager();
     ofxOscSubscriberManager::iterator it  = manager.begin(),
                                       end = manager.end();
-    for(; it != end; it++) {
+    for(; it != end; ++it) {
         it->second->notify(m);
     }
 }
@@ -839,7 +840,7 @@ inline void ofxRemoveLeakedOscPicker() {
     ofxOscSubscriberManager &manager = ofxGetOscSubscriberManager();
     ofxOscSubscriberManager::iterator it  = manager.begin(),
                                       end = manager.end();
-    for(; it != end; it++) {
+    for(; it != end; ++it) {
         it->second->removeLeakPicker();
     }
 }
