@@ -304,7 +304,7 @@ namespace ofx {
         struct LambdaCallbackParameter : AbstractParameter, SetImplementation {
         public:
             typedef std::function<void(ofxOscMessage &)> Callback;
-            LambdaCallbackParameter(Callback &callback)
+            LambdaCallbackParameter(const Callback &callback)
             : callback(callback) {}
             
             virtual void read(ofxOscMessage &message) { callback(message); }
@@ -364,7 +364,7 @@ namespace ofx {
             }
             
 #if ENABLE_FUNCTIONAL
-            inline void subscribe(const std::string &address, std::function<void(ofxOscMessage &)> callback) {
+            inline void subscribe(const std::string &address, const std::function<void(ofxOscMessage &)> callback) {
                 subscribe(address, ParameterRef(new LambdaCallbackParameter(callback)));
             }
 #endif
@@ -395,7 +395,7 @@ namespace ofx {
             }
             
 #if ENABLE_FUNCTIONAL
-            inline void setLeakPicker(std::function<void(ofxOscMessage &)> &callback) {
+            inline void setLeakPicker(const std::function<void(ofxOscMessage &)> &callback) {
                 setLeakPicker(ParameterRef(new LambdaCallbackParameter(callback)));
             }
 #endif
@@ -809,7 +809,7 @@ inline void ofxSetLeakedOscPicker(int port, const C *that, R (C::*callback)(ofxO
 }
 
 #if ENABLE_FUNCTIONAL
-inline void ofxSetLeakedOscPicker(int port, std::function<void(ofxOscMessage &)> &callback) {
+inline void ofxSetLeakedOscPicker(int port, const std::function<void(ofxOscMessage &)> &callback) {
     ofxGetOscSubscriber(port).setLeakPicker(callback);
 }
 #endif
