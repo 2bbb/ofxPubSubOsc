@@ -460,10 +460,12 @@ namespace ofx {
         };
 
         class Identifier {
-            std::multimap<std::string, ParameterRef>::iterator it;
+            const std::string address;
+            const ParameterRef ref;
         public:
-            Identifier(const std::multimap<std::string, ParameterRef>::iterator &it, const Destination &key)
-            : it(it)
+            Identifier(const std::string &address, const ParameterRef &ref, const Destination &key)
+            : address(address)
+            , ref(ref)
             , key(key) {}
             Destination key;
             
@@ -472,12 +474,33 @@ namespace ofx {
 
     public:
         class OscPublisher {
+            Targets::const_iterator findFromTargets(const Identifier &identifier, const Targets &targets) const {
+                Targets::const_iterator it = targets.find(identifier.address);
+                if(it != targets.end()) {
+                    for(std::size_t i = 0, size = targets.count(identifier.address); i < size; ++i, ++it) {
+                        if(it->second == identifier.ref) {
+                            return it;
+                        }
+                    }
+                }
+                return targets.end();
+            }
+            
+            inline Targets::const_iterator findPublished(const Identifier &identifier) const {
+                return findFromTargets(identifier, targets);
+            }
+            
+            inline Targets::const_iterator findRegistered(const Identifier &identifier) const {
+                return findFromTargets(identifier, registeredTargets);
+            }
+            
+
         public:
 #pragma mark publish
             
             inline Identifier publish(const std::string &address, ParameterRef ref) {
-                Targets::iterator it = targets.insert(std::make_pair(address, ref));
-                return {it, destination};
+                targets.insert(std::make_pair(address, ref));
+                return {address, ref, destination};
             }
             
             template <typename T>
@@ -712,7 +735,10 @@ namespace ofx {
             }
             
             void unpublish(const Identifier &identifier) {
-                targets.erase(identifier.it);
+                Targets::const_iterator it{findPublished(identifier)};
+                if(it != targets.end()) {
+                    targets.erase(it);
+                }
             }
             
             void unpublish() {
@@ -730,6 +756,13 @@ namespace ofx {
                 }
             }
             
+            void stopPublishTemporary(const Identifier &identifier) {
+                Targets::const_iterator it{findPublished(identifier)};
+                if(it != targets.end()) {
+                    it->second->setEnablePublish(false);
+                }
+            }
+            
             void resumePublish(const std::string &address) {
                 if(isPublished(address)) {
                     Targets::iterator it = targets.find(address);
@@ -739,11 +772,18 @@ namespace ofx {
                 }
             }
             
+            void resumePublishTemporary(const Identifier &identifier) {
+                Targets::const_iterator it{findPublished(identifier)};
+                if(it != targets.end()) {
+                    it->second->setEnablePublish(true);
+                }
+            }
+            
 #pragma mark doRegister
             
             inline Identifier doRegister(const std::string &address, ParameterRef ref) {
-                Targets::iterator it = registeredTargets.insert(std::make_pair(address, ref));
-                return {it, destination};
+                registeredTargets.insert(std::make_pair(address, ref));
+                return {address, ref, destination};
             }
             
             template <typename T>
@@ -779,7 +819,6 @@ namespace ofx {
 #pragma mark publishRegistered
             
             inline void publishRegistered(const std::string &address) {
-                // TODO: fix
                 Targets::iterator it = registeredTargets.find(address);
                 if(it == registeredTargets.end()) {
                     ofLogWarning("ofxPubSubOsc") << address << " is not registered.";
@@ -793,6 +832,12 @@ namespace ofx {
             
             inline void publishRegistered(const Identifier &identifier) {
                 // TODO: implement
+                Targets::const_iterator it{findRegistered(identifier)};
+                if(it != registeredTargets.end()) {
+                    ofxOscMessage m;
+                    if(it->second->setMessage(m, it->first)) sender.sendMessage(m);
+                    m.clear();
+                }
             }
             
 #pragma mark unregister
@@ -803,6 +848,10 @@ namespace ofx {
             
             inline void unregister(const Identifier &identifier) {
                 // TODO: implement
+                Targets::const_iterator it{findRegistered(identifier)};
+                if(it != registeredTargets.end()) {
+                    registeredTargets.erase(it);
+                }
             }
             
             inline void unregister() {
@@ -815,6 +864,10 @@ namespace ofx {
                 return !targets.empty();
             }
             
+            inline bool isPublished(const Identifier &identifier) const {
+                return isPublished() && (findPublished(identifier) != targets.end());
+            }
+            
             inline bool isPublished(const std::string &address) const {
                 return isPublished() && (targets.find(address) != targets.end());
             }
@@ -825,8 +878,8 @@ namespace ofx {
             }
             
             inline bool isEnabled(const Identifier &identifier) const {
-                // TODO: implement
-                return true;
+                Targets::const_iterator it{findPublished(identifier)};
+                return (it != targets.end()) && it->second->isPublishNow();
             }
             
             inline bool isRegistered() const {
