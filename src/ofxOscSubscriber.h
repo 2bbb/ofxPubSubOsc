@@ -336,7 +336,7 @@ namespace ofx {
             ParameterRef ref;
             int key;
             
-            void invalidation() {
+            void invalidate() {
                 address = "";
                 ref = nullptr;
                 key = 0;
@@ -357,6 +357,7 @@ namespace ofx {
     public:
         class OscSubscriber {
             Targets::const_iterator findFromTargets(const Identifier &identifier, const Targets &targets) const {
+                if(!identifier.isValid()) return targets.end();
                 Targets::const_iterator it = targets.find(identifier.address);
                 if(it != targets.end()) {
                     for(std::size_t i = 0, size = targets.count(identifier.address); i < size; ++i, ++it) {
@@ -421,11 +422,13 @@ namespace ofx {
                 targets.erase(address);
             }
             
-            inline void unsubscribe(const Identifier &identifier) {
+            inline void unsubscribe(Identifier &identifier) {
+                if(!identifier.isValid()) return;
                 Targets::const_iterator it{findSubscribed(identifier)};
                 if(it != targets.end()) {
                     targets.erase(it);
                 }
+                identifier.invalidate();
             }
             
             inline void unsubscribe() {
@@ -502,6 +505,7 @@ namespace ofx {
             }
             
             void notify(const Identifier &identifier, ofxOscMessage &m) {
+                if(!identifier.isValid()) return;
                 Targets::const_iterator it{findSubscribed(identifier)};
                 if(it != targets.end() && it->first == m.getAddress()) {
                     it->second->read(m);
@@ -773,7 +777,9 @@ inline void ofxSubscribeOsc(const std::initializer_list<int> &ports, const std::
 /// \name ofxUnsubscribeOsc
 /// \{
 
-inline void ofxUnsubscribeOsc(const ofxOscSubscriberIdentifier &identifier) {
+// TODO: add document
+
+inline void ofxUnsubscribeOsc(ofxOscSubscriberIdentifier &identifier) {
     if(!identifier.isValid()) return;
     ofxGetOscSubscriber(identifier.getKey()).unsubscribe(identifier);
 }
@@ -811,6 +817,10 @@ inline void ofxUnsubscribeOsc() {
 /// \}
 
 #pragma mark notify messages manually
+
+inline void ofxNotifyToSubscribedOsc(ofxOscSubscriberIdentifier &identifier, ofxOscMessage &m) {
+    ofxGetOscSubscriber(identifier.getKey()).notify(m);
+}
 
 inline void ofxNotifyToSubscribedOsc(int port, ofxOscMessage &m) {
     ofxGetOscSubscriber(port).notify(m);

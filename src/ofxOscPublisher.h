@@ -527,7 +527,7 @@ namespace ofx {
             ParameterRef ref;
             Destination key;
             
-            void invalidation() {
+            void invalidate() {
                 address = "";
                 ref = nullptr;
                 key = Destination();
@@ -548,6 +548,7 @@ namespace ofx {
     public:
         class OscPublisher {
             Targets::const_iterator findFromTargets(const Identifier &identifier, const Targets &targets) const {
+                if(!identifier.isValid()) return targets.end();
                 Targets::const_iterator it = targets.find(identifier.address);
                 if(it != targets.end()) {
                     for(std::size_t i = 0, size = targets.count(identifier.address); i < size; ++i, ++it) {
@@ -822,11 +823,13 @@ namespace ofx {
                 if(targets.find(address) == targets.end()) targets.erase(address);
             }
             
-            void unpublish(const Identifier &identifier) {
+            void unpublish(Identifier &identifier) {
+                if(!identifier.isValid()) return;
                 Targets::const_iterator it{findPublished(identifier)};
                 if(it != targets.end()) {
                     targets.erase(it);
                 }
+                identifier.invalidate();
             }
             
             void unpublish() {
@@ -845,6 +848,7 @@ namespace ofx {
             }
             
             void stopPublishTemporary(const Identifier &identifier) {
+                if(!identifier.isValid()) return;
                 Targets::const_iterator it{findPublished(identifier)};
                 if(it != targets.end()) {
                     it->second->setEnablePublish(false);
@@ -861,6 +865,7 @@ namespace ofx {
             }
             
             void resumePublishTemporary(const Identifier &identifier) {
+                if(!identifier.isValid()) return;
                 Targets::const_iterator it{findPublished(identifier)};
                 if(it != targets.end()) {
                     it->second->setEnablePublish(true);
@@ -919,7 +924,7 @@ namespace ofx {
             }
             
             inline void publishRegistered(const Identifier &identifier) {
-                // TODO: implement
+                if(!identifier.isValid()) return;
                 Targets::const_iterator it{findRegistered(identifier)};
                 if(it != registeredTargets.end()) {
                     ofxOscMessage m;
@@ -934,12 +939,13 @@ namespace ofx {
                 if(registeredTargets.find(address) == registeredTargets.end()) registeredTargets.erase(address);
             }
             
-            inline void unregister(const Identifier &identifier) {
-                // TODO: implement
+            inline void unregister(Identifier &identifier) {
+                if(!identifier.isValid()) return;
                 Targets::const_iterator it{findRegistered(identifier)};
                 if(it != registeredTargets.end()) {
                     registeredTargets.erase(it);
                 }
+                identifier.invalidate();
             }
             
             inline void unregister() {
@@ -953,6 +959,7 @@ namespace ofx {
             }
             
             inline bool isPublished(const Identifier &identifier) const {
+                if(!identifier.isValid()) false;
                 return isPublished() && (findPublished(identifier) != targets.end());
             }
             
@@ -966,6 +973,7 @@ namespace ofx {
             }
             
             inline bool isEnabled(const Identifier &identifier) const {
+                if(!identifier.isValid()) return false;
                 Targets::const_iterator it{findPublished(identifier)};
                 return (it != targets.end()) && it->second->isPublishNow();
             }
@@ -1290,7 +1298,7 @@ inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionObjectPtrOrRef &condit
 /// \name ofxUnpublishOsc
 /// \{
 
-inline void ofxUnpublishOsc(const ofxOscPublisherIdentifier &identifier) {
+inline void ofxUnpublishOsc(ofxOscPublisherIdentifier &identifier) {
     if(!identifier.isValid()) return;
     ofxGetOscPublisher(identifier.getKey().ip, identifier.getKey().port).unpublish(identifier);
 }
@@ -1361,7 +1369,8 @@ inline void ofxPublishRegisteredOsc(const std::string &ip, int port, const std::
 }
 
 inline void ofxPublishRegisteredOsc(const ofxOscPublisherIdentifier &identifier) {
-//    ofxGetOscPublisher(identifier.key.ip, identifier.key.port).publishRegistered();
+    if(!identifier.isValid()) return;
+    ofxGetOscPublisher(identifier.getKey().ip, identifier.getKey().port).publishRegistered(identifier);
 }
 
 /// \}
@@ -1371,7 +1380,7 @@ inline void ofxPublishRegisteredOsc(const ofxOscPublisherIdentifier &identifier)
 /// \name ofxUnregisterPublishingOsc
 /// \{
 
-inline void ofxUnregisterPublishingOsc(const ofxOscPublisherIdentifier &identifier) {
+inline void ofxUnregisterPublishingOsc(ofxOscPublisherIdentifier &identifier) {
     if(!identifier.isValid()) return;
     ofxGetOscPublisher(identifier.getKey().ip, identifier.getKey().port).unregister(identifier);
 }
