@@ -1174,24 +1174,24 @@ inline void ofxPublishOsc(const std::initializer_list<ofxOscPublisherManager::De
 
 template <typename ConditionValueRefOrFunction, typename ValueRefOrFunction>
 inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionValueRefOrFunction &condition, const std::string &ip, int port, const std::string &address, ValueRefOrFunction &value) {
-    ofxGetOscPublisher(ip, port).publishIf(condition, address, value);
+    return ofxGetOscPublisher(ip, port).publishIf(condition, address, value);
 }
 
 template <typename ConditionValueRefOrFunction, typename ObjectPtrOrRef, typename GetterMethod>
 inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionValueRefOrFunction &condition, const std::string &ip, int port, const std::string &address, ObjectPtrOrRef &that, GetterMethod getter) {
-    ofxGetOscPublisher(ip, port).publishIf(condition, address, that, getter);
+    return ofxGetOscPublisher(ip, port).publishIf(condition, address, that, getter);
 }
 
 #pragma mark condition is method
 
 template <typename ConditionObjectPtrOrRef, typename ConditionMethodReturnsBool, typename ValueRefOrFunction>
 inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionObjectPtrOrRef &condition, ConditionMethodReturnsBool method, const std::string &ip, int port, const std::string &address, ValueRefOrFunction &value) {
-    ofxGetOscPublisher(ip, port).publishIf(condition, method, address, value);
+    return ofxGetOscPublisher(ip, port).publishIf(condition, method, address, value);
 }
 
 template <typename ConditionObjectPtrOrRef, typename ConditionMethodReturnsBool, typename ObjectRefOrPtr, typename GetterMethod>
 inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionObjectPtrOrRef &condition, ConditionMethodReturnsBool method, const std::string &ip, int port, const std::string &address, ObjectRefOrPtr &that, GetterMethod getter) {
-    ofxGetOscPublisher(ip, port).publishIf(condition, method, address, *that, getter);
+    return ofxGetOscPublisher(ip, port).publishIf(condition, method, address, *that, getter);
 }
 
 /// \}
@@ -1232,32 +1232,32 @@ inline void ofxUnpublishOsc() {
 
 template <typename T>
 inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, int port, const std::string &address, T &value) {
-    ofxGetOscPublisher(ip, port).doRegister(address, value);
+    return ofxGetOscPublisher(ip, port).doRegister(address, value);
 }
 
 template <typename T>
 inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, int port, const std::string &address, T (*getter)()) {
-    ofxGetOscPublisher(ip, port).doRegister(address, getter);
+    return ofxGetOscPublisher(ip, port).doRegister(address, getter);
 }
 
 template <typename T, typename C>
 inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, int port, const std::string &address, C *that, T (C::*getter)()) {
-    ofxGetOscPublisher(ip, port).doRegister(address, that, getter);
+    return ofxGetOscPublisher(ip, port).doRegister(address, that, getter);
 }
 
 template <typename T, typename C>
 inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, int port, const std::string &address, const C * const that, T (C::*getter)() const) {
-    ofxGetOscPublisher(ip, port).doRegister(address, that, getter);
+    return ofxGetOscPublisher(ip, port).doRegister(address, that, getter);
 }
 
 template <typename T, typename C>
 inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, int port, const std::string &address, C &that, T (C::*getter)()) {
-    ofxGetOscPublisher(ip, port).doRegister(address, that, getter);
+    return ofxGetOscPublisher(ip, port).doRegister(address, that, getter);
 }
 
 template <typename T, typename C>
 inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, int port, const std::string &address, const C &that, T (C::*getter)() const) {
-    ofxGetOscPublisher(ip, port).doRegister(address, that, getter);
+    return ofxGetOscPublisher(ip, port).doRegister(address, that, getter);
 }
 
 /// \}
