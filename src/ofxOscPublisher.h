@@ -591,6 +591,11 @@ namespace ofx {
                 return {address, ref, destination};
             }
             
+            Identifier publish(const std::string &address, const char * const value, bool whenValueIsChanged = true) {
+                ParameterRef p;
+                return publish(address, std::string(value), whenValueIsChanged);
+            }
+            
             template <typename T>
             Identifier publish(const std::string &address, T &value, bool whenValueIsChanged = true) {
                 ParameterRef p;
@@ -649,6 +654,11 @@ namespace ofx {
 
 #pragma mark publish conditional
 #pragma mark condition is bool value ref
+            
+            Identifier publishIf(bool &condition, const std::string &address,const char * const value) {
+                ParameterRef p;
+                return publishIf(condition, address, std::string(value));
+            }
             
             template <typename T>
             Identifier publishIf(bool &condition, const std::string &address, T &value) {
