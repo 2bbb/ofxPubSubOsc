@@ -419,8 +419,7 @@ namespace ofx {
             , port(port) {}
             
             inline bool operator<(const Destination &rhs) const {
-                if(ip != rhs.ip) return ip < rhs.ip;
-                return port < rhs.port;
+                return (ip != rhs.ip) ? (ip < rhs.ip) : (port < rhs.port);
             }
             
             inline bool operator!=(const Destination &rhs) const {
@@ -443,8 +442,7 @@ namespace ofx {
             , address(address) {}
             
             inline bool operator<(const DestinationWithAddress &rhs) const {
-                if(destination != rhs.destination) return destination < rhs.destination;
-                return address < rhs.address;
+                return (destination != rhs.destination) ? (destination < rhs.destination) : (address < rhs.address);
             }
             
             operator Destination() const {
