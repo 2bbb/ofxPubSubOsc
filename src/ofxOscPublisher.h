@@ -404,7 +404,7 @@ namespace ofx {
                 return ip < rhs.ip;
             }
             
-            const std::string ip;
+            std::string ip;
         private:
             IP();
         };
@@ -426,8 +426,8 @@ namespace ofx {
                 return ip != rhs.ip || port != rhs.port;
             }
             
-            const std::string ip;
-            const int port;
+            std::string ip;
+            int port;
         private:
             Destination();
         };
@@ -453,22 +453,32 @@ namespace ofx {
                 return destination;
             }
             
-            const Destination destination;
-            const std::string address;
+            Destination destination;
+            std::string address;
         private:
             DestinationWithAddress();
         };
 
         class Identifier {
-            const std::string address;
-            const ParameterRef ref;
+            std::string address;
+            ParameterRef ref;
+            Destination key;
+            
+            void invalidation() {
+                address = "";
+                ref = nullptr;
+                key = Destination();
+            }
         public:
+            Identifier() {}
             Identifier(const std::string &address, const ParameterRef &ref, const Destination &key)
             : address(address)
             , ref(ref)
             , key(key) {}
-            Destination key;
             
+            const Destination &getKey() const { return key; };
+            bool isValid() const { return static_cast<bool>(ref); }
+
             friend class OscPublisher;
         };
 

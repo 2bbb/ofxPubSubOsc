@@ -320,14 +320,24 @@ namespace ofx {
         typedef std::multimap<std::string, ParameterRef> Targets;
         
         class Identifier {
-            const std::string address;
-            const ParameterRef ref;
+            std::string address;
+            ParameterRef ref;
+            int key;
+            
+            void invalidation() {
+                address = "";
+                ref = nullptr;
+                key = 0;
+            }
         public:
+            Identifier() : address(""), ref(nullptr) {}
             Identifier(const std::string &address, const ParameterRef &ref, int key)
             : address(address)
             , ref(ref)
             , key(key) {}
-            int key;
+            
+            const int getKey() const { return key; };
+            bool isValid() const { return static_cast<bool>(ref); }
             
             friend class OscSubscriber;
         };
