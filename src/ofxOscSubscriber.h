@@ -931,3 +931,5 @@ inline void ofxRemoveLeakedOscPicker() {
 }
 
 /// \}
+
+#define ofxSubScribeOscWithSameName(port, name) ofxSubscribeOsc(port, "/" #name, name)
