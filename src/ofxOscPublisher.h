@@ -45,12 +45,26 @@ namespace ofx {
 #undef define_is_integral
         
 #define type_ref(T) typename add_reference_if_non_arithmetic<T>::type
-
-        template <bool b>
-        struct enable;
         
-        template <>
-        struct enable<true> { typedef void type; };
+        namespace impl {
+            template <bool b, typename T>
+            struct enable {};
+            
+            template <typename T>
+            struct enable<true, T> { typedef T type;};
+        }
+        template <bool b, typename T = void>
+        struct enable : impl::enable<b, T> {};
+        
+        template <typename T>
+        struct is_pointer {
+            static const bool value = false;
+        };
+        
+        template <typename T>
+        struct is_pointer<T *> {
+            static const bool value = true;
+        };
         
         template <typename T>
         struct is_integral_and_lt_64bit {
@@ -1131,7 +1145,7 @@ inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, 
 }
 
 // TODO: add document
-template <typename T, typename U = typename std::enable_if<!std::is_pointer<T>::value>::type>
+template <typename T, typename U = typename ofx::enable<!ofx::is_pointer<T>::value>::type>
 inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, const std::string &address, const T &value, bool whenValueIsChanged = true) {
     return ofxGetOscPublisher(ip, port).publish(address, value, whenValueIsChanged);
 }
