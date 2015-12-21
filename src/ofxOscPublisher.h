@@ -279,7 +279,6 @@ namespace ofx {
             }
             
             virtual Base (&get())[size] { return t; }
-        protected:
             Base (&t)[size];
             Base old[size];
         };
