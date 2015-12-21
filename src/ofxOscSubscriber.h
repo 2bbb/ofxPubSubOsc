@@ -31,6 +31,7 @@ namespace ofx {
                 else if(m.getArgType(offset) == OFXOSC_TYPE_INT64) v = m.getArgAsInt64(offset); \
                 else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); \
                 else if(m.getArgType(offset) == OFXOSC_TYPE_DOUBLE) v = m.getArgAsDouble(offset); \
+                else if(m.getArgType(offset) == OFXOSC_TYPE_STRING) v = ofToDouble(m.getArgAsString(offset)); \
             }
 #else
 #define define_set_arithmetic(type) \
@@ -38,8 +39,10 @@ namespace ofx {
                 if(m.getArgType(offset) == OFXOSC_TYPE_INT32) v = m.getArgAsInt32(offset); \
                 else if(m.getArgType(offset) == OFXOSC_TYPE_INT64) v = m.getArgAsInt64(offset); \
                 else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); \
+                else if(m.getArgType(offset) == OFXOSC_TYPE_STRING) v = ofToDouble(m.getArgAsString(offset)); \
             }
 #endif
+            
             define_set_arithmetic(bool);
             define_set_arithmetic(char);
             define_set_arithmetic(unsigned char);
@@ -57,7 +60,16 @@ namespace ofx {
 #undef define_set_arithmetic
             
             inline void set(ofxOscMessage &m, std::string &v, std::size_t offset = 0) {
-                v = m.getArgAsString(offset);
+                if(m.getArgType(offset) == OFXOSC_TYPE_STRING) v = m.getArgAsString(offset);
+                else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = ofToString(m.getArgAsFloat(offset));
+#if ENABLE_FUNCTIONAL
+                else if(m.getArgType(offset) == OFXOSC_TYPE_DOUBLE) v = ofToString(m.getArgAsDouble(offset));
+                else if(m.getArgType(offset) == OFXOSC_TYPE_INT32) v = ofToString(m.getArgAsInt32(offset));
+                else if(m.getArgType(offset) == OFXOSC_TYPE_INT64) v = ofToString(m.getArgAsInt64(offset));
+#else
+                else if(m.getArgType(offset) == OFXOSC_TYPE_INT) v = ofToString(m.getArgAsInt(offset));
+#endif
+                else v = m.getArgAsString(offset);
             }
             
 #if ENABLE_OF_BUFFER
