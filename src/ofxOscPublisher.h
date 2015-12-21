@@ -1191,16 +1191,17 @@ inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionObjectPtrOrRef &condit
 /// \name ofxUnpublishOsc
 /// \{
 
+inline void ofxUnpublishOsc(const ofxOscPublisherIdentifier &identifier) {
+    if(!identifier.isValid()) return;
+    ofxGetOscPublisher(identifier.getKey().ip, identifier.getKey().port).unpublish(identifier);
+}
+
 inline void ofxUnpublishOsc(const std::string &ip, int port, const std::string &address) {
     ofxGetOscPublisher(ip, port).unpublish(address);
 }
 
 inline void ofxUnpublishOsc(const std::string &ip, int port) {
     ofxGetOscPublisher(ip, port).unpublish();
-}
-
-inline void ofxUnpublishOsc(const ofxOscPublisherIdentifier &identifier) {
-    ofxGetOscPublisher(identifier.key.ip, identifier.key.port).unpublish(identifier);
 }
 
 inline void ofxUnpublishOsc() {
@@ -1270,6 +1271,11 @@ inline void ofxPublishRegisteredOsc(const ofxOscPublisherIdentifier &identifier)
 
 /// \name ofxUnregisterPublishingOsc
 /// \{
+
+inline void ofxUnregisterPublishingOsc(const ofxOscPublisherIdentifier &identifier) {
+    if(!identifier.isValid()) return;
+    ofxGetOscPublisher(identifier.getKey().ip, identifier.getKey().port).unregister(identifier);
+}
 
 inline void ofxUnregisterPublishingOsc(const std::string &ip, int port, const std::string &address) {
     ofxGetOscPublisher(ip, port).unregister(address);

@@ -751,6 +751,12 @@ inline void ofxSubscribeOsc(const std::initializer_list<int> &ports, const std::
 /// \name ofxUnsubscribeOsc
 /// \{
 
+inline void ofxUnsubscribeOsc(const ofxOscSubscriberIdentifier &identifier) {
+    if(!identifier.isValid()) return;
+    ofxGetOscSubscriber(identifier.getKey()).unsubscribe(identifier);
+}
+
+
 /// \brief unbind from OSC messages with an address pattern _address_ incoming to _port_.
 /// \param port binded port is typed int
 /// \param address osc address is typed const std::string &
