@@ -414,7 +414,7 @@ namespace ofx {
             }
             
             inline bool isSubscribed() const {
-                return targets.empty();
+                return !targets.empty();
             }
             
             inline bool isSubscribed(const std::string &address) const {
