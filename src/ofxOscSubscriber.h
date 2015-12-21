@@ -320,10 +320,12 @@ namespace ofx {
         typedef std::multimap<std::string, ParameterRef> Targets;
         
         class Identifier {
-            std::multimap<std::string, ParameterRef>::iterator it;
+            const std::string address;
+            const ParameterRef ref;
         public:
-            Identifier(const std::multimap<std::string, ParameterRef>::iterator &it, int key)
-            : it(it)
+            Identifier(const std::string &address, const ParameterRef &ref, int key)
+            : address(address)
+            , ref(ref)
             , key(key) {}
             int key;
             
@@ -332,10 +334,26 @@ namespace ofx {
 
     public:
         class OscSubscriber {
+            Targets::const_iterator findFromTargets(const Identifier &identifier, const Targets &targets) const {
+                Targets::const_iterator it = targets.find(identifier.address);
+                if(it != targets.end()) {
+                    for(std::size_t i = 0, size = targets.count(identifier.address); i < size; ++i, ++it) {
+                        if(it->second == identifier.ref) {
+                            return it;
+                        }
+                    }
+                }
+                return targets.end();
+            }
+            
+            inline Targets::const_iterator findSubscribed(const Identifier &identifier) const {
+                return findFromTargets(identifier, targets);
+            }
+
         public:
             inline Identifier subscribe(const std::string &address, ParameterRef ref) {
                 Targets::iterator it = targets.insert(std::make_pair(address, ref));
-                return {it, port};
+                return {address, ref, port};
             }
             
             template <typename T>
@@ -379,6 +397,13 @@ namespace ofx {
 #endif
             inline void unsubscribe(const std::string &address) {
                 targets.erase(address);
+            }
+            
+            inline void unsubscribe(const Identifier &identifier) {
+                Targets::const_iterator it{findSubscribed(identifier)};
+                if(it != targets.end()) {
+                    targets.erase(it);
+                }
             }
             
             inline void unsubscribe() {
@@ -451,6 +476,13 @@ namespace ofx {
                     for(std::size_t i = 0; i < targets.count(address); i++, ++it) {
                         it->second->read(m);
                     }
+                }
+            }
+            
+            void notify(const Identifier &identifier, ofxOscMessage &m) {
+                Targets::const_iterator it{findSubscribed(identifier)};
+                if(it != targets.end() && it->first == m.getAddress()) {
+                    it->second->read(m);
                 }
             }
             
