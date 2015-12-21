@@ -285,6 +285,70 @@ namespace ofx {
         };
         
         template <typename T, bool isCheckValue>
+        struct ConstParameter : AbstractParameter, SetImplementation {
+            ConstParameter(const T &t)
+            : t(t) {}
+            
+            virtual bool setMessage(ofxOscMessage &m, const std::string &address) {
+                if(!canPublish() || !isChanged()) return false;
+                m.setAddress(address);
+                set(m, get());
+                return true;
+            }
+        protected:
+            virtual bool isChanged() { return true; }
+            virtual const T &get() { return t; }
+            const T t;
+        };
+        
+        template <typename T>
+        struct ConstParameter<T, true> : ConstParameter<T, false> {
+            ConstParameter(const T &t)
+            : ConstParameter<T, false>(t) {}
+            
+        protected:
+            virtual bool isChanged() {
+                static bool initial{true};
+                bool tmp = initial;
+                initial = false;
+                return tmp;
+            }
+        };
+        
+        template <typename Base, size_t size>
+        struct ConstParameter<const Base(&)[size], false> : AbstractParameter, SetImplementation {
+            ConstParameter(const Base (&t)[size])
+            : t(t) {}
+            
+            virtual bool setMessage(ofxOscMessage &m, const std::string &address) {
+                if(!canPublish() || !isChanged()) return false;
+                m.setAddress(address);
+                set(m, get());
+                return true;
+            }
+            
+        protected:
+            virtual bool isChanged() { return true; }
+            
+            virtual const Base (&get())[size] { return t; }
+            const Base (&t)[size];
+        };
+        
+        template <typename Base, size_t size>
+        struct ConstParameter<const Base(&)[size], true> : ConstParameter<const Base(&)[size], false> {
+            ConstParameter(const Base(&t)[size])
+            : ConstParameter<const Base(&)[size], false>(t) {}
+            
+        protected:
+            virtual bool isChanged() {
+                static bool initial{true};
+                bool tmp = initial;
+                initial = false;
+                return tmp;
+            }
+        };
+
+        template <typename T, bool isCheckValue>
         struct GetterFunctionParameter : Parameter<T, isCheckValue> {
             typedef T (*GetterFunction)();
             GetterFunctionParameter(GetterFunction getter)
@@ -522,6 +586,14 @@ namespace ofx {
             }
             
             template <typename T>
+            Identifier publish(const std::string &address, const T &value, bool whenValueIsChanged = true) {
+                ParameterRef p;
+                if(whenValueIsChanged) p = ParameterRef(new ConstParameter<T, true>(value));
+                else                   p = ParameterRef(new ConstParameter<T, false>(value));
+                return publish(address, p);
+            }
+            
+            template <typename T>
             Identifier publish(const std::string &address, T (*getter)(), bool whenValueIsChanged = true) {
                 ParameterRef p;
                 if(whenValueIsChanged) p = ParameterRef(new GetterFunctionParameter<T, true>(getter));
@@ -571,6 +643,13 @@ namespace ofx {
                 return publish(address, p);
             }
 
+            template <typename T>
+            Identifier publishIf(bool &condition, const std::string &address, const T &value) {
+                ParameterRef p = ParameterRef(new ConstParameter<T, false>(value));
+                p->setCondition(std::shared_ptr<BasicCondition>(new ConditionRef(condition)));
+                return publish(address, p);
+            }
+            
             template <typename T>
             Identifier publishIf(bool &condition, const std::string &address, T (*getter)()) {
                 ParameterRef p = ParameterRef(new GetterFunctionParameter<T, false>(getter));
@@ -1042,6 +1121,17 @@ inline ofxOscPublisher &ofxGetOscPublisher(const std::string &ip, int port) {
 template <typename T>
 inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, const std::string &address, T &value, bool whenValueIsChanged = true) {
     return ofxGetOscPublisher(ip, port).publish(address, value, whenValueIsChanged);
+}
+
+// TODO: add document
+template <typename T, typename U = typename std::enable_if<!std::is_pointer<T>::value>::type>
+inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, const std::string &address, const T &value, bool whenValueIsChanged = true) {
+    return ofxGetOscPublisher(ip, port).publish(address, value, whenValueIsChanged);
+}
+
+// TODO: add document
+inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, const std::string &address, const char * const value, bool whenValueIsChanged = true) {
+    return ofxGetOscPublisher(ip, port).publish(address, std::string(value), whenValueIsChanged);
 }
 
 /// \brief publish the value will be gave by function as an OSC message with an address pattern address to ip:port every time the value has changed.
