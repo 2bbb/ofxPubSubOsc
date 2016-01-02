@@ -137,8 +137,8 @@ namespace ofxpubsubosc {
         
         template <typename T, size_t s>
         struct array_publisher {
-            typedef const T inner_type;
-            typedef T const (&const_array_t)[s];
+            using inner_type = const T;
+            using const_array_t = T const (&)[s];
             
             array_publisher(T *v)
             : stream(pointer_stream_factory(v)) {}
@@ -171,8 +171,8 @@ namespace ofxpubsubosc {
         
         template <typename T, size_t s>
         struct array_buffer {
-            typedef T inner_type;
-            typedef T (&array_t)[s];
+            using inner_type = T;
+            using array_t = T (&)[s];
             
             array_buffer() : v(malloc(sizeof(T) * s)) {}
             virtual ~array_buffer() { free(v); v = NULL; }

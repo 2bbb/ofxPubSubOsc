@@ -21,11 +21,11 @@ namespace ofx {
     namespace {
         template <typename T>
         struct remove_reference {
-            typedef T type;
+            using type = T;
         };
         template <typename T>
         struct remove_reference<T &> {
-            typedef T type;
+            using type = T;
         };
 #define remove_ref(T) typename ofx::remove_reference<T>::type
         
@@ -45,16 +45,6 @@ namespace ofx {
 #undef define_is_integral
         
 #define type_ref(T) typename add_reference_if_non_arithmetic<T>::type
-        
-        namespace impl {
-            template <bool b, typename T>
-            struct enable {};
-            
-            template <typename T>
-            struct enable<true, T> { typedef T type;};
-        }
-        template <bool b, typename T = void>
-        struct enable : impl::enable<b, T> {};
         
         template <typename T>
         struct is_pointer {
@@ -84,10 +74,10 @@ namespace ofx {
         struct SetImplementation {
         protected:
             template <typename T>
-            inline typename enable<is_integral_and_lt_64bit<T>::value>::type set(ofxOscMessage &m, T v) const { m.addIntArg(v); }
+            inline typename std::enable_if<is_integral_and_lt_64bit<T>::value>::type set(ofxOscMessage &m, T v) const { m.addIntArg(v); }
             
             template <typename T>
-            inline typename enable<is_integral_and_geq_64bit<T>::value>::type set(ofxOscMessage &m, T v) const { m.addInt64Arg(v); }
+            inline typename std::enable_if<is_integral_and_geq_64bit<T>::value>::type set(ofxOscMessage &m, T v) const { m.addInt64Arg(v); }
             
 #define define_set_float(type) inline void set(ofxOscMessage &m, type v) const { m.addFloatArg(v); }
             define_set_float(float);
@@ -160,7 +150,7 @@ namespace ofx {
             
             virtual bool inner_condition() { return true; };
             
-            typedef std::shared_ptr<BasicCondition> Ref;
+            using Ref = std::shared_ptr<BasicCondition>;
         private:
             bool bPublishNow;
         };
@@ -205,7 +195,7 @@ namespace ofx {
             bool (T::*getter)() const;
         };
 
-        typedef BasicCondition::Ref BasicConditionRef;
+        using BasicConditionRef = BasicCondition::Ref;
         
 #pragma mark Parameter
         
@@ -361,7 +351,7 @@ namespace ofx {
 
         template <typename T, bool isCheckValue>
         struct GetterFunctionParameter : Parameter<T, isCheckValue> {
-            typedef T (*GetterFunction)();
+            using GetterFunction = T (*)();
             GetterFunctionParameter(GetterFunction getter)
             : Parameter<T, isCheckValue>(dummy)
             , getter(getter) {}
@@ -374,8 +364,8 @@ namespace ofx {
         
         template <typename Base, size_t size, bool isCheckValue>
         struct GetterFunctionParameter<Base(&)[size], isCheckValue> : Parameter<Base(&)[size], isCheckValue>  {
-            typedef Base (&T)[size];
-            typedef T (*GetterFunction)();
+            using T = Base (&)[size];
+            using GetterFunction = T (*)();
             GetterFunctionParameter(GetterFunction getter)
             : Parameter<Base[size], isCheckValue>(dummy)
             , getter(getter) {}
@@ -392,7 +382,7 @@ namespace ofx {
         
         template <typename T, typename C, bool isCheckValue>
         struct GetterParameter : Parameter<T, isCheckValue> {
-            typedef T (C::*Getter)();
+            using Getter = T (C::*)();
             
             GetterParameter(C &that, Getter getter)
             : Parameter<T, isCheckValue>(dummy)
@@ -408,8 +398,8 @@ namespace ofx {
 
         template <typename Base, size_t size, typename C, bool isCheckValue>
         struct GetterParameter<Base(&)[size], C, isCheckValue> : Parameter<Base(&)[size], isCheckValue> {
-            typedef Base (&T)[size];
-            typedef T (C::*Getter)();
+            using T = Base (&)[size];
+            using Getter = T (C::*)();
             
             GetterParameter(C &that, Getter getter)
             : Parameter<T, isCheckValue>(dummy)
@@ -429,7 +419,7 @@ namespace ofx {
         
         template <typename T, typename C, bool isCheckValue>
         struct ConstGetterParameter : Parameter<T, isCheckValue> {
-            typedef T (C::*Getter)() const;
+            using Getter = T (C::*)() const;
             
             ConstGetterParameter(const C &that, Getter getter)
             : Parameter<T, isCheckValue>(dummy)
@@ -445,8 +435,8 @@ namespace ofx {
         
         template <typename Base, size_t size, typename C, bool isCheckValue>
         struct ConstGetterParameter<Base(&)[size], C, isCheckValue> : Parameter<Base(&)[size], isCheckValue> {
-            typedef Base (&T)[size];
-            typedef T (C::*Getter)() const;
+            using T = Base (&)[size];
+            using Getter = T (C::*)() const;
             
             ConstGetterParameter(const C &that, Getter getter)
             : Parameter<T, isCheckValue>(dummy)
@@ -464,8 +454,8 @@ namespace ofx {
             Base dummy[size];
         };
 
-        typedef std::shared_ptr<AbstractParameter> ParameterRef;
-        typedef std::multimap<std::string, ParameterRef> Targets;
+        using ParameterRef = std::shared_ptr<AbstractParameter>;
+        using Targets = std::multimap<std::string, ParameterRef>;
         
         public:
         struct IP {
@@ -1008,7 +998,7 @@ namespace ofx {
                 return isRegistered() && (registeredTargets.find(address) != registeredTargets.end());
             }
             
-            typedef std::shared_ptr<OscPublisher> Ref;
+            using Ref = std::shared_ptr<OscPublisher>;
             
             static void setUseBundle(bool b) {
                 bUseBundle = b;
@@ -1051,7 +1041,7 @@ namespace ofx {
             friend class OscPublisherManager;
         };
         
-        typedef std::map<Destination, OscPublisher::Ref> OscPublishers;
+        using OscPublishers = std::map<Destination, OscPublisher::Ref>;
         
         static OscPublisherManager &getSharedInstance() {
             static OscPublisherManager *sharedInstance = new OscPublisherManager;
@@ -1082,25 +1072,25 @@ namespace ofx {
         
 #pragma mark iterator
     public:
-        typedef OscPublishers::iterator iterator;
-        typedef OscPublishers::const_iterator const_iterator;
-        typedef OscPublishers::reverse_iterator reverse_iterator;
-        typedef OscPublishers::const_reverse_iterator const_reverse_iterator;
+        using iterator = OscPublishers::iterator;
+        using const_iterator = OscPublishers::const_iterator;
+        using reverse_iterator = OscPublishers::reverse_iterator;
+        using const_reverse_iterator = OscPublishers::const_reverse_iterator;
         
         iterator begin() { return publishers.begin(); }
         iterator end() { return publishers.end(); }
         
-        const_iterator begin() const { return publishers.begin(); }
-        const_iterator end() const { return publishers.end(); }
-        const_iterator cbegin() const { return publishers.begin(); }
-        const_iterator cend() const { return publishers.end(); }
+        const_iterator begin() const { return publishers.cbegin(); }
+        const_iterator end() const { return publishers.cend(); }
+        const_iterator cbegin() const { return publishers.cbegin(); }
+        const_iterator cend() const { return publishers.cend(); }
         
         reverse_iterator rbegin() { return publishers.rbegin(); }
         reverse_iterator rend() { return publishers.rend(); }
         
-        const_reverse_iterator rbegin() const { return publishers.rbegin(); }
-        const_reverse_iterator rend() const { return publishers.rend(); }
-        const_reverse_iterator crbegin() const { return publishers.rbegin(); }
+        const_reverse_iterator rbegin() const { return publishers.crbegin(); }
+        const_reverse_iterator rend() const { return publishers.crend(); }
+        const_reverse_iterator crbegin() const { return publishers.crbegin(); }
         const_reverse_iterator crend() const { return publishers.crend(); }
     };
     
@@ -1112,9 +1102,9 @@ namespace ofx {
 
 #pragma mark getter
 
-typedef ofx::OscPublisherManager ofxOscPublisherManager;
-typedef ofxOscPublisherManager::OscPublisher ofxOscPublisher;
-typedef ofxOscPublisherManager::Identifier ofxOscPublisherIdentifier;
+using ofxOscPublisherManager = ofx::OscPublisherManager;
+using ofxOscPublisher = ofxOscPublisherManager::OscPublisher;
+using ofxOscPublisherIdentifier = ofxOscPublisherManager::Identifier;
 
 /// \brief get a OscPublisherManager.
 /// \returns ofxOscPublisherManager
@@ -1341,12 +1331,12 @@ inline void ofxSetPublisherUsingBundle(bool bUseBundle) {
 
 template <typename T, size_t size>
 struct array_type {
-    typedef T (&type)[size];
-    typedef type (*fun)();
+    using type = T (&)[size];
+    using fun = type (*)();
     template <typename U>
     struct meth {
-        typedef type (U::*method)();
-        typedef type (U::*const_method)() const;
+        using method = type (U::*)();
+        using const_method = type (U::*)() const;
     };
 };
 

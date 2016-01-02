@@ -302,7 +302,7 @@ namespace ofx {
         template <typename R>
         struct CallbackParameter : AbstractParameter, SetImplementation {
         public:
-            typedef std::function<R(ofxOscMessage &)> Callback;
+            using Callback = std::function<R(ofxOscMessage &)>;
             CallbackParameter(const Callback &callback)
             : callback(callback) {}
             
@@ -314,7 +314,7 @@ namespace ofx {
         
         template <typename C, typename R>
         struct MethodCallbackParameter : AbstractParameter, SetImplementation {
-            typedef R (C::*Callback)(ofxOscMessage &);
+            using Callback = R (C::*)(ofxOscMessage &);
             MethodCallbackParameter(C &that, Callback callback)
             : that(that), callback(callback) {}
             
@@ -327,7 +327,7 @@ namespace ofx {
 
         template <typename C, typename R>
         struct ConstMethodCallbackParameter : AbstractParameter, SetImplementation {
-            typedef R (C::*Callback)(ofxOscMessage &) const;
+            using Callback = R (C::*)(ofxOscMessage &) const;
             ConstMethodCallbackParameter(const C &that, Callback callback)
             : that(that), callback(callback) {}
             
@@ -338,9 +338,9 @@ namespace ofx {
             const C &that;
         };
         
-        typedef std::shared_ptr<AbstractParameter> ParameterRef;
-        typedef std::shared_ptr<ofxOscReceiver> OscReceiverRef;
-        typedef std::multimap<std::string, ParameterRef> Targets;
+        using ParameterRef = std::shared_ptr<AbstractParameter>;
+        using OscReceiverRef = std::shared_ptr<ofxOscReceiver>;
+        using Targets = std::multimap<std::string, ParameterRef>;
         
         class Identifier {
             std::string address;
@@ -529,7 +529,7 @@ namespace ofx {
                 }
             }
             
-            typedef  std::shared_ptr<OscSubscriber> Ref;
+            using Ref = std::shared_ptr<OscSubscriber>;
         private:
             OscSubscriber(int port)
             : port(port) {
@@ -580,7 +580,7 @@ namespace ofx {
         }
         
     private:
-        typedef std::map<int, OscSubscriber::Ref> OscSubscribers;
+        using OscSubscribers = std::map<int, OscSubscriber::Ref>;
         void update(ofEventArgs &args) {
             for(OscSubscribers::iterator it = managers.begin(); it != managers.end(); ++it) {
                 it->second->update();
@@ -598,32 +598,32 @@ namespace ofx {
         
 #pragma mark iterator
     public:
-        typedef OscSubscribers::iterator iterator;
-        typedef OscSubscribers::const_iterator const_iterator;
-        typedef OscSubscribers::reverse_iterator reverse_iterator;
-        typedef OscSubscribers::const_reverse_iterator const_reverse_iterator;
+        using iterator = OscSubscribers::iterator;
+        using const_iterator = OscSubscribers::const_iterator;
+        using reverse_iterator = OscSubscribers::reverse_iterator;
+        using const_reverse_iterator = OscSubscribers::const_reverse_iterator;
         
         iterator begin() { return managers.begin(); }
         iterator end() { return managers.end(); }
         
-        const_iterator begin() const { return managers.begin(); }
-        const_iterator end() const { return managers.end(); }
-        const_iterator cbegin() const { return managers.begin(); }
-        const_iterator cend() const { return managers.end(); }
+        const_iterator begin() const { return managers.cbegin(); }
+        const_iterator end() const { return managers.cend(); }
+        const_iterator cbegin() const { return managers.cbegin(); }
+        const_iterator cend() const { return managers.cend(); }
         
         reverse_iterator rbegin() { return managers.rbegin(); }
         reverse_iterator rend() { return managers.rend(); }
         
-        const_reverse_iterator rbegin() const { return managers.rbegin(); }
-        const_reverse_iterator rend() const { return managers.rend(); }
-        const_reverse_iterator crbegin() const { return managers.rbegin(); }
+        const_reverse_iterator rbegin() const { return managers.crbegin(); }
+        const_reverse_iterator rend() const { return managers.crend(); }
+        const_reverse_iterator crbegin() const { return managers.crbegin(); }
         const_reverse_iterator crend() const { return managers.crend(); }
     };
 };
 
-typedef ofx::OscSubscriberManager ofxOscSubscriberManager;
-typedef ofxOscSubscriberManager::OscSubscriber ofxOscSubscriber;
-typedef ofxOscSubscriberManager::Identifier ofxOscSubscriberIdentifier;
+using ofxOscSubscriberManager = ofx::OscSubscriberManager;
+using ofxOscSubscriber = ofxOscSubscriberManager::OscSubscriber;
+using ofxOscSubscriberIdentifier = ofxOscSubscriberManager::Identifier;
 
 /// \brief get a OscSubscriberManager.
 /// \returns ofxOscSubscriberManager

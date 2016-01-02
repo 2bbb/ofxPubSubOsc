@@ -16,7 +16,7 @@ namespace ofxpubsubosc {
     namespace {
         template <typename T>
         struct remove_const_reference {
-            typedef T type;
+            using type = T;
         };
         
         template <typename T>
@@ -30,13 +30,13 @@ namespace ofxpubsubosc {
         
         template <typename T>
         struct add_reference_if_non_arithmetic {
-            typedef T& type;
+            using type = T&;
         };
         
 #define define_add_reference_if_non_arithmetic(T) \
 template <> \
 struct add_reference_if_non_arithmetic<T> { \
-typedef T type; \
+using type = T; \
 };
         define_add_reference_if_non_arithmetic(bool);
         define_add_reference_if_non_arithmetic(short);
