@@ -196,6 +196,13 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 ## <a name="UpdateHistory">Update history</a>
 
+### 2016/01/02 ver 0.1.2 release
+
+* this is *final update added new feature, with oF0.8.4 support*
+* after this release, "ver 0.1.x will only bugfie about supporting oF0.8.4
+* add new feature ofxNotifyToSubscribedOsc (proposed by [satcy](http://github.com/satcy/). thanks!!)
+* some bugfix
+
 ### 2015/09/17 ver 0.1.1 release
 
 * support [ofParameter](#SupportedTypes_ofParameter)
@@ -278,6 +285,7 @@ MIT License.
 * [SHIMIZU Motoi](http://github.com/motoishmz)
 * [IWATANI Nariaki](http://github.com/nariakiiwatani)
 * [USAMI Takuto](http://github.com/usm916)
+* [HORII Satoshi](http://github.com/satcy)
 
 ## <a name="AtTheLast">At the last</a>
 
