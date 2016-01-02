@@ -18,6 +18,50 @@
 namespace ofx {
     using namespace ofxpubsubosc;
     
+#ifdef ENABLE_FUNCTIONAL
+    namespace {
+        template <typename T>
+        using get_type = typename T::type;
+        
+        template <typename T>
+        struct is_callable {
+            template <typename U, decltype(&U::operator()) = &U::operator()>
+            struct checker {};
+            template <typename U> static std::true_type  test(checker<U> *);
+            template <typename>   static std::false_type test(...);
+            static constexpr bool value = decltype(test<T>(nullptr))::value;
+        };
+        
+        template <typename T>
+        struct function_info;
+        
+        template <typename T, bool b>
+        struct function_info_impl {
+            static constexpr bool is_function = false;
+        };
+        
+        template <typename T>
+        struct function_info_impl<T, true> : public function_info<decltype(&T::operator())> {};
+        
+        template <typename T>
+        struct function_info : public function_info_impl<T, is_callable<T>::value> {};
+        
+        template <typename ret, typename ... arguments>
+        struct function_info<ret(*)(arguments ...)> {
+            static constexpr bool is_function = true;
+            static constexpr std::size_t arity = sizeof...(arguments);
+            using result_type = ret;
+            using arguments_types_tuple = std::tuple<arguments ...>;
+            template <std::size_t index>
+            using argument_type = get_type<std::tuple_element<index, arguments_types_tuple>>;
+            using function_type = std::function<result_type(arguments ...)>;
+        };
+        
+        template <typename T>
+        function_info<T> get_function_info(T &t); // for decltype
+    };
+#endif
+    
     class OscSubscriberManager {
     private:
         class OscSubscriber;
@@ -227,6 +271,20 @@ namespace ofx {
             T &t;
         };
         
+#if ENABLE_FUNCTIONAL
+        template <typename T, typename R>
+        struct SetterFunctionParameter : AbstractParameter, SetImplementation {
+            SetterFunctionParameter(std::function<R(T)> setter) : setter(setter) {};
+            virtual void read(ofxOscMessage &message) {
+                typename remove_const_reference<T>::type t;
+                set(message, t);
+                setter(t);
+            }
+            
+        private:
+            std::function<R(T)> setter;
+        };
+#else
         template <typename T, typename R>
         struct SetterFunctionParameter : AbstractParameter, SetImplementation {
             SetterFunctionParameter(R (*setter)(T)) : setter(setter) {};
@@ -239,6 +297,7 @@ namespace ofx {
         private:
             R (*setter)(T);
         };
+#endif
         
         template <typename T, typename C, typename R>
         struct SetterMethodParameter : AbstractParameter, SetImplementation {
@@ -275,7 +334,21 @@ namespace ofx {
         };
 
 #pragma mark callbacks
-        
+
+#if ENABLE_FUNCTIONAL
+        template <typename R>
+        struct CallbackParameter : AbstractParameter, SetImplementation {
+        public:
+            typedef std::function<R(ofxOscMessage &)> Callback;
+            CallbackParameter(const Callback &callback)
+            : callback(callback) {}
+            
+            virtual void read(ofxOscMessage &message) { callback(message); }
+            
+        private:
+            Callback callback;
+        };
+#else
         struct CallbackParameter : AbstractParameter, SetImplementation {
         public:
             typedef void (*Callback)(ofxOscMessage &);
@@ -283,11 +356,12 @@ namespace ofx {
             : callback(callback) {}
             
             virtual void read(ofxOscMessage &message) { callback(message); }
-
+            
         private:
             Callback callback;
         };
-
+#endif
+        
         template <typename C, typename R>
         struct MethodCallbackParameter : AbstractParameter, SetImplementation {
             typedef R (C::*Callback)(ofxOscMessage &);
@@ -314,19 +388,6 @@ namespace ofx {
             const C &that;
         };
         
-#if ENABLE_FUNCTIONAL
-        struct LambdaCallbackParameter : AbstractParameter, SetImplementation {
-        public:
-            typedef std::function<void(ofxOscMessage &)> Callback;
-            LambdaCallbackParameter(const Callback &callback)
-            : callback(callback) {}
-            
-            virtual void read(ofxOscMessage &message) { callback(message); }
-            
-        private:
-            Callback callback;
-        };
-#endif
         typedef std::shared_ptr<AbstractParameter> ParameterRef;
         typedef std::shared_ptr<ofxOscReceiver> OscReceiverRef;
         typedef std::multimap<std::string, ParameterRef> Targets;
@@ -373,51 +434,79 @@ namespace ofx {
                 return findFromTargets(identifier, targets);
             }
 
-        public:
             inline Identifier subscribe(const std::string &address, ParameterRef ref) {
                 Targets::iterator it = targets.insert(std::make_pair(address, ref));
                 return {address, ref, port};
             }
             
+        public:
+            
+#if ENABLE_FUNCTIONAL
+            template <typename T>
+            inline typename std::enable_if<!function_info<T>::is_function, Identifier>::type subscribe(const std::string &address, T &value) {
+                return subscribe(address, ParameterRef(new Parameter<T>(value)));
+            }
+            
+            template <typename T>
+            inline typename std::enable_if<function_info<T>::is_function, Identifier>::type subscribe(const std::string &address, T &value) {
+                return subscribe(address, static_cast<typename function_info<T>::function_type>(value));
+            }
+            
+            template <typename T, typename R>
+            inline typename std::enable_if<!std::is_same<typename remove_const_reference<T>::type, ofxOscMessage>::value, Identifier>::type subscribe(const std::string &address, std::function<R(T)> setter) {
+                return subscribe(address, ParameterRef(new SetterFunctionParameter<T, R>(setter)));
+            }
+#else
             template <typename T>
             inline Identifier subscribe(const std::string &address, T &value) {
                 return subscribe(address, ParameterRef(new Parameter<T>(value)));
             }
             
             template <typename T, typename R>
-            inline typename is_not_ofxoscmessage<R, Identifier>::type subscribe(const std::string &address, R (*setter)(T)) {
+            inline typename is_not_ofxoscmessage<T, Identifier>::type subscribe(const std::string &address, R (*setter)(T)) {
                 return subscribe(address, ParameterRef(new SetterFunctionParameter<T, R>(setter)));
             }
+#endif
             
             template <typename T, typename C, typename R>
-            inline typename is_not_ofxoscmessage<R, Identifier>::type subscribe(const std::string &address, C &that, R (C::*setter)(T)) {
+            inline typename is_not_ofxoscmessage<T, Identifier>::type subscribe(const std::string &address, C &that, R (C::*setter)(T)) {
                 return subscribe(address, ParameterRef(new SetterMethodParameter<T, C, R>(that, setter)));
             }
             
             template <typename T, typename C, typename R>
-            inline typename is_not_ofxoscmessage<R, Identifier>::type subscribe(const std::string &address, const C &that, R (C::*setter)(T) const) {
-                return subscribe(address, ParameterRef(new ConstSetterMethodParameter<T, C, R>(that, setter)));
+            inline typename is_not_ofxoscmessage<T, Identifier>::type subscribe(const std::string &address, C *that, R (C::*setter)(T)) {
+                return subscribe(address, ParameterRef(new SetterMethodParameter<T, C, R>(*that, setter)));
             }
             
             template <typename T, typename C, typename R>
-            inline typename is_not_ofxoscmessage<R, Identifier>::type subscribe(const std::string &address, C *that, R (C::*setter)(T)) {
-                return subscribe(address, ParameterRef(new SetterMethodParameter<T, C, R>(*that, setter)));
+            inline typename is_not_ofxoscmessage<T, Identifier>::type subscribe(const std::string &address, const C &that, R (C::*setter)(T) const) {
+                return subscribe(address, ParameterRef(new ConstSetterMethodParameter<T, C, R>(that, setter)));
             }
 
+            template <typename T, typename C, typename R>
+            inline typename is_not_ofxoscmessage<T, Identifier>::type subscribe(const std::string &address, const C * const that, R (C::*setter)(T) const) {
+                return subscribe(address, ParameterRef(new ConstSetterMethodParameter<T, C, R>(*that, setter)));
+            }
+
+#if ENABLE_FUNCTIONAL
+            template <typename R>
+            inline Identifier subscribe(const std::string &address, const std::function<R(ofxOscMessage &)> callback) {
+                return subscribe(address, ParameterRef(new CallbackParameter<R>(callback)));
+            }
+            inline Identifier subscribe(const std::string &address, const std::function<void(ofxOscMessage &)> callback) {
+                return subscribe(address, ParameterRef(new CallbackParameter<void>(callback)));
+            }
+#else
             inline Identifier subscribe(const std::string &address, void (*callback)(ofxOscMessage &)) {
                 return subscribe(address, ParameterRef(new CallbackParameter(callback)));
             }
+#endif
             
             template <typename C, typename R>
             inline Identifier subscribe(const std::string &address, C &that, R (C::*callback)(ofxOscMessage &)) {
                 return subscribe(address, ParameterRef(new MethodCallbackParameter<C, R>(that, callback)));
             }
             
-#if ENABLE_FUNCTIONAL
-            inline Identifier subscribe(const std::string &address, const std::function<void(ofxOscMessage &)> callback) {
-                return subscribe(address, ParameterRef(new LambdaCallbackParameter(callback)));
-            }
-#endif
             inline void unsubscribe(const std::string &address) {
                 targets.erase(address);
             }
@@ -439,10 +528,16 @@ namespace ofx {
                 leakPicker = ref;
             }
             
+#if ENABLE_FUNCTIONAL
+            inline void setLeakPicker(const std::function<void(ofxOscMessage &)> &callback) {
+                setLeakPicker(ParameterRef(new CallbackParameter<void>(callback)));
+            }
+#else
             inline void setLeakPicker(void (*callback)(ofxOscMessage &)) {
                 setLeakPicker(ParameterRef(new CallbackParameter(callback)));
             }
-            
+#endif
+       
             template <typename C, typename R>
             inline void setLeakPicker(C &that, R (C::*callback)(ofxOscMessage &)) {
                 setLeakPicker(ParameterRef(new MethodCallbackParameter<C, R>(that, callback)));
@@ -453,11 +548,6 @@ namespace ofx {
                 setLeakPicker(ParameterRef(new ConstMethodCallbackParameter<C, R>(that, callback)));
             }
             
-#if ENABLE_FUNCTIONAL
-            inline void setLeakPicker(const std::function<void(ofxOscMessage &)> &callback) {
-                setLeakPicker(ParameterRef(new LambdaCallbackParameter(callback)));
-            }
-#endif
             
             inline void removeLeakPicker() {
                 leakPicker.reset();

@@ -14,6 +14,8 @@ namespace ofxpubsubosc {
     struct is_not_ofxoscmessage { typedef U type; };
     template <>
     struct is_not_ofxoscmessage<ofxOscMessage &> {};
+    template <>
+    struct is_not_ofxoscmessage<ofxOscMessage> {};
     
     namespace {
         template <typename T>

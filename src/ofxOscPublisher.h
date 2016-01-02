@@ -655,7 +655,7 @@ namespace ofx {
 #pragma mark publish conditional
 #pragma mark condition is bool value ref
             
-            Identifier publishIf(bool &condition, const std::string &address,const char * const value) {
+            Identifier publishIf(bool &condition, const std::string &address, const char * const value) {
                 ParameterRef p;
                 return publishIf(condition, address, std::string(value));
             }
@@ -1139,7 +1139,7 @@ inline ofxOscPublisher &ofxGetOscPublisher(const std::string &ip, int port) {
 /// \name ofxPublishOsc
 /// \{
 
-/// \brief publish value as an OSC message with an address pattern address to ip:port every time the value has changed. 
+/// \brief publish value as an OSC message with an address pattern address to ip:port every time the value has changed.
 /// If whenValueIsChanged is set to false, then the binded value is sent every frame after App::update.
 /// template parameter T is suggested by value
 /// \param ip target ip is typed const std::string &
@@ -1149,98 +1149,24 @@ inline ofxOscPublisher &ofxGetOscPublisher(const std::string &ip, int port) {
 /// \param whenValueIsChanged if this value to false, then we send value every update
 /// \returns ofxOscPublisherIdentifier
 
-template <typename T>
-inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, const std::string &address, T &value, bool whenValueIsChanged = true) {
-    return ofxGetOscPublisher(ip, port).publish(address, value, whenValueIsChanged);
-}
-
-// TODO: add document
-template <typename T, typename U = typename ofx::enable<!ofx::is_pointer<T>::value>::type>
-inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, const std::string &address, const T &value, bool whenValueIsChanged = true) {
-    return ofxGetOscPublisher(ip, port).publish(address, value, whenValueIsChanged);
-}
-
-// TODO: add document
-inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, const std::string &address, const char * const value, bool whenValueIsChanged = true) {
-    return ofxGetOscPublisher(ip, port).publish(address, std::string(value), whenValueIsChanged);
-}
-
-/// \brief publish the value will be gave by function as an OSC message with an address pattern address to ip:port every time the value has changed.
-///  If whenValueIsChanged is set to false, then the binded value is sent every frame after App::update.
-/// template parameter T is suggested by value
-/// \param ip target ip is typed const std::string &
-/// \param port target port is typed int
-/// \param address osc address is typed const std::string &
-/// \param getter this function gives value, is typed T(*)()
-/// \param whenValueIsChanged if this value to false, then we send value every update
-/// \returns ofxOscPublisherIdentifier
-
-template <typename T>
-inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, const std::string &address, T (*getter)(), bool whenValueIsChanged = true) {
-    return ofxGetOscPublisher(ip, port).publish(address, getter, whenValueIsChanged);
+template <typename ValueRefOrGetterFunction>
+inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, const std::string &address, ValueRefOrGetterFunction &&valueRefOrGetterFunction, bool whenValueIsChanged = true) {
+    return ofxGetOscPublisher(ip, port).publish(address, valueRefOrGetterFunction, whenValueIsChanged);
 }
 
 /// \brief publish the value will be gave by function as an OSC message with an address pattern address to ip:port every time the value has changed.
 /// If whenValueIsChanged is set to false, then the binded value is sent every frame after App::update.
-/// template parameter T is suggested by value and U is suggested by that and getter.
+/// template parameter ObjectPtrOrRef is suggested by that, and Method is suggested by getter.
 /// \param ip target ip is typed const std::string &
 /// \param port target port is typed int
 /// \param address osc address is typed const std::string &
-/// \param that this object is typed U*, will bind with next parameter method. is called as (that->*getter)().
+/// \param that this object is typed ObjectPtrOrRef, will bind with next parameter method. is called as (that->*getter)() or (that.*getter)().
 /// \param getter this method gives value, is typed T(C::*)()
 /// \param whenValueIsChanged if this value to false, then we send value every update
 /// \returns ofxOscPublisherIdentifier
 
-template <typename T, typename C>
-inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, const std::string &address, C *that, T (C::*getter)(), bool whenValueIsChanged = true) {
-    return ofxGetOscPublisher(ip, port).publish(address, *that, getter, whenValueIsChanged);
-}
-
-/// \brief publish the value will be gave by function as an OSC message with an address pattern address to ip:port every time the value has changed.
-/// If whenValueIsChanged is set to false, then the binded value is sent every frame after App::update.
-/// template parameter T is suggested by value and U is suggested by that and getter.
-/// \param ip target ip is typed const std::string &
-/// \param port target port is typed int
-/// \param address osc address is typed const std::string &
-/// \param that this object is typed U*, will bind with next parameter method. is called as (that->*getter)().
-/// \param getter this method gives value, is typed T(C::*)() const
-/// \param whenValueIsChanged if this value to false, then we send value every update
-/// \returns ofxOscPublisherIdentifier
-
-template <typename T, typename C>
-inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, const std::string &address, const C * const that, T (C::*getter)() const, bool whenValueIsChanged = true) {
-    return ofxGetOscPublisher(ip, port).publish(address, *that, getter, whenValueIsChanged);
-}
-
-/// \brief publish the value will be gave by function as an OSC message with an address pattern address to ip:port every time the value has changed.
-/// If whenValueIsChanged is set to false, then the binded value is sent every frame after App::update.
-/// template parameter T is suggested by value and U is suggested by that and getter.
-/// \param ip target ip is typed const std::string &
-/// \param port target port is typed int
-/// \param address osc address is typed const std::string &
-/// \param that this object is typed U&, will bind with next parameter method. is called as (that.*getter)()
-/// \param getter this method gives value, is typed T(C::*)()
-/// \param whenValueIsChanged if this value to false, then we send value every update
-/// \returns ofxOscPublisherIdentifier
-
-template <typename T, typename C>
-inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, const std::string &address, C &that, T (C::*getter)(), bool whenValueIsChanged = true) {
-    return ofxGetOscPublisher(ip, port).publish(address, that, getter, whenValueIsChanged);
-}
-
-/// \brief publish the value will be gave by function as an OSC message with an address pattern address to ip:port every time the value has changed.
-/// If whenValueIsChanged is set to false, then the binded value is sent every frame after App::update.
-/// template parameter T is suggested by value and U is suggested by that and getter.
-/// \param ip target ip is typed const std::string &
-/// \param port target port is typed int
-/// \param address osc address is typed const std::string &
-/// \param that this object is typed U&, will bind with next parameter method. is called as (that.*getter)()
-/// \param getter this method gives value, is typed T(C::*)() const
-/// \param whenValueIsChanged if this value to false, then we send value every update
-/// \returns ofxOscPublisherIdentifier
-
-template <typename T, typename C>
-inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, const std::string &address, const C &that, T (C::*getter)() const, bool whenValueIsChanged = true) {
+template <typename ObjectPtrOrRef, typename Method>
+inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, const std::string &address, ObjectPtrOrRef &&that, Method getter, bool whenValueIsChanged = true) {
     return ofxGetOscPublisher(ip, port).publish(address, that, getter, whenValueIsChanged);
 }
 
@@ -1293,25 +1219,25 @@ inline void ofxPublishOsc(const std::initializer_list<ofxOscPublisherManager::De
 /// \param whenValueIsChanged if this value to false, then we send value every update
 /// \returns ofxOscPublisherIdentifier
 
-template <typename ConditionValueRefOrFunction, typename ValueRefOrFunction>
-inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionValueRefOrFunction &condition, const std::string &ip, int port, const std::string &address, ValueRefOrFunction &value) {
-    return ofxGetOscPublisher(ip, port).publishIf(condition, address, value);
+template <typename ConditionValueRef, typename ValueRefOrGetterFunction>
+inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionValueRef &&condition, const std::string &ip, int port, const std::string &address, ValueRefOrGetterFunction &&valueRefOrGetterFunction) {
+    return ofxGetOscPublisher(ip, port).publishIf(condition, address, valueRefOrGetterFunction);
 }
 
-template <typename ConditionValueRefOrFunction, typename ObjectPtrOrRef, typename GetterMethod>
-inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionValueRefOrFunction &condition, const std::string &ip, int port, const std::string &address, ObjectPtrOrRef &that, GetterMethod getter) {
+template <typename ConditionValueRef, typename ObjectPtrOrRef, typename GetterMethod>
+inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionValueRef &&condition, const std::string &ip, int port, const std::string &address, ObjectPtrOrRef &&that, GetterMethod getter) {
     return ofxGetOscPublisher(ip, port).publishIf(condition, address, that, getter);
 }
 
 #pragma mark condition is method
 
 template <typename ConditionObjectPtrOrRef, typename ConditionMethodReturnsBool, typename ValueRefOrFunction>
-inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionObjectPtrOrRef &condition, ConditionMethodReturnsBool method, const std::string &ip, int port, const std::string &address, ValueRefOrFunction &value) {
-    return ofxGetOscPublisher(ip, port).publishIf(condition, method, address, value);
+inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionObjectPtrOrRef &&condition, ConditionMethodReturnsBool method, const std::string &ip, int port, const std::string &address, ValueRefOrFunction &&valueRefOrGetterFunction) {
+    return ofxGetOscPublisher(ip, port).publishIf(condition, method, address, valueRefOrGetterFunction);
 }
 
-template <typename ConditionObjectPtrOrRef, typename ConditionMethodReturnsBool, typename ObjectRefOrPtr, typename GetterMethod>
-inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionObjectPtrOrRef &condition, ConditionMethodReturnsBool method, const std::string &ip, int port, const std::string &address, ObjectRefOrPtr &that, GetterMethod getter) {
+template <typename ConditionObjectPtrOrRef, typename ConditionMethodReturnsBool, typename ObjectPtrOrRef, typename GetterMethod>
+inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionObjectPtrOrRef &&condition, ConditionMethodReturnsBool method, const std::string &ip, int port, const std::string &address, ObjectPtrOrRef &&that, GetterMethod getter) {
     return ofxGetOscPublisher(ip, port).publishIf(condition, method, address, *that, getter);
 }
 
@@ -1351,33 +1277,13 @@ inline void ofxUnpublishOsc() {
 /// \name ofxRegisterPublishingOsc
 /// \{
 
-template <typename T>
-inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, int port, const std::string &address, T &value) {
-    return ofxGetOscPublisher(ip, port).doRegister(address, value);
+template <typename ValueOrGetterFunctionType>
+inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, int port, const std::string &address, ValueOrGetterFunctionType &&valueOrGetterFunction) {
+    return ofxGetOscPublisher(ip, port).doRegister(address, valueOrGetterFunction);
 }
 
-template <typename T>
-inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, int port, const std::string &address, T (*getter)()) {
-    return ofxGetOscPublisher(ip, port).doRegister(address, getter);
-}
-
-template <typename T, typename C>
-inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, int port, const std::string &address, C *that, T (C::*getter)()) {
-    return ofxGetOscPublisher(ip, port).doRegister(address, that, getter);
-}
-
-template <typename T, typename C>
-inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, int port, const std::string &address, const C * const that, T (C::*getter)() const) {
-    return ofxGetOscPublisher(ip, port).doRegister(address, that, getter);
-}
-
-template <typename T, typename C>
-inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, int port, const std::string &address, C &that, T (C::*getter)()) {
-    return ofxGetOscPublisher(ip, port).doRegister(address, that, getter);
-}
-
-template <typename T, typename C>
-inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, int port, const std::string &address, const C &that, T (C::*getter)() const) {
+template <typename ObjectPtrOrRef, typename GetterMethod>
+inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, int port, const std::string &address, ObjectPtrOrRef &&that, GetterMethod &&getter) {
     return ofxGetOscPublisher(ip, port).doRegister(address, that, getter);
 }
 
