@@ -4,7 +4,7 @@ easy utility for publish/subscribe OSC message.
 
 ## Dependencies
 
-* ofxOsc (maybe oF0.8.2~)
+* ofxOsc
 
 ## Notice
 
@@ -12,7 +12,7 @@ easy utility for publish/subscribe OSC message.
 * if you use oF0.9.0~, then you can use `std::function<void(ofxOscMessage &)>`! detail: [API Reference](API_Reference.md#API_lambda_callback)
 * **if you use oF0.8.2~0.8.4, then you can use [v0.1.2](releases/tag/v0_1_2)**
 * if you have challange spirit, please use dev/main branch.
-* if you want to join development ofxPubSubOsc, open the issue and post the PR for dev/main.
+* if you want to join development ofxPubSubOsc, open the issue and post the PR for [dev/main](tree/dev/main).
 
 ## TOC
 
@@ -191,7 +191,6 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 * pair of `U &that`, `T (U::\*callback)(ofxOscMessage &)`;
 * pair of `U \*that`, `T (U::\*callback)(ofxOscMessage &)`;
 * `std::function<void(ofxOscMessage &)>`
-	* (oF0.9.0~)
 
 ## <a name="UpdateHistory">Update history</a>
 
@@ -206,6 +205,7 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 * add iterators to [ofxOscPublisherManager](API_Reference.md#Advanced_ofxOscPublisherManager)
 * add all port operation to ofxUnpublishOsc, ofxUnregisterPublishingOsc
 * add feature publishing r-value. (i.e., you can do `ofxPublishOsc(host, port, "/bar", "value!!")`)
+* add `const` to lambda callback (proposed by [satoruhiga](https://github.com/satoruhiga). thanks!!)
 * add useful macro `SubscribeOsc(port, name)` is same as `ofxSubscribeOsc(port, "/name", name)` (porposed by [hanasaan](https://github.com/hanasaan). thanks!!)
 * add `std::` prefix
 * cleaning up conditional macro about oF0.8.x
