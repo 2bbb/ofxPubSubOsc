@@ -197,6 +197,10 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 ### 2016/01/02 [ver 0.2.0](releases/tag/v2_0_0) release
 
 * *after this release, we will only test on oF0.9.0~*
+* new feature: multi-subscribe, multi-publish
+	* `ofxSubscribeOsc` returns `ofxSubscriberIdentifier`
+	* `ofxPublishOsc` returns `ofxPublisherIdentifier`
+	* TODO: API Reference
 * add iterators to [ofxOscSubscriberManager](API_Reference.md#Advanced_ofxOscSubscriberManager)
 * add iterators to [ofxOscPublisherManager](API_Reference.md#Advanced_ofxOscPublisherManager)
 * add all port operation to ofxUnsubscribeOsc, ofxNotifyToSubscribedOsc, ofxRemoveLeakedOscPicker
