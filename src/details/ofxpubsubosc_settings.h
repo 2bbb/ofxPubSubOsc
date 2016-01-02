@@ -8,16 +8,16 @@
 #ifndef ofxPubSubDevelopProject_ofxpubsubosc_settings_h
 #define ofxPubSubDevelopProject_ofxpubsubosc_settings_h
 
-#if (OF_VERSION_MAJOR == 0) && (OF_VERSION_MINOR < 8) && (OF_VERSION_PATCH < 2)
-#   define ENABLE_OF_BUFFER 0
-#else
-#   define ENABLE_OF_BUFFER 1
-#endif
+#pragma mark versioning tags
 
-#if (OF_VERSION_MAJOR == 0) && OF_VERSION_MINOR < 9
-#   define ENABLE_FUNCTIONAL 0
-#else
-#   define ENABLE_FUNCTIONAL 1
+#define OFX_PUBSUBOSC_VERSION_MAJOR 0
+#define OFX_PUBSUBOSC_VERSION_MINOR 2
+#define OFX_PUBSUBOSC_VERSION_PATCH 0
+
+#define OFX_PUBSUBOSC_MULTISUBSCRIBE 1
+
+#if (OF_VERSION_MAJOR == 0) && (OF_VERSION_MINOR < 9)
+#   error this version uses C++11. (i.e. only oF0.9.0~). you can use old version ( from https://github.com/2bbb/ofxPubSubOsc/releases/tag/v0_1_2 )
 #endif
 
 #endif

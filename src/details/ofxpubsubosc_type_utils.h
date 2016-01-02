@@ -10,15 +10,13 @@
 #include "ofxpubsubosc_settings.h"
 
 namespace ofxpubsubosc {
-    template <typename T>
-    struct is_not_ofxoscmessage { typedef void type; };
-    template <>
-    struct is_not_ofxoscmessage<ofxOscMessage &> {};
+    template <typename T, typename U = void>
+    using is_not_ofxoscmessage = std::enable_if<!std::is_same<std::remove_reference<T>, ofxOscMessage>::value, U>;
     
     namespace {
         template <typename T>
         struct remove_const_reference {
-            typedef T type;
+            using type = T;
         };
         
         template <typename T>
@@ -32,13 +30,13 @@ namespace ofxpubsubosc {
         
         template <typename T>
         struct add_reference_if_non_arithmetic {
-            typedef T& type;
+            using type = T&;
         };
         
 #define define_add_reference_if_non_arithmetic(T) \
 template <> \
 struct add_reference_if_non_arithmetic<T> { \
-typedef T type; \
+using type = T; \
 };
         define_add_reference_if_non_arithmetic(bool);
         define_add_reference_if_non_arithmetic(short);
@@ -53,20 +51,6 @@ typedef T type; \
                 
     };
 };
-
-#if (OF_VERSION_MAJOR == 0) && (OF_VERSION_MINOR < 9) /* ofColor will provid operator==(const ofColor &c) const from ver. 0.9.0 */
-
-template <typename T>
-bool operator==(const ofColor_<T> &x, const ofColor_<T> &y) {
-    return x == y;
-}
-
-template <typename T>
-bool operator!=(const ofColor_<T> &x, const ofColor_<T> &y) {
-    return x != y;
-}
-
-#endif
 
 bool operator==(const ofMatrix3x3 &x, const ofMatrix3x3 &y) {
     return (x.a == y.a) && (x.b == y.b) && (x.c == y.c)
@@ -89,18 +73,10 @@ bool operator!=(const ofMatrix4x4 &x, const ofMatrix4x4 &y) {
     return !operator==(x, y);
 }
 
-#if ENABLE_OF_BUFFER
-
 bool operator==(const ofBuffer &x, const ofBuffer &y) {
-#if OF_VERSION_MINOR < 9
-    return (x.size() == y.size()) && (memcmp(x.getBinaryBuffer(), y.getBinaryBuffer(), x.size()) == 0);
-#else
     return (x.size() == y.size()) && (memcmp(x.getData(), y.getData(), x.size()) == 0);
-#endif
 }
 
 bool operator!=(const ofBuffer &x, const ofBuffer &y) {
     return !operator==(x, y);
 }
-
-#endif
