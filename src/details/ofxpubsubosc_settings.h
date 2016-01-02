@@ -16,22 +16,4 @@
 
 #define OFX_PUBSUBOSC_MULTISUBSCRIBE 1
 
-#if (OF_VERSION_MAJOR == 0) && ((OF_VERSION_MINOR < 8) || ((OF_VERSION_MINOR == 8) && (OF_VERSION_PATCH < 2)))
-#   define ENABLE_OF_BUFFER 0
-#else
-#   define ENABLE_OF_BUFFER 1
-#endif
-
-#if (OF_VERSION_MAJOR == 0) && (OF_VERSION_MINOR < 9)
-#   define ENABLE_FUNCTIONAL 0
-#else
-#   define ENABLE_FUNCTIONAL 1
-#endif
-
-#if __cplusplus <= 199711L
-#   define ENABLE_CPP11 0
-#else
-#   define ENABLE_CPP11 1
-#endif
-
 #endif

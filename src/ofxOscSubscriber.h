@@ -18,7 +18,6 @@
 namespace ofx {
     using namespace ofxpubsubosc;
     
-#ifdef ENABLE_FUNCTIONAL
     namespace {
         template <typename T>
         using get_type = typename T::type;
@@ -60,7 +59,6 @@ namespace ofx {
         template <typename T>
         function_info<T> get_function_info(T &t); // for decltype
     };
-#endif
     
     class OscSubscriberManager {
     private:
@@ -68,7 +66,6 @@ namespace ofx {
         
         struct SetImplementation {
         protected:
-#if ENABLE_FUNCTIONAL
 #define define_set_arithmetic(type) \
             inline void set(ofxOscMessage &m, type &v, std::size_t offset = 0) { \
                 if(m.getArgType(offset) == OFXOSC_TYPE_INT32) v = m.getArgAsInt32(offset); \
@@ -77,15 +74,6 @@ namespace ofx {
                 else if(m.getArgType(offset) == OFXOSC_TYPE_DOUBLE) v = m.getArgAsDouble(offset); \
                 else if(m.getArgType(offset) == OFXOSC_TYPE_STRING) v = ofToDouble(m.getArgAsString(offset)); \
             }
-#else
-#define define_set_arithmetic(type) \
-            inline void set(ofxOscMessage &m, type &v, std::size_t offset = 0) { \
-                if(m.getArgType(offset) == OFXOSC_TYPE_INT32) v = m.getArgAsInt32(offset); \
-                else if(m.getArgType(offset) == OFXOSC_TYPE_INT64) v = m.getArgAsInt64(offset); \
-                else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); \
-                else if(m.getArgType(offset) == OFXOSC_TYPE_STRING) v = ofToDouble(m.getArgAsString(offset)); \
-            }
-#endif
             
             define_set_arithmetic(bool);
             define_set_arithmetic(char);
@@ -106,21 +94,15 @@ namespace ofx {
             inline void set(ofxOscMessage &m, std::string &v, std::size_t offset = 0) {
                 if(m.getArgType(offset) == OFXOSC_TYPE_STRING) v = m.getArgAsString(offset);
                 else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = ofToString(m.getArgAsFloat(offset));
-#if ENABLE_FUNCTIONAL
                 else if(m.getArgType(offset) == OFXOSC_TYPE_DOUBLE) v = ofToString(m.getArgAsDouble(offset));
                 else if(m.getArgType(offset) == OFXOSC_TYPE_INT32) v = ofToString(m.getArgAsInt32(offset));
                 else if(m.getArgType(offset) == OFXOSC_TYPE_INT64) v = ofToString(m.getArgAsInt64(offset));
-#else
-                else if(m.getArgType(offset) == OFXOSC_TYPE_INT) v = ofToString(m.getArgAsInt(offset));
-#endif
                 else v = m.getArgAsString(offset);
             }
             
-#if ENABLE_OF_BUFFER
             inline void set(ofxOscMessage &m, ofBuffer &v, std::size_t offset = 0) {
                 v = m.getArgAsBlob(offset);
             }
-#endif
             
             inline void set(ofxOscMessage &m, ofColor &v, std::size_t offset = 0)      { setColor<unsigned char>(m, v, 255, offset); }
             inline void set(ofxOscMessage &m, ofShortColor &v, std::size_t offset = 0) { setColor<unsigned short>(m, v, 65535, offset); }
@@ -224,10 +206,7 @@ namespace ofx {
                 type_convert(unsigned short);
                 type_convert(long long);
                 type_convert(unsigned long long);
-                
-#if ENABLE_OF_BUFFER
                 type_convert(ofBuffer);
-#endif
                 ofLogWarning("ofxOscSubscriber") << "ofAbstractParameter: Unknown type \"" << p.type() << "\", bind to " << m.getAddress() << ". we ignored.";
 #undef type_convert
             }
@@ -271,7 +250,6 @@ namespace ofx {
             T &t;
         };
         
-#if ENABLE_FUNCTIONAL
         template <typename T, typename R>
         struct SetterFunctionParameter : AbstractParameter, SetImplementation {
             SetterFunctionParameter(std::function<R(T)> setter) : setter(setter) {};
@@ -284,20 +262,6 @@ namespace ofx {
         private:
             std::function<R(T)> setter;
         };
-#else
-        template <typename T, typename R>
-        struct SetterFunctionParameter : AbstractParameter, SetImplementation {
-            SetterFunctionParameter(R (*setter)(T)) : setter(setter) {};
-            virtual void read(ofxOscMessage &message) {
-                typename remove_const_reference<T>::type t;
-                set(message, t);
-                setter(t);
-            }
-            
-        private:
-            R (*setter)(T);
-        };
-#endif
         
         template <typename T, typename C, typename R>
         struct SetterMethodParameter : AbstractParameter, SetImplementation {
@@ -335,7 +299,6 @@ namespace ofx {
 
 #pragma mark callbacks
 
-#if ENABLE_FUNCTIONAL
         template <typename R>
         struct CallbackParameter : AbstractParameter, SetImplementation {
         public:
@@ -348,19 +311,6 @@ namespace ofx {
         private:
             Callback callback;
         };
-#else
-        struct CallbackParameter : AbstractParameter, SetImplementation {
-        public:
-            typedef void (*Callback)(ofxOscMessage &);
-            CallbackParameter(Callback callback)
-            : callback(callback) {}
-            
-            virtual void read(ofxOscMessage &message) { callback(message); }
-            
-        private:
-            Callback callback;
-        };
-#endif
         
         template <typename C, typename R>
         struct MethodCallbackParameter : AbstractParameter, SetImplementation {
@@ -441,7 +391,6 @@ namespace ofx {
             
         public:
             
-#if ENABLE_FUNCTIONAL
             template <typename T>
             inline typename std::enable_if<!function_info<T>::is_function, Identifier>::type subscribe(const std::string &address, T &value) {
                 return subscribe(address, ParameterRef(new Parameter<T>(value)));
@@ -456,17 +405,6 @@ namespace ofx {
             inline typename std::enable_if<!std::is_same<typename remove_const_reference<T>::type, ofxOscMessage>::value, Identifier>::type subscribe(const std::string &address, std::function<R(T)> setter) {
                 return subscribe(address, ParameterRef(new SetterFunctionParameter<T, R>(setter)));
             }
-#else
-            template <typename T>
-            inline Identifier subscribe(const std::string &address, T &value) {
-                return subscribe(address, ParameterRef(new Parameter<T>(value)));
-            }
-            
-            template <typename T, typename R>
-            inline typename is_not_ofxoscmessage<T, Identifier>::type subscribe(const std::string &address, R (*setter)(T)) {
-                return subscribe(address, ParameterRef(new SetterFunctionParameter<T, R>(setter)));
-            }
-#endif
             
             template <typename T, typename C, typename R>
             inline typename is_not_ofxoscmessage<T, Identifier>::type subscribe(const std::string &address, C &that, R (C::*setter)(T)) {
@@ -488,19 +426,14 @@ namespace ofx {
                 return subscribe(address, ParameterRef(new ConstSetterMethodParameter<T, C, R>(*that, setter)));
             }
 
-#if ENABLE_FUNCTIONAL
             template <typename R>
             inline Identifier subscribe(const std::string &address, const std::function<R(ofxOscMessage &)> callback) {
                 return subscribe(address, ParameterRef(new CallbackParameter<R>(callback)));
             }
+            
             inline Identifier subscribe(const std::string &address, const std::function<void(ofxOscMessage &)> callback) {
                 return subscribe(address, ParameterRef(new CallbackParameter<void>(callback)));
             }
-#else
-            inline Identifier subscribe(const std::string &address, void (*callback)(ofxOscMessage &)) {
-                return subscribe(address, ParameterRef(new CallbackParameter(callback)));
-            }
-#endif
             
             template <typename C, typename R>
             inline Identifier subscribe(const std::string &address, C &that, R (C::*callback)(ofxOscMessage &)) {
@@ -528,15 +461,9 @@ namespace ofx {
                 leakPicker = ref;
             }
             
-#if ENABLE_FUNCTIONAL
             inline void setLeakPicker(const std::function<void(ofxOscMessage &)> &callback) {
                 setLeakPicker(ParameterRef(new CallbackParameter<void>(callback)));
             }
-#else
-            inline void setLeakPicker(void (*callback)(ofxOscMessage &)) {
-                setLeakPicker(ParameterRef(new CallbackParameter(callback)));
-            }
-#endif
        
             template <typename C, typename R>
             inline void setLeakPicker(C &that, R (C::*callback)(ofxOscMessage &)) {
@@ -613,11 +540,7 @@ namespace ofx {
                 clearLeakedOscMessages();
                 ofxOscMessage m;
                 while(receiver.hasWaitingMessages()) {
-#if (OF_VERSION_MAJOR == 0) && (OF_VERSION_MINOR < 9)
-                    receiver.getNextMessage(&m);
-#else
                     receiver.getNextMessage(m);
-#endif
                     const std::string &address = m.getAddress();
                     Targets::iterator it = targets.find(address);
                     if(it != targets.end()) {
@@ -827,14 +750,10 @@ inline void ofxSubscribeOsc(int port, const std::string &address, const C *that,
     return ofxGetOscSubscriber(port).subscribe(address, *that, callback);
 }
 
-#if ENABLE_FUNCTIONAL
 template <typename C, typename R>
 inline void ofxSubscribeOsc(int port, const std::string &address, const std::function<void(ofxOscMessage &)> &callback) {
     return ofxGetOscSubscriber(port).subscribe(address, callback);
 }
-#endif
-
-#if ENABLE_CPP11
 
 template <typename ... Args>
 inline void ofxSubscribeOsc(const std::initializer_list<int> &ports, const std::string &address, Args & ... args) {
@@ -857,8 +776,6 @@ inline void ofxSubscribeOsc(const std::initializer_list<int> &ports, const std::
         ofxSubscribeOsc(port, addresses, args ...);
     }
 }
-
-#endif
 
 /// \}
 
@@ -984,13 +901,9 @@ inline void ofxSetLeakedOscPicker(int port, const C *that, R (C::*callback)(ofxO
     ofxGetOscSubscriber(port).setLeakPicker(*that, callback);
 }
 
-#if ENABLE_FUNCTIONAL
 inline void ofxSetLeakedOscPicker(int port, const std::function<void(ofxOscMessage &)> &callback) {
     ofxGetOscSubscriber(port).setLeakPicker(callback);
 }
-#endif
-
-#if ENABLE_CPP11
 #pragma mark leak picking all port
 
 template <typename T, typename ... Args>
@@ -999,7 +912,6 @@ inline typename std::enable_if<!std::is_integral<T>::value>::type ofxSetLeakedOs
         subscriber.second->setLeakPicker(arg, args ...);
     }
 }
-#endif
 
 #pragma mark remove leaked osc picker(s)
 

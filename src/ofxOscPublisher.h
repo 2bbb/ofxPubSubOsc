@@ -94,9 +94,7 @@ namespace ofx {
             define_set_float(double);
 #undef define_set_float
             inline void set(ofxOscMessage &m, const std::string &v) const { m.addStringArg(v); }
-#if ENABLE_OF_BUFFER
             inline void set(ofxOscMessage &m, const ofBuffer &v) const { m.addBlobArg(v); };
-#endif
             template <typename PixType>
             inline void set(ofxOscMessage &m, const ofColor_<PixType> &v) const {  setVec<4>(m, v); }
             inline void set(ofxOscMessage &m, const ofVec2f &v) const { setVec<2>(m, v); }
@@ -1170,8 +1168,6 @@ inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, 
     return ofxGetOscPublisher(ip, port).publish(address, that, getter, whenValueIsChanged);
 }
 
-#if ENABLE_CPP11
-
 template <typename ... Args>
 inline void ofxPublishOsc(const std::string &ip, const std::initializer_list<int> ports, Args & ... args) {
     for(auto port : ports) {
@@ -1199,8 +1195,6 @@ inline void ofxPublishOsc(const std::initializer_list<ofxOscPublisherManager::De
         ofxPublishOsc(target.destination.ip, target.destination.port, target.address, args ...);
     }
 }
-
-#endif
 
 /// \}
 
