@@ -58,12 +58,11 @@ namespace ofx {
             inline void set(ofxOscMessage &m, std::string &v, std::size_t offset = 0) {
                 if(m.getArgType(offset) == OFXOSC_TYPE_STRING) v = m.getArgAsString(offset);
                 else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = ofToString(m.getArgAsFloat(offset));
-#if ENABLE_FUNCTIONAL
-                else if(m.getArgType(offset) == OFXOSC_TYPE_DOUBLE) v = ofToString(m.getArgAsDouble(offset));
                 else if(m.getArgType(offset) == OFXOSC_TYPE_INT32) v = ofToString(m.getArgAsInt32(offset));
                 else if(m.getArgType(offset) == OFXOSC_TYPE_INT64) v = ofToString(m.getArgAsInt64(offset));
+#if ENABLE_FUNCTIONAL
+                else if(m.getArgType(offset) == OFXOSC_TYPE_DOUBLE) v = ofToString(m.getArgAsDouble(offset));
 #else
-                else if(m.getArgType(offset) == OFXOSC_TYPE_INT) v = ofToString(m.getArgAsInt(offset));
 #endif
                 else v = m.getArgAsString(offset);
             }
