@@ -6,9 +6,11 @@ easy utility for publish/subscribe OSC message.
 
 * ofxOsc (maybe oF0.8.2~)
 
-this addon is tested with oF0.8.4~
+this addon is tested with oF0.9.0~
 
 if you use oF0.9.0~, then you can use `std::function<void(ofxOscMessage &)>`! detail: [API Reference](API_Reference.md#API_lambda_callback)
+
+**if you use oF0.8.2~0.8.4, then you can use [v0.1.2](releases/tag/v0_1_2)**
 
 if you have challange spirit, please use dev/main branch.
 
@@ -195,75 +197,26 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 ## <a name="UpdateHistory">Update history</a>
 
-### 2015/XX/XX ver 0.1.2 release
+### 2016/01/02 [ver 0.2.0](releases/tag/v2_0_0) release
 
-* add new feature [ofxNotifyToSubscribedOsc](#SimpleAPI_ofxNotifyToSubscribedOsc) (proposed by [satcy](http://github.com/satcy). thanks!!)
+* this is only tested on oF0.9.0~
 * add iterators to [ofxOscSubscriberManager](API_Reference.md#Advanced_ofxOscSubscriberManager)
 * add all port operation to ofxUnsubscribeOsc, ofxNotifyToSubscribedOsc, ofxRemoveLeakedOscPicker
-* add ofxSetLeakedOscPickerAll (only oF0.9.0~)
-* add ofxSubscribeOsc with `std::initializer_list<int> port` and `std::initializer_list<std::string> addresses` (only oF0.9.0~)
+* add ofxSetLeakedOscPickerAll
+* add ofxSubscribeOsc with `std::initializer_list<int> port` and `std::initializer_list<std::string> addresses`
 * add iterators to [ofxOscPublisherManager](API_Reference.md#Advanced_ofxOscPublisherManager)
 * add all port operation to ofxUnpublishOsc, ofxUnregisterPublishingOsc
 * add `std::` prefix
 
-### 2015/09/17 ver 0.1.1 release
+### 2016/01/02 [ver 0.1.2](releases/tag/v0_1_2) release
 
-* support [ofParameter](#SupportedTypes_ofParameter)
-* support [ofParameterGroup](API_Reference.md#Advanced_how_to_subscribe_ofParameterGroup) for ofxSubscirbeOsc
-* add [ofxRegisterPublishingOsc](#ofxRegisterPublishingOsc)
-* add [ofxSetPublisherUsingBundle](API_Reference.md#ofxSetPublisherUsingBundle)
-* support 0.8.1 (not support ofBuffer as blob)
-* update README and [API_Reference.md](API_Reference.md)
-
-### 2015/08/31 ver 0.1.0 release
-
-* add [lambda function callback](API_Reference.md#API_lambda_callback) for ofxSubscirbeOsc
-* update README and [API_Reference.md](API_Reference.md)
+* this is *final update added new feature, with oF0.8.4 support*
+* after this release, "ver 0.1.x will only bugfie about supporting oF0.8.4
+* add new feature ofxNotifyToSubscribedOsc (proposed by [satcy](http://github.com/satcy/). thanks!!)
 * some bugfix
 
-### 2015/06/10 ver 0.0.8 release
+### [Older update histories](Update_History.md)
 
-* add [ofxPublishAsArray](API_Reference.md#API_ofxPublishAsArray)
-* enable to use in publish `T (U::*)() const`
-* update README and [API_Reference.md](API_Reference.md)
-* add [Legacy style pick up leaked OSC](API_Reference.md#Advanced_LegacyStylePickUpLeakedOSCMessage)
-* add some doxygen texts
-* some bugfix
-
-### 2015/05/19 ver 0.0.7 release
-
-* add [ofxPublishOscIf](API_Reference.md#API_ofxPublishOscIf)
-* some bugfix
-
-### 2015/05/17 ver 0.0.6 release
-
-* add publish ofBuffer as blob
-* some bugfix
-* big change on inner class structure
-
-### 2015/05/15 ver 0.0.5 release
-
-* add system about [pick up leaked OSC messages](API_Reference.md#API_ofxSetLeakedOscPicker)
-* some bugfix
-* add examples
-
-### 2015/05/11 ver 0.0.4 release
-
-* support ofMatrix3x3/4x4, ofQuaternion, ofBuffer (only subscribe now), vector<ofXXX>, ofXXX[]
-* bugfix for Visual Studio
-
-### 2015/05/11 ver 0.0.3 release
-
-* add subscribe with callback
-
-### 2015/05/11 ver 0.0.2 release
-
-* rename from ofxOscSubscriber
-* add ofxOscPublisher
-
-### 2015/05/09 ver 0.0.1 release
-
-* initial
 
 #### about Versioning
 
