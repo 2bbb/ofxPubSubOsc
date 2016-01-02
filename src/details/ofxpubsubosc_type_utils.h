@@ -11,11 +11,7 @@
 
 namespace ofxpubsubosc {
     template <typename T, typename U = void>
-    struct is_not_ofxoscmessage { typedef U type; };
-    template <>
-    struct is_not_ofxoscmessage<ofxOscMessage &> {};
-    template <>
-    struct is_not_ofxoscmessage<ofxOscMessage> {};
+    using is_not_ofxoscmessage = std::enable_if<!std::is_same<std::remove_reference<T>, ofxOscMessage>::value, U>;
     
     namespace {
         template <typename T>
