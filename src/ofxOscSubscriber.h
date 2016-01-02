@@ -1022,4 +1022,4 @@ inline void ofxRemoveLeakedOscPicker() {
 
 /// \}
 
-#define ofxSubScribeOscWithSameName(port, name) ofxSubscribeOsc(port, "/" #name, name)
+#define SubscribeOsc(port, name) ofxSubscribeOsc(port, "/" #name, name)
