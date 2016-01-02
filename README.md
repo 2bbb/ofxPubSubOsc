@@ -214,7 +214,7 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 * this is *final update added new feature, with oF0.8.4 support*
 * after this release, "ver 0.1.x will only bugfie about supporting oF0.8.4
-* add new feature ofxNotifyToSubscribedOsc (proposed by [satcy](http://github.com/satcy/). thanks!!)
+* add new feature ofxNotifyToSubscribedOsc (proposed by [satcy](https://github.com/satcy). thanks!!)
 * some bugfix
 
 ### [Older update histories](Update_History.md)
@@ -235,15 +235,15 @@ MIT License.
 
 ## <a name="SuppotingContributor">Supporting Contributor</a>
 
-* [HIEDA Naoto](http://github.com/micuat)
+* [HIEDA Naoto](https://github.com/micuat)
 
 ## <a name="SpecialThanks">Special Thanks</a>
 
-* [HIGA Satoru](http://github.com/satoruhiga)
-* [SHIMIZU Motoi](http://github.com/motoishmz)
-* [IWATANI Nariaki](http://github.com/nariakiiwatani)
-* [USAMI Takuto](http://github.com/usm916)
-* [HORII Satoshi](http://github.com/satcy)
+* [HIGA Satoru](https://github.com/satoruhiga)
+* [SHIMIZU Motoi](https://github.com/motoishmz)
+* [IWATANI Nariaki](https://github.com/nariakiiwatani)
+* [USAMI Takuto](https://github.com/usm916)
+* [HORII Satoshi](https://github.com/satcy)
 
 ## <a name="AtTheLast">At the last</a>
 
