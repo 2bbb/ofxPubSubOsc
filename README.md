@@ -199,7 +199,7 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 ### 2016/01/02 [ver 0.2.0](releases/tag/v2_0_0) release
 
-* this is only tested on oF0.9.0~
+* after this release, we will only test on oF0.9.0~
 * add iterators to [ofxOscSubscriberManager](API_Reference.md#Advanced_ofxOscSubscriberManager)
 * add all port operation to ofxUnsubscribeOsc, ofxNotifyToSubscribedOsc, ofxRemoveLeakedOscPicker
 * add ofxSetLeakedOscPickerAll
@@ -207,6 +207,10 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 * add iterators to [ofxOscPublisherManager](API_Reference.md#Advanced_ofxOscPublisherManager)
 * add all port operation to ofxUnpublishOsc, ofxUnregisterPublishingOsc
 * add `std::` prefix
+* some bugfix around lambda
+* add useful macro `SubscribeOsc(port, name)` is same as `ofxSubscribeOsc(port, "/name", name)` (porposed by [hanasaan](https://github.com/hanasaan). thanks!!)
+* cleaning up conditional macro about oF0.8.x
+* TODO: update some API Documentations
 
 ### 2016/01/02 [ver 0.1.2](releases/tag/v0_1_2) release
 

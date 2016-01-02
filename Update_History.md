@@ -11,6 +11,9 @@
 * add all port operation to ofxUnpublishOsc, ofxUnregisterPublishingOsc
 * add `std::` prefix
 * some bugfix around lambda
+* add useful macro `SubscribeOsc(port, name)` is same as `ofxSubscribeOsc(port, "/name", name)` (porposed by [hanasaan](https://github.com/hanasaan). thanks!!)
+* cleaning up conditional macro about oF0.8.x
+* TODO: update some API Documentations
 
 ## 2016/01/02 [ver 0.1.2](releases/tag/v0_1_2) release
 
