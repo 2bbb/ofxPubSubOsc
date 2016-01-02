@@ -197,17 +197,19 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 ### 2016/01/02 [ver 0.2.0](releases/tag/v2_0_0) release
 
-* after this release, we will only test on oF0.9.0~
+* *after this release, we will only test on oF0.9.0~*
 * add iterators to [ofxOscSubscriberManager](API_Reference.md#Advanced_ofxOscSubscriberManager)
+* add iterators to [ofxOscPublisherManager](API_Reference.md#Advanced_ofxOscPublisherManager)
 * add all port operation to ofxUnsubscribeOsc, ofxNotifyToSubscribedOsc, ofxRemoveLeakedOscPicker
 * add ofxSetLeakedOscPickerAll
 * add ofxSubscribeOsc with `std::initializer_list<int> port` and `std::initializer_list<std::string> addresses`
 * add iterators to [ofxOscPublisherManager](API_Reference.md#Advanced_ofxOscPublisherManager)
 * add all port operation to ofxUnpublishOsc, ofxUnregisterPublishingOsc
-* add `std::` prefix
-* some bugfix around lambda
+* add feature publishing r-value. (i.e., you can do `ofxPublishOsc(host, port, "/bar", "value!!")`)
 * add useful macro `SubscribeOsc(port, name)` is same as `ofxSubscribeOsc(port, "/name", name)` (porposed by [hanasaan](https://github.com/hanasaan). thanks!!)
+* add `std::` prefix
 * cleaning up conditional macro about oF0.8.x
+* some bugfix around lambda
 * TODO: update some API Documentations
 
 ### 2016/01/02 [ver 0.1.2](releases/tag/v0_1_2) release
