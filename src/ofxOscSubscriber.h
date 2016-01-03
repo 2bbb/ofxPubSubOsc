@@ -37,19 +37,33 @@ namespace ofx {
             static constexpr bool value = decltype(test<T>(nullptr))::value;
         };
         
-        template <typename T>
-        struct function_info;
+        template <typename R, typename ... Arguments>
+        struct is_callable<R(*)(Arguments ...)> {
+            static constexpr bool value = true;
+        };
         
-        template <typename T, bool b>
-        struct function_info_impl {
-            static constexpr bool is_function = false;
+        template <typename R, typename ... Arguments>
+        struct is_callable<R(*&)(Arguments ...)> {
+            static constexpr bool value = true;
+        };
+        
+        template <typename R, typename ... Arguments>
+        struct is_callable<R(&)(Arguments ...)> {
+            static constexpr bool value = true;
+        };
+        
+        template <typename R, typename ... Arguments>
+        struct is_callable<R(Arguments ...)> {
+            static constexpr bool value = true;
+        };
+        
+        template <typename R, typename ... Arguments>
+        struct is_callable<std::function<R(Arguments ...)>> {
+            static constexpr bool value = true;
         };
         
         template <typename T>
-        struct function_info_impl<T, true> : public function_info<decltype(&T::operator())> {};
-        
-        template <typename T>
-        struct function_info : public function_info_impl<T, is_callable<T>::value> {};
+        struct function_info : public function_info<decltype(&T::operator())>  {};
         
         template <typename U, typename ret, typename ... arguments>
         struct function_info<ret(U::*)(arguments ...) const> {
@@ -75,6 +89,17 @@ namespace ofx {
         
         template <typename ret, typename ... arguments>
         struct function_info<ret(*)(arguments ...)> {
+            static constexpr bool is_function = true;
+            static constexpr std::size_t arity = sizeof...(arguments);
+            using result_type = ret;
+            using arguments_types_tuple = std::tuple<arguments ...>;
+            template <std::size_t index>
+            using argument_type = get_type<std::tuple_element<index, arguments_types_tuple>>;
+            using function_type = std::function<result_type(arguments ...)>;
+        };
+        
+        template <typename ret, typename ... arguments>
+        struct function_info<ret(arguments ...)> {
             static constexpr bool is_function = true;
             static constexpr std::size_t arity = sizeof...(arguments);
             using result_type = ret;
@@ -292,79 +317,84 @@ namespace ofx {
             Setter setter;
         };
         
-        template <typename T, typename C, typename R>
-        struct SetterMethodParameter : AbstractParameter, SetImplementation {
-            SetterMethodParameter(C &that, R (C::*setter)(T))
-            : that(that)
-            , setter(setter) {};
-            
-            virtual void read(ofxOscMessage &message) {
-                typename remove_const_reference<T>::type t;
-                set(message, t);
-                (that.*setter)(t);
-            }
-            
-        private:
-            C &that;
-            R (C::*setter)(T);
-        };
-
-        template <typename T, typename C, typename R>
-        struct ConstSetterMethodParameter : AbstractParameter, SetImplementation {
-            ConstSetterMethodParameter(const C &that, R (C::*setter)(T) const)
-            : that(that)
-            , setter(setter) {};
-            
-            virtual void read(ofxOscMessage &message) {
-                typename remove_const_reference<T>::type t;
-                set(message, t);
-                (that.*setter)(t);
-            }
-            
-        private:
-            const C &that;
-            R (C::*setter)(T) const;
-        };
-
-#pragma mark callbacks
-
         template <typename R>
-        struct CallbackParameter : AbstractParameter, SetImplementation {
-        public:
-            using Callback = std::function<R(ofxOscMessage &)>;
-            CallbackParameter(const Callback &callback)
-            : callback(callback) {}
-            
-            virtual void read(ofxOscMessage &message) { callback(message); }
+        struct SetterFunctionParameter<ofxOscMessage &, R> : AbstractParameter, SetImplementation {
+            using Setter = std::function<R(ofxOscMessage &)>;
+            SetterFunctionParameter(Setter setter) : setter(setter) {};
+            virtual void read(ofxOscMessage &message) {
+                setter(message);
+            }
             
         private:
-            Callback callback;
+            Setter setter;
         };
         
-        template <typename C, typename R>
-        struct MethodCallbackParameter : AbstractParameter, SetImplementation {
-            using Callback = R (C::*)(ofxOscMessage &);
-            MethodCallbackParameter(C &that, Callback callback)
-            : that(that), callback(callback) {}
+        template <typename T, typename C, typename R>
+        struct SetterMethodParameter : AbstractParameter, SetImplementation {
+            using Method = R (C::*)(T);
+            SetterMethodParameter(C &that, Method setter)
+            : that(that)
+            , setter(setter) {};
             
-            virtual void read(ofxOscMessage &message) { (that.*callback)(message); }
+            virtual void read(ofxOscMessage &message) {
+                typename remove_const_reference<T>::type t;
+                set(message, t);
+                (that.*setter)(t);
+            }
             
         private:
-            Callback callback;
             C &that;
+            Method setter;
         };
 
         template <typename C, typename R>
-        struct ConstMethodCallbackParameter : AbstractParameter, SetImplementation {
-            using Callback = R (C::*)(ofxOscMessage &) const;
-            ConstMethodCallbackParameter(const C &that, Callback callback)
-            : that(that), callback(callback) {}
+        struct SetterMethodParameter<ofxOscMessage &, C, R> : AbstractParameter, SetImplementation {
+            using Method = R (C::*)(ofxOscMessage &);
+            SetterMethodParameter(C &that, Method setter)
+            : that(that)
+            , setter(setter) {};
             
-            virtual void read(ofxOscMessage &message) { (that.*callback)(message); }
+            virtual void read(ofxOscMessage &message) {
+                (that.*setter)(message);
+            }
             
         private:
-            Callback callback;
+            C &that;
+            Method setter;
+        };
+        
+        template <typename T, typename C, typename R>
+        struct ConstSetterMethodParameter : AbstractParameter, SetImplementation {
+            using Method = R (C::*)(T) const;
+            ConstSetterMethodParameter(const C &that, Method setter)
+            : that(that)
+            , setter(setter) {};
+            
+            virtual void read(ofxOscMessage &message) {
+                typename remove_const_reference<T>::type t;
+                set(message, t);
+                (that.*setter)(t);
+            }
+            
+        private:
             const C &that;
+            Method setter;
+        };
+
+        template <typename C, typename R>
+        struct ConstSetterMethodParameter<ofxOscMessage &, C, R> : AbstractParameter, SetImplementation {
+            using Method = R (C::*)(ofxOscMessage &) const;
+            ConstSetterMethodParameter(const C &that, Method setter)
+            : that(that)
+            , setter(setter) {};
+            
+            virtual void read(ofxOscMessage &message) {
+                (that.*setter)(message);
+            }
+            
+        private:
+            const C &that;
+            Method setter;
         };
         
         using ParameterRef = std::shared_ptr<AbstractParameter>;
@@ -413,7 +443,7 @@ namespace ofx {
                 return findFromTargets(identifier, targets);
             }
 
-            inline Identifier subscribe(const std::string &address, ParameterRef ref) {
+            inline Identifier subscribe_impl(const std::string &address, ParameterRef ref) {
                 Targets::iterator it = targets.insert(std::make_pair(address, ref));
                 return {address, ref, port};
             }
@@ -424,69 +454,70 @@ namespace ofx {
             
             template <typename T>
             inline auto subscribe(const std::string &address, T &value)
-            -> typename std::enable_if<!function_info<T>::is_function, Identifier>::type
+            -> typename std::enable_if<!is_callable<T>::value, Identifier>::type
             {
-                return subscribe(address, ParameterRef(new Parameter<T>(value)));
+                return subscribe_impl(address, ParameterRef(new Parameter<T>(value)));
             }
             
             template <typename T>
             inline auto subscribe(const std::string &address, T &value)
-            -> typename std::enable_if<function_info<T>::is_function, Identifier>::type
+            -> typename std::enable_if<is_callable<T>::value, Identifier>::type
             {
                 TYPE_DEBUG(T);
                 return subscribe(address, static_cast<typename function_info<T>::function_type>(value));
             }
             
-            template <typename T, typename R>
-            inline auto subscribe(const std::string &address, std::function<R(T)> setter)
-            -> typename is_not_ofxoscmessage<T, Identifier>::type
+            template <typename T>
+            inline auto subscribe(const std::string &address, T &&value)
+            -> typename std::enable_if<is_callable<T>::value, Identifier>::type
             {
                 TYPE_DEBUG(T);
-                return subscribe(address, ParameterRef(new SetterFunctionParameter<T, R>(setter)));
+                return subscribe(address, static_cast<typename function_info<T>::function_type>(value));
+            }
+            
+            template <typename T>
+            inline auto subscribe(const std::string &address, T *value)
+            -> typename std::enable_if<is_callable<T>::value, Identifier>::type
+            {
+                TYPE_DEBUG(T);
+                return subscribe(address, static_cast<typename function_info<T>::function_type>(value));
+            }
+            
+#pragma mark -
+#pragma mark setter function
+
+            template <typename T, typename R>
+            inline Identifier subscribe(const std::string &address, std::function<R(T)> setter) {
+                TYPE_DEBUG(T);
+                return subscribe_impl(address, ParameterRef(new SetterFunctionParameter<T, R>(setter)));
+            }
+            
+            template <typename T, typename R>
+            inline Identifier subscribe(const std::string &address, std::function<R(T &&)> setter) {
+                TYPE_DEBUG(T);
+                return subscribe_impl(address, ParameterRef(new SetterFunctionParameter<T, R>(setter)));
+            }
+            
+#pragma mark setter method
+            
+            template <typename T, typename C, typename R>
+            inline Identifier subscribe(const std::string &address, C &that, R (C::*setter)(T)) {
+                return subscribe_impl(address, ParameterRef(new SetterMethodParameter<T, C, R>(that, setter)));
             }
             
             template <typename T, typename C, typename R>
-            inline auto subscribe(const std::string &address, C &that, R (C::*setter)(T))
-            -> typename is_not_ofxoscmessage<T, Identifier>::type
-            {
-                return subscribe(address, ParameterRef(new SetterMethodParameter<T, C, R>(that, setter)));
+            inline Identifier subscribe(const std::string &address, C *that, R (C::*setter)(T)) {
+                return subscribe_impl(address, ParameterRef(new SetterMethodParameter<T, C, R>(*that, setter)));
             }
             
             template <typename T, typename C, typename R>
-            inline auto subscribe(const std::string &address, C *that, R (C::*setter)(T))
-            -> typename is_not_ofxoscmessage<T, Identifier>::type
-            {
-                return subscribe(address, ParameterRef(new SetterMethodParameter<T, C, R>(*that, setter)));
-            }
-            
-            template <typename T, typename C, typename R>
-            inline auto subscribe(const std::string &address, const C &that, R (C::*setter)(T) const)
-            -> typename is_not_ofxoscmessage<T, Identifier>::type
-            {
-                return subscribe(address, ParameterRef(new ConstSetterMethodParameter<T, C, R>(that, setter)));
+            inline Identifier subscribe(const std::string &address, const C &that, R (C::*setter)(T) const) {
+                return subscribe_impl(address, ParameterRef(new ConstSetterMethodParameter<T, C, R>(that, setter)));
             }
 
             template <typename T, typename C, typename R>
-            inline auto subscribe(const std::string &address, const C * const that, R (C::*setter)(T) const)
-            -> typename is_not_ofxoscmessage<T, Identifier>::type
-            {
-                return subscribe(address, ParameterRef(new ConstSetterMethodParameter<T, C, R>(*that, setter)));
-            }
-
-            template <typename R>
-            inline Identifier subscribe(const std::string &address, const std::function<R(ofxOscMessage &)> callback) {
-                TYPE_DEBUG(R);
-                return subscribe(address, ParameterRef(new CallbackParameter<R>(callback)));
-            }
-            
-            inline Identifier subscribe(const std::string &address, const std::function<void(ofxOscMessage &)> callback) {
-                TYPE_DEBUG(void);
-                return subscribe(address, ParameterRef(new CallbackParameter<void>(callback)));
-            }
-            
-            template <typename C, typename R>
-            inline Identifier subscribe(const std::string &address, C &that, R (C::*callback)(ofxOscMessage &)) {
-                return subscribe(address, ParameterRef(new MethodCallbackParameter<C, R>(that, callback)));
+            inline Identifier subscribe(const std::string &address, const C * const that, R (C::*setter)(T) const) {
+                return subscribe_impl(address, ParameterRef(new ConstSetterMethodParameter<T, C, R>(*that, setter)));
             }
             
 #pragma mark unscribe
@@ -514,18 +545,29 @@ namespace ofx {
                 leakPicker = ref;
             }
             
-            inline void setLeakPicker(const std::function<void(ofxOscMessage &)> &callback) {
-                setLeakPicker(ParameterRef(new CallbackParameter<void>(callback)));
+            template <typename R>
+            inline void setLeakPicker(std::function<R(ofxOscMessage &)> callback) {
+                setLeakPicker(ParameterRef(new SetterFunctionParameter<ofxOscMessage &, R>(callback)));
             }
        
             template <typename C, typename R>
             inline void setLeakPicker(C &that, R (C::*callback)(ofxOscMessage &)) {
-                setLeakPicker(ParameterRef(new MethodCallbackParameter<C, R>(that, callback)));
+                setLeakPicker(ParameterRef(new SetterMethodParameter<ofxOscMessage &, C, R>(that, callback)));
+            }
+            
+            template <typename C, typename R>
+            inline void setLeakPicker(C *that, R (C::*callback)(ofxOscMessage &)) {
+                setLeakPicker(ParameterRef(new SetterMethodParameter<ofxOscMessage &, C, R>(*that, callback)));
             }
             
             template <typename C, typename R>
             inline void setLeakPicker(const C &that, R (C::*callback)(ofxOscMessage &) const) {
-                setLeakPicker(ParameterRef(new ConstMethodCallbackParameter<C, R>(that, callback)));
+                setLeakPicker(ParameterRef(new ConstSetterMethodParameter<ofxOscMessage &, C, R>(that, callback)));
+            }
+            
+            template <typename C, typename R>
+            inline void setLeakPicker(const C * const that, R (C::*callback)(ofxOscMessage &) const) {
+                setLeakPicker(ParameterRef(new ConstSetterMethodParameter<ofxOscMessage &, C, R>(*that, callback)));
             }
             
             
@@ -714,50 +756,14 @@ inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &a
 
 #pragma mark setter function/method
 
-template <typename T, typename R>
-inline auto ofxSubscribeOsc(int port, const std::string &address, R (*callback)(T))
--> typename ofxpubsubosc::is_not_ofxoscmessage<T, ofxOscSubscriberIdentifier>::type
-{
-    return ofxGetOscSubscriber(port).subscribe(address, callback);
-}
-
-template <typename T, typename C, typename R>
-inline auto ofxSubscribeOsc(int port, const std::string &address, C &that, R (C::*callback)(T))
--> typename ofxpubsubosc::is_not_ofxoscmessage<T, ofxOscSubscriberIdentifier>::type
-{
-    return ofxGetOscSubscriber(port).subscribe(address, that, callback);
-}
-
-template <typename T, typename C, typename R>
-inline auto ofxSubscribeOsc(int port, const std::string &address, C *that, R (C::*callback)(T))
--> typename ofxpubsubosc::is_not_ofxoscmessage<T, ofxOscSubscriberIdentifier>::type
-{
-    return ofxGetOscSubscriber(port).subscribe(address, *that, callback);
-}
-
-template <typename T, typename C, typename R>
-inline auto ofxSubscribeOsc(int port, const std::string &address, const C &that, R (C::*callback)(T) const)
--> typename ofxpubsubosc::is_not_ofxoscmessage<T, ofxOscSubscriberIdentifier>::type
-{
-    return ofxGetOscSubscriber(port).subscribe(address, that, callback);
-}
-
-template <typename T, typename C, typename R>
-inline auto ofxSubscribeOsc(int port, const std::string &address, const C * const that, R (C::*callback)(T) const)
--> typename ofxpubsubosc::is_not_ofxoscmessage<T, ofxOscSubscriberIdentifier>::type
-{
-    return ofxGetOscSubscriber(port).subscribe(address, *that, callback);
-}
-
-#pragma mark callback function/method
-
 /// \brief bind a callback to the OSC messages with an address pattern _address_ incoming to _port_.
 /// \param port binded port is typed int
 /// \param address osc address is typed const std::string &
 /// \param callback is kicked when receive a message to address
 /// \returns void
 
-inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, void (*callback)(ofxOscMessage &)) {
+template <typename T, typename R>
+inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, std::function<R(T)> callback) {
     return ofxGetOscSubscriber(port).subscribe(address, callback);
 }
 
@@ -769,8 +775,8 @@ inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &a
 /// \param callback has argument ofxOscMessage &
 /// \returns void
 
-template <typename C, typename R>
-inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, C &that, R (C::*callback)(ofxOscMessage &)) {
+template <typename T, typename C, typename R>
+inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, C &that, R (C::*callback)(T)) {
     return ofxGetOscSubscriber(port).subscribe(address, that, callback);
 }
 
@@ -782,8 +788,8 @@ inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &a
 /// \param callback has argument ofxOscMessage &
 /// \returns void
 
-template <typename C, typename R>
-inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, C *that, R (C::*callback)(ofxOscMessage &)) {
+template <typename T, typename C, typename R>
+inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, C *that, R (C::*callback)(T)) {
     return ofxGetOscSubscriber(port).subscribe(address, *that, callback);
 }
 
@@ -795,8 +801,8 @@ inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &a
 /// \param callback has argument ofxOscMessage &
 /// \returns void
 
-template <typename C, typename R>
-inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, const C &that, R (C::*callback)(ofxOscMessage &) const) {
+template <typename T, typename C, typename R>
+inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, const C &that, R (C::*callback)(T) const) {
     return ofxGetOscSubscriber(port).subscribe(address, that, callback);
 }
 
@@ -808,8 +814,8 @@ inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &a
 /// \param callback has argument ofxOscMessage &
 /// \returns void
 
-template <typename C, typename R>
-inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, const C *that, R (C::*callback)(ofxOscMessage &) const) {
+template <typename T, typename C, typename R>
+inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, const C *that, R (C::*callback)(T) const) {
     return ofxGetOscSubscriber(port).subscribe(address, *that, callback);
 }
 
