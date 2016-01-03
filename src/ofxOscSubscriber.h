@@ -741,11 +741,10 @@ inline ofxOscSubscriber &ofxGetOscSubscriber(int port) {
 /// \{
 
 /// \brief bind a referece of value to the argument(s) of OSC messages with an address pattern _address_ incoming to _port_.
-/// template parameter T is suggested by value
 /// \param port binded port is typed int
 /// \param address osc address is typed const std::string &
 /// \param value reference of value is typed T &
-/// \returns void
+/// \returns ofxOscSubscriberIdentifier
 
 #pragma mark reference
 
@@ -760,7 +759,7 @@ inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &a
 /// \param port binded port is typed int
 /// \param address osc address is typed const std::string &
 /// \param callback is kicked when receive a message to address
-/// \returns void
+/// \returns ofxOscSubscriberIdentifier
 
 template <typename Ret, typename Arg>
 inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, std::function<Ret(Arg)> callback) {
@@ -768,18 +767,18 @@ inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &a
 }
 
 /// \brief bind a callback to the OSC messages with an address pattern _address_ incoming to _port_.
-/// template parameter C is suggested by that & callback
 /// \param port binded port is typed int
 /// \param address osc address is typed const std::string &
-/// \param that this object is typed T&, will bind with next argument of parameter method. is called as (that.*getter)(message) when receive a message.
-/// \param callback has argument ofxOscMessage &
-/// \returns void
+/// \param that this object is typed ObjectRefOrPtr is reference or pointer of object, will bind with next argument of parameter method. is called as (that.*getter)(message) when receive a message.
+/// \param callback is kicked when receive a message to address
+/// \returns ofxOscSubscriberIdentifier
 
 template <typename ObjectRefOrPtr, typename Method>
 inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, ObjectRefOrPtr &&that, Method callback) {
     return ofxGetOscSubscriber(port).subscribe(address, that, callback);
 }
 
+#pragma mark subscribe multiple port at once
 
 template <typename ... Args>
 inline void ofxSubscribeOsc(const std::initializer_list<int> &ports, const std::string &address, Args & ... args) {
