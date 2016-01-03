@@ -68,9 +68,10 @@ namespace ofx {
     };
     
     class OscPublisherManager {
-    private:
+    public:
         class OscPublisher;
         
+    private:
         struct SetImplementation {
         protected:
             template <typename T>
@@ -475,6 +476,7 @@ namespace ofx {
         };
         
         struct Destination {
+            Destination() {}
             Destination(const Destination &destination)
             : ip(destination.ip)
             , port(destination.port) {}
@@ -494,7 +496,6 @@ namespace ofx {
             std::string ip;
             int port;
         private:
-            Destination();
         };
         
         struct DestinationWithAddress {

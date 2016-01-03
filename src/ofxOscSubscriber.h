@@ -114,9 +114,10 @@ namespace ofx {
     };
     
     class OscSubscriberManager {
-    private:
+    public:
         class OscSubscriber;
         
+    private:
         struct SetImplementation {
         protected:
 #define define_set_arithmetic(type) \
@@ -445,6 +446,7 @@ namespace ofx {
         using OscReceiverRef = std::shared_ptr<ofxOscReceiver>;
         using Targets = std::multimap<std::string, ParameterRef>;
         
+    public:
         class Identifier {
             std::string address;
             ParameterRef ref;
@@ -467,8 +469,7 @@ namespace ofx {
             
             friend class OscSubscriber;
         };
-
-    public:
+        
         class OscSubscriber {
             Targets::const_iterator findFromTargets(const Identifier &identifier, const Targets &targets) const {
                 if(!identifier.isValid()) return targets.end();
