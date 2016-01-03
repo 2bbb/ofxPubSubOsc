@@ -701,7 +701,7 @@ inline ofxOscSubscriber &ofxGetOscSubscriber(int port) {
 #pragma mark reference
 
 template <typename T>
-inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, T &value) {
+inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, T &&value) {
     return ofxGetOscSubscriber(port).subscribe(address, value);
 }
 
