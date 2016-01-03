@@ -194,6 +194,14 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 ## <a name="UpdateHistory">Update history</a>
 
+### 2016/01/04 [ver 0.2.1](releases/tag/v2_0_1) release
+
+* **critical bugfix**, hehe
+* enable subscribe lambda has argument is not ofxOscMessage.
+* enable subscribe method has no argument
+* update exmaples (xcodeproj) for oF0.9.0
+* some cleaning source and doxygen
+
 ### 2016/01/02 [ver 0.2.0](releases/tag/v2_0_0) release
 
 * *after this release, we will only test on oF0.9.0~*
