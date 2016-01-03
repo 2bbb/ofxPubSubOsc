@@ -15,6 +15,12 @@
 
 #include <initializer_list>
 
+#if OFX_PUBSUBOSC_DEBUG
+#   define TYPE_DEBUG(type) ofLogNotice() << __func__ << ":" << __LINE__ << "[" << address << "], " << typeid(type).name();
+#else
+#   define TYPE_DEBUG(type) ;
+#endif
+
 namespace ofx {
     using namespace ofxpubsubosc;
     
@@ -420,11 +426,13 @@ namespace ofx {
             
             template <typename T>
             inline typename std::enable_if<function_info<T>::is_function, Identifier>::type subscribe(const std::string &address, T &value) {
+                TYPE_DEBUG(T);
                 return subscribe(address, static_cast<typename function_info<T>::function_type>(value));
             }
             
             template <typename T, typename R>
             inline typename std::enable_if<!std::is_same<typename remove_const_reference<T>::type, ofxOscMessage>::value, Identifier>::type subscribe(const std::string &address, std::function<R(T)> setter) {
+                TYPE_DEBUG(T);
                 return subscribe(address, ParameterRef(new SetterFunctionParameter<T, R>(setter)));
             }
             
@@ -450,10 +458,12 @@ namespace ofx {
 
             template <typename R>
             inline Identifier subscribe(const std::string &address, const std::function<R(ofxOscMessage &)> callback) {
+                TYPE_DEBUG(R);
                 return subscribe(address, ParameterRef(new CallbackParameter<R>(callback)));
             }
             
             inline Identifier subscribe(const std::string &address, const std::function<void(ofxOscMessage &)> callback) {
+                TYPE_DEBUG(void);
                 return subscribe(address, ParameterRef(new CallbackParameter<void>(callback)));
             }
             

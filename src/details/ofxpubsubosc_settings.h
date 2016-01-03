@@ -20,4 +20,6 @@
 #   error this version uses C++11. (i.e. only oF0.9.0~). you can use old version ( from https://github.com/2bbb/ofxPubSubOsc/releases/tag/v0_1_2 )
 #endif
 
+#define OFX_PUBSUBOSC_DEBUG 0
+
 #endif
