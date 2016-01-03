@@ -420,39 +420,53 @@ namespace ofx {
         public:
             
             template <typename T>
-            inline typename std::enable_if<!function_info<T>::is_function, Identifier>::type subscribe(const std::string &address, T &value) {
+            inline auto subscribe(const std::string &address, T &value)
+            -> typename std::enable_if<!function_info<T>::is_function, Identifier>::type
+            {
                 return subscribe(address, ParameterRef(new Parameter<T>(value)));
             }
             
             template <typename T>
-            inline typename std::enable_if<function_info<T>::is_function, Identifier>::type subscribe(const std::string &address, T &value) {
+            inline auto subscribe(const std::string &address, T &value)
+            -> typename std::enable_if<function_info<T>::is_function, Identifier>::type
+            {
                 TYPE_DEBUG(T);
                 return subscribe(address, static_cast<typename function_info<T>::function_type>(value));
             }
             
             template <typename T, typename R>
-            inline typename std::enable_if<!std::is_same<typename remove_const_reference<T>::type, ofxOscMessage>::value, Identifier>::type subscribe(const std::string &address, std::function<R(T)> setter) {
+            inline auto subscribe(const std::string &address, std::function<R(T)> setter)
+            -> typename is_not_ofxoscmessage<T, Identifier>::type
+            {
                 TYPE_DEBUG(T);
                 return subscribe(address, ParameterRef(new SetterFunctionParameter<T, R>(setter)));
             }
             
             template <typename T, typename C, typename R>
-            inline typename is_not_ofxoscmessage<T, Identifier>::type subscribe(const std::string &address, C &that, R (C::*setter)(T)) {
+            inline auto subscribe(const std::string &address, C &that, R (C::*setter)(T))
+            -> typename is_not_ofxoscmessage<T, Identifier>::type
+            {
                 return subscribe(address, ParameterRef(new SetterMethodParameter<T, C, R>(that, setter)));
             }
             
             template <typename T, typename C, typename R>
-            inline typename is_not_ofxoscmessage<T, Identifier>::type subscribe(const std::string &address, C *that, R (C::*setter)(T)) {
+            inline auto subscribe(const std::string &address, C *that, R (C::*setter)(T))
+            -> typename is_not_ofxoscmessage<T, Identifier>::type
+            {
                 return subscribe(address, ParameterRef(new SetterMethodParameter<T, C, R>(*that, setter)));
             }
             
             template <typename T, typename C, typename R>
-            inline typename is_not_ofxoscmessage<T, Identifier>::type subscribe(const std::string &address, const C &that, R (C::*setter)(T) const) {
+            inline auto subscribe(const std::string &address, const C &that, R (C::*setter)(T) const)
+            -> typename is_not_ofxoscmessage<T, Identifier>::type
+            {
                 return subscribe(address, ParameterRef(new ConstSetterMethodParameter<T, C, R>(that, setter)));
             }
 
             template <typename T, typename C, typename R>
-            inline typename is_not_ofxoscmessage<T, Identifier>::type subscribe(const std::string &address, const C * const that, R (C::*setter)(T) const) {
+            inline auto subscribe(const std::string &address, const C * const that, R (C::*setter)(T) const)
+            -> typename is_not_ofxoscmessage<T, Identifier>::type
+            {
                 return subscribe(address, ParameterRef(new ConstSetterMethodParameter<T, C, R>(*that, setter)));
             }
 
@@ -694,27 +708,37 @@ inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &a
 #pragma mark setter function/method
 
 template <typename T, typename R>
-inline typename ofxpubsubosc::is_not_ofxoscmessage<T, ofxOscSubscriberIdentifier>::type ofxSubscribeOsc(int port, const std::string &address, R (*callback)(T)) {
+inline auto ofxSubscribeOsc(int port, const std::string &address, R (*callback)(T))
+-> typename ofxpubsubosc::is_not_ofxoscmessage<T, ofxOscSubscriberIdentifier>::type
+{
     return ofxGetOscSubscriber(port).subscribe(address, callback);
 }
 
 template <typename T, typename C, typename R>
-inline typename ofxpubsubosc::is_not_ofxoscmessage<T, ofxOscSubscriberIdentifier>::type ofxSubscribeOsc(int port, const std::string &address, C &that, R (C::*callback)(T)) {
+inline auto ofxSubscribeOsc(int port, const std::string &address, C &that, R (C::*callback)(T))
+-> typename ofxpubsubosc::is_not_ofxoscmessage<T, ofxOscSubscriberIdentifier>::type
+{
     return ofxGetOscSubscriber(port).subscribe(address, that, callback);
 }
 
 template <typename T, typename C, typename R>
-inline typename ofxpubsubosc::is_not_ofxoscmessage<T, ofxOscSubscriberIdentifier>::type ofxSubscribeOsc(int port, const std::string &address, C *that, R (C::*callback)(T)) {
+inline auto ofxSubscribeOsc(int port, const std::string &address, C *that, R (C::*callback)(T))
+-> typename ofxpubsubosc::is_not_ofxoscmessage<T, ofxOscSubscriberIdentifier>::type
+{
     return ofxGetOscSubscriber(port).subscribe(address, *that, callback);
 }
 
 template <typename T, typename C, typename R>
-inline typename ofxpubsubosc::is_not_ofxoscmessage<T, ofxOscSubscriberIdentifier>::type ofxSubscribeOsc(int port, const std::string &address, const C &that, R (C::*callback)(T) const) {
+inline auto ofxSubscribeOsc(int port, const std::string &address, const C &that, R (C::*callback)(T) const)
+-> typename ofxpubsubosc::is_not_ofxoscmessage<T, ofxOscSubscriberIdentifier>::type
+{
     return ofxGetOscSubscriber(port).subscribe(address, that, callback);
 }
 
 template <typename T, typename C, typename R>
-inline typename ofxpubsubosc::is_not_ofxoscmessage<T, ofxOscSubscriberIdentifier>::type ofxSubscribeOsc(int port, const std::string &address, const C * const that, R (C::*callback)(T) const) {
+inline auto ofxSubscribeOsc(int port, const std::string &address, const C * const that, R (C::*callback)(T) const)
+-> typename ofxpubsubosc::is_not_ofxoscmessage<T, ofxOscSubscriberIdentifier>::type
+{
     return ofxGetOscSubscriber(port).subscribe(address, *that, callback);
 }
 
