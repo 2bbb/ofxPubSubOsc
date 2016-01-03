@@ -8,7 +8,7 @@
 * update exmaples (xcodeproj) for oF0.9.0
 * some cleaning source and doxygen
 
-## 2016/01/02 [ver 0.2.0](releases/tag/v0_2_0) release
+## 2016/01/02 [ver 0.2.0](releases/tag/v0_2_0) release *(this version is broken)*
 
 * *after this release, we will only test on oF0.9.0~*
 * add iterators to [ofxOscSubscriberManager](API_Reference.md#Advanced_ofxOscSubscriberManager)

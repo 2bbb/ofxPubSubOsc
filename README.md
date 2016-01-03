@@ -202,7 +202,7 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 * update exmaples (xcodeproj) for oF0.9.0
 * some cleaning source and doxygen
 
-### 2016/01/02 [ver 0.2.0](releases/tag/v2_0_0) release
+### 2016/01/02 [ver 0.2.0](releases/tag/v2_0_0) release *(this version is broken)*
 
 * *after this release, we will only test on oF0.9.0~*
 * new feature: multi-subscribe, multi-publish
