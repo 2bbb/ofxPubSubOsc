@@ -280,7 +280,8 @@ namespace ofx {
         
         template <typename T, typename R>
         struct SetterFunctionParameter : AbstractParameter, SetImplementation {
-            SetterFunctionParameter(std::function<R(T)> setter) : setter(setter) {};
+            using Setter = std::function<R(T)>;
+            SetterFunctionParameter(Setter setter) : setter(setter) {};
             virtual void read(ofxOscMessage &message) {
                 typename remove_const_reference<T>::type t;
                 set(message, t);
@@ -288,7 +289,7 @@ namespace ofx {
             }
             
         private:
-            std::function<R(T)> setter;
+            Setter setter;
         };
         
         template <typename T, typename C, typename R>
@@ -419,6 +420,8 @@ namespace ofx {
             
         public:
             
+#pragma mark subscribe
+            
             template <typename T>
             inline auto subscribe(const std::string &address, T &value)
             -> typename std::enable_if<!function_info<T>::is_function, Identifier>::type
@@ -486,6 +489,8 @@ namespace ofx {
                 return subscribe(address, ParameterRef(new MethodCallbackParameter<C, R>(that, callback)));
             }
             
+#pragma mark unscribe
+            
             inline void unsubscribe(const std::string &address) {
                 targets.erase(address);
             }
@@ -502,6 +507,8 @@ namespace ofx {
             inline void unsubscribe() {
                 targets.clear();
             }
+            
+#pragma mark leakPicker
             
             inline void setLeakPicker(ParameterRef ref) {
                 leakPicker = ref;
