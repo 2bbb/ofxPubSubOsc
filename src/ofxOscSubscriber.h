@@ -329,6 +329,18 @@ namespace ofx {
             Setter setter;
         };
         
+        template <typename R>
+        struct SetterFunctionParameter<void, R> : AbstractParameter, SetImplementation {
+            using Setter = std::function<R()>;
+            SetterFunctionParameter(Setter setter) : setter(setter) {};
+            virtual void read(ofxOscMessage &message) {
+                setter();
+            }
+            
+        private:
+            Setter setter;
+        };
+
         template <typename T, typename C, typename R>
         struct SetterMethodParameter : AbstractParameter, SetImplementation {
             using Method = R (C::*)(T);
@@ -363,6 +375,22 @@ namespace ofx {
             Method setter;
         };
         
+        template <typename C, typename R>
+        struct SetterMethodParameter<void, C, R> : AbstractParameter, SetImplementation {
+            using Method = R (C::*)();
+            SetterMethodParameter(C &that, Method setter)
+            : that(that)
+            , setter(setter) {};
+            
+            virtual void read(ofxOscMessage &message) {
+                (that.*setter)();
+            }
+            
+        private:
+            C &that;
+            Method setter;
+        };
+        
         template <typename T, typename C, typename R>
         struct ConstSetterMethodParameter : AbstractParameter, SetImplementation {
             using Method = R (C::*)(T) const;
@@ -390,6 +418,22 @@ namespace ofx {
             
             virtual void read(ofxOscMessage &message) {
                 (that.*setter)(message);
+            }
+            
+        private:
+            const C &that;
+            Method setter;
+        };
+        
+        template <typename C, typename R>
+        struct ConstSetterMethodParameter<void, C, R> : AbstractParameter, SetImplementation {
+            using Method = R (C::*)() const;
+            ConstSetterMethodParameter(const C &that, Method setter)
+            : that(that)
+            , setter(setter) {};
+            
+            virtual void read(ofxOscMessage &message) {
+                (that.*setter)();
             }
             
         private:
@@ -486,6 +530,12 @@ namespace ofx {
 #pragma mark -
 #pragma mark setter function
 
+            template <typename R>
+            inline Identifier subscribe(const std::string &address, std::function<R()> setter) {
+                TYPE_DEBUG(T);
+                return subscribe_impl(address, ParameterRef(new SetterFunctionParameter<void, R>(setter)));
+            }
+            
             template <typename T, typename R>
             inline Identifier subscribe(const std::string &address, std::function<R(T)> setter) {
                 TYPE_DEBUG(T);
