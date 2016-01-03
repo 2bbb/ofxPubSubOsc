@@ -716,7 +716,7 @@ inline typename ofxpubsubosc::is_not_ofxoscmessage<T, ofxOscSubscriberIdentifier
 /// \param callback is kicked when receive a message to address
 /// \returns void
 
-inline void ofxSubscribeOsc(int port, const std::string &address, void (*callback)(ofxOscMessage &)) {
+inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, void (*callback)(ofxOscMessage &)) {
     return ofxGetOscSubscriber(port).subscribe(address, callback);
 }
 
@@ -729,7 +729,7 @@ inline void ofxSubscribeOsc(int port, const std::string &address, void (*callbac
 /// \returns void
 
 template <typename C, typename R>
-inline void ofxSubscribeOsc(int port, const std::string &address, C &that, R (C::*callback)(ofxOscMessage &)) {
+inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, C &that, R (C::*callback)(ofxOscMessage &)) {
     return ofxGetOscSubscriber(port).subscribe(address, that, callback);
 }
 
@@ -742,7 +742,7 @@ inline void ofxSubscribeOsc(int port, const std::string &address, C &that, R (C:
 /// \returns void
 
 template <typename C, typename R>
-inline void ofxSubscribeOsc(int port, const std::string &address, C *that, R (C::*callback)(ofxOscMessage &)) {
+inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, C *that, R (C::*callback)(ofxOscMessage &)) {
     return ofxGetOscSubscriber(port).subscribe(address, *that, callback);
 }
 
@@ -755,7 +755,7 @@ inline void ofxSubscribeOsc(int port, const std::string &address, C *that, R (C:
 /// \returns void
 
 template <typename C, typename R>
-inline void ofxSubscribeOsc(int port, const std::string &address, const C &that, R (C::*callback)(ofxOscMessage &) const) {
+inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, const C &that, R (C::*callback)(ofxOscMessage &) const) {
     return ofxGetOscSubscriber(port).subscribe(address, that, callback);
 }
 
@@ -768,12 +768,12 @@ inline void ofxSubscribeOsc(int port, const std::string &address, const C &that,
 /// \returns void
 
 template <typename C, typename R>
-inline void ofxSubscribeOsc(int port, const std::string &address, const C *that, R (C::*callback)(ofxOscMessage &) const) {
+inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, const C *that, R (C::*callback)(ofxOscMessage &) const) {
     return ofxGetOscSubscriber(port).subscribe(address, *that, callback);
 }
 
 template <typename C, typename R>
-inline void ofxSubscribeOsc(int port, const std::string &address, const std::function<void(ofxOscMessage &)> &callback) {
+inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, const std::function<void(ofxOscMessage &)> &callback) {
     return ofxGetOscSubscriber(port).subscribe(address, callback);
 }
 
