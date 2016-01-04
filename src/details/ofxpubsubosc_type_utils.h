@@ -29,26 +29,7 @@ namespace ofxpubsubosc {
         struct remove_const_reference<const T&> : remove_const_reference<T> {};
         
         template <typename T>
-        struct add_reference_if_non_arithmetic {
-            using type = T&;
-        };
-        
-#define define_add_reference_if_non_arithmetic(T) \
-template <> \
-struct add_reference_if_non_arithmetic<T> { \
-using type = T; \
-};
-        define_add_reference_if_non_arithmetic(bool);
-        define_add_reference_if_non_arithmetic(short);
-        define_add_reference_if_non_arithmetic(unsigned short);
-        define_add_reference_if_non_arithmetic(int);
-        define_add_reference_if_non_arithmetic(unsigned int);
-        define_add_reference_if_non_arithmetic(long);
-        define_add_reference_if_non_arithmetic(unsigned long);
-        define_add_reference_if_non_arithmetic(float);
-        define_add_reference_if_non_arithmetic(double);
-#undef define_add_reference_if_non_arithmetic
-                
+        using add_reference_if_non_arithmetic = std::conditional<std::is_arithmetic<T>::value, T, T&>;
     };
 };
 
