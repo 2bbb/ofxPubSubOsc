@@ -50,9 +50,11 @@ public:
 		
 		ofxPublishOsc("localhost", 9006, "/fps", &ofGetFrameRate);
 		
-		// if you use v0.9.0~
-		ofxSubscribeOsc(9005, "/lambda", [](ofxOscMessage &m){
-			ofLogNotice() << m;
+		ofxSubscribeOsc(9005, "/lambda", [](const std::string &str){
+			ofLogNotice() << "receive " << str;
+		});
+		ofxSubscribeOsc(9005, "/trigger_event", [](){
+			ofLogNotice() << "receive trigger_event";
 		});
 	}
 	
