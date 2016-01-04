@@ -216,7 +216,7 @@ namespace ofx {
             }
             
             template <typename U>
-            inline void set(ofxOscMessage &m, vector<U> &v, std::size_t offset = 0) {
+            inline void set(ofxOscMessage &m, std::vector<U> &v, std::size_t offset = 0) {
                 std::size_t num = (m.getNumArgs() - offset) / ofxpubsubosc::type_traits<U>::size;
                 if(v.size() != num) v.resize(num);
                 for(int i = 0; i < num; i++) {

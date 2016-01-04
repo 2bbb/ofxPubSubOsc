@@ -64,7 +64,7 @@ namespace ofxpubsubosc {
         template <typename T>
         struct abstract_pointer_stream {
             virtual T *get() { return NULL; };
-            T operator [](size_t n) { return get()[n]; };
+            T operator [](std::size_t n) { return get()[n]; };
         };
         
         template <typename T>
@@ -135,7 +135,7 @@ namespace ofxpubsubosc {
         
 #pragma mark array publisher
         
-        template <typename T, size_t s>
+        template <typename T, std::size_t s>
         struct array_publisher {
             using inner_type = const T;
             using const_array_t = T const (&)[s];
@@ -155,21 +155,21 @@ namespace ofxpubsubosc {
             : stream(pointer_stream_factory(that, getter)) {}
             virtual ~array_publisher() { }
             
-            T operator[](size_t n) const { return stream[n]; };
+            T operator[](std::size_t n) const { return stream[n]; };
             
-            size_t size() const { return s; };
+            std::size_t size() const { return s; };
             operator const_array_t() { return get(); };
             const_array_t get() { return reinterpret_cast<const_array_t>(stream.get()); };
         protected:
             std::shared_ptr<abstract_pointer_stream<T> > stream;
         };
         
-        template <typename T, size_t s>
+        template <typename T, std::size_t s>
         struct array_publisher<const T, s> : array_publisher<T, s> {};
         
 #pragma mark array buffer
         
-        template <typename T, size_t s>
+        template <typename T, std::size_t s>
         struct array_buffer {
             using inner_type = T;
             using array_t = T (&)[s];
@@ -180,17 +180,17 @@ namespace ofxpubsubosc {
             array_t operator=(const array_publisher<T, s> &arr) { for(int i = 0; i < size(); i++) v[i] = arr[i]; return get(); };
             bool operator!=(const array_publisher<T, s> &arr) const { for(int i = 0; i < size(); i++) if(v[i] != arr[i]) return true; return false; };
             bool operator==(const array_publisher<T, s> &arr) const { for(int i = 0; i < size(); i++) if(v[i] != arr[i]) return false; return true; };
-            T operator[](size_t n) const { return v[n]; };
-            T &operator[](size_t n) { return v[n]; };
+            T operator[](std::size_t n) const { return v[n]; };
+            T &operator[](std::size_t n) { return v[n]; };
             
-            size_t size() const { return s; };
+            std::size_t size() const { return s; };
             operator array_t() { return get(); };
             array_t get() { return reinterpret_cast<array_t>(reinterpret_cast<T &>(v[0])); };
         protected:
             T *v;
         };
         
-        template <typename T, size_t s>
+        template <typename T, std::size_t s>
         struct array_buffer<const T, s> : array_buffer<T, s> {};
     };
 };

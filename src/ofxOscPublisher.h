@@ -93,7 +93,7 @@ namespace ofx {
             inline void set(ofxOscMessage &m, const ofVec4f &v) const { setVec<4>(m, v); }
             inline void set(ofxOscMessage &m, const ofQuaternion &v) const { setVec<4>(m, v); }
             
-            template <size_t n, typename T>
+            template <std::size_t n, typename T>
             inline void setVec(ofxOscMessage &m, const T &v) const {
                 for(int i = 0; i < n; i++) { set(m, v[i]); }
             }
@@ -121,13 +121,13 @@ namespace ofx {
                 set(m, v.height);
             }
             
-            template <typename U, size_t size>
+            template <typename U, std::size_t size>
             inline void set(ofxOscMessage &m, const U (&v)[size]) const {
                 for(int i = 0; i < size; i++) { set(m, v[i]); }
             }
             
             template <typename U>
-            inline void set(ofxOscMessage &m, const vector<U> &v) const {
+            inline void set(ofxOscMessage &m, const std::vector<U> &v) const {
                 for(int i = 0; i < v.size(); i++) { set(m, v[i]); }
             }
             
@@ -250,10 +250,10 @@ namespace ofx {
             T old;
         };
 
-        template <typename Base, size_t size>
+        template <typename Base, std::size_t size>
         struct Parameter<Base(&)[size], true> : AbstractParameter, SetImplementation {
             Parameter(Base (&t)[size])
-            : t(t) { for(size_t i = 0; i < size; i++) old[i] = t[i]; }
+            : t(t) { for(std::size_t i = 0; i < size; i++) old[i] = t[i]; }
             virtual ~Parameter() { };
             
             virtual bool setMessage(ofxOscMessage &m, const std::string &address) {
@@ -317,7 +317,7 @@ namespace ofx {
             }
         };
         
-        template <typename Base, size_t size>
+        template <typename Base, std::size_t size>
         struct ConstParameter<const Base(&)[size], false> : AbstractParameter, SetImplementation {
             ConstParameter(const Base (&t)[size])
             : t(t) {}
@@ -336,7 +336,7 @@ namespace ofx {
             const Base (&t)[size];
         };
         
-        template <typename Base, size_t size>
+        template <typename Base, std::size_t size>
         struct ConstParameter<const Base(&)[size], true> : ConstParameter<const Base(&)[size], false> {
             ConstParameter(const Base(&t)[size])
             : ConstParameter<const Base(&)[size], false>(t) {}
@@ -363,7 +363,7 @@ namespace ofx {
             remove_ref(T) dummy;
         };
         
-        template <typename Base, size_t size, bool isCheckValue>
+        template <typename Base, std::size_t size, bool isCheckValue>
         struct GetterFunctionParameter<Base(&)[size], isCheckValue> : Parameter<Base(&)[size], isCheckValue>  {
             using T = Base (&)[size];
             using GetterFunction = T (*)();
@@ -374,7 +374,7 @@ namespace ofx {
         protected:
             virtual Base (&get())[size] {
                 Base (&arr)[size] = getter();
-                for(size_t i = 0; i < size; i++) dummy[i] = arr[i];
+                for(std::size_t i = 0; i < size; i++) dummy[i] = arr[i];
                 return dummy;
             }
             GetterFunction getter;
@@ -397,7 +397,7 @@ namespace ofx {
             remove_ref(T) dummy;
         };
 
-        template <typename Base, size_t size, typename C, bool isCheckValue>
+        template <typename Base, std::size_t size, typename C, bool isCheckValue>
         struct GetterParameter<Base(&)[size], C, isCheckValue> : Parameter<Base(&)[size], isCheckValue> {
             using T = Base (&)[size];
             using Getter = T (C::*)();
@@ -410,7 +410,7 @@ namespace ofx {
         protected:
             virtual T get() {
                 T arr = (that.*getter)();
-                for(size_t i = 0; i < size; i++) dummy[i] = arr[i];
+                for(std::size_t i = 0; i < size; i++) dummy[i] = arr[i];
                 return dummy;
             }
             Getter getter;
@@ -434,7 +434,7 @@ namespace ofx {
             remove_ref(T) dummy;
         };
         
-        template <typename Base, size_t size, typename C, bool isCheckValue>
+        template <typename Base, std::size_t size, typename C, bool isCheckValue>
         struct ConstGetterParameter<Base(&)[size], C, isCheckValue> : Parameter<Base(&)[size], isCheckValue> {
             using T = Base (&)[size];
             using Getter = T (C::*)() const;
@@ -447,7 +447,7 @@ namespace ofx {
         protected:
             virtual T get() {
                 T arr = (that.*getter)();
-                for(size_t i = 0; i < size; i++) dummy[i] = arr[i];
+                for(std::size_t i = 0; i < size; i++) dummy[i] = arr[i];
                 return dummy;
             }
             Getter getter;
