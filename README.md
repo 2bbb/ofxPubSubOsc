@@ -10,7 +10,7 @@ easy utility for publish/subscribe OSC message.
 
 * this addon is tested with oF0.9.0~
 * if you use oF0.9.0~, then you can use `std::function<void(ofxOscMessage &)>`! detail: [API Reference](API_Reference.md#API_lambda_callback)
-* **if you use oF0.8.2~0.8.4, then you can use [v0.1.2](releases/tag/v0_1_2)**
+* **if you use oF0.8.2~0.8.4, then you can use [v0.1.2](../../releases/tag/v0_1_2)**
 * if you have challange spirit, please use dev/main branch.
 * if you want to join development ofxPubSubOsc, open the issue and post the PR for [dev/main](tree/dev/main).
 
