@@ -196,7 +196,7 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 ## <a name="UpdateHistory">Update history</a>
 
-### 2016/01/04 [ver 0.2.1](releases/tag/v2_0_1) release
+### 2016/01/04 [ver 0.2.1](../../releases/tag/v2_0_1) release
 
 * **critical bugfix**, hehe
 * enable subscribe lambda has argument is not ofxOscMessage.
@@ -204,7 +204,7 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 * update exmaples (xcodeproj) for oF0.9.0
 * some cleaning source and doxygen
 
-### 2016/01/02 [ver 0.2.0](releases/tag/v2_0_0) release *(this version is broken)*
+### 2016/01/02 [ver 0.2.0](../../releases/tag/v2_0_0) release *(this version is broken)*
 
 * *after this release, we will only test on oF0.9.0~*
 * new feature: multi-subscribe, multi-publish
@@ -226,7 +226,7 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 * some bugfix around lambda
 * TODO: update some API Documentations
 
-### 2016/01/02 [ver 0.1.2](releases/tag/v0_1_2) release
+### 2016/01/02 [ver 0.1.2](../../releases/tag/v0_1_2) release
 
 * this is *final update added new feature, with oF0.8.4 support*
 * after this release, "ver 0.1.x will only bugfie about supporting oF0.8.4
