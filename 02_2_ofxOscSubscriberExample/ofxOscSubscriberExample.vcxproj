@@ -127,10 +127,14 @@
     <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscPrintReceivedElements.h" />
     <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscReceivedElements.h" />
     <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscTypes.h" />
-    <ClInclude Include="..\..\..\addons\ofxPubSubOsc\src\details\ofx_type_traits.h" />
     <ClInclude Include="..\..\..\addons\ofxPubSubOsc\src\ofxOscPublisher.h" />
     <ClInclude Include="..\..\..\addons\ofxPubSubOsc\src\ofxOscSubscriber.h" />
     <ClInclude Include="..\..\..\addons\ofxPubSubOsc\src\ofxPubSubOsc.h" />
+    <ClInclude Include="..\src\details\ofxpubsubosc_publish_value_wrappers.h" />
+    <ClInclude Include="..\src\details\ofxpubsubosc_settings.h" />
+    <ClInclude Include="..\src\details\ofxpubsubosc_subscribe_value_wrappers.h" />
+    <ClInclude Include="..\src\details\ofxpubsubosc_type_traits.h" />
+    <ClInclude Include="..\src\details\ofxpubsubosc_type_utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
