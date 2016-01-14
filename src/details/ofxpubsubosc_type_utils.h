@@ -80,3 +80,19 @@ bool operator==(const ofBuffer &x, const ofBuffer &y) {
 bool operator!=(const ofBuffer &x, const ofBuffer &y) {
     return !operator==(x, y);
 }
+
+std::ostream &operator<<(std::ostream &os, const ofQuaternion &q) {
+    os << q.x() << ", " << q.y() << ", " << q.z() << ", " << q.w();
+    return os;
+}
+
+std::istream &operator>>(std::istream &is, ofQuaternion &q) {
+    is >> q.x();
+    is.ignore(2);
+    is >> q.y();
+    is.ignore(2);
+    is >> q.z();
+    is.ignore(2);
+    is >> q.w();
+    return is;
+}
