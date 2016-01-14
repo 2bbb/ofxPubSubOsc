@@ -62,6 +62,8 @@ bool operator!=(const ofBuffer &x, const ofBuffer &y) {
     return !operator==(x, y);
 }
 
+#if (OF_VERSION_MAJOR == 0) && ((OF_VERSION_MINOR < 9) || ((OF_VERSION_MINOR == 9) && (OF_VERSION_PATCH == 0)))
+
 std::ostream &operator<<(std::ostream &os, const ofQuaternion &q) {
     os << q.x() << ", " << q.y() << ", " << q.z() << ", " << q.w();
     return os;
@@ -77,3 +79,5 @@ std::istream &operator>>(std::istream &is, ofQuaternion &q) {
     is >> q.w();
     return is;
 }
+
+#endif
