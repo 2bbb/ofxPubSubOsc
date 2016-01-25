@@ -196,6 +196,10 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 ## <a name="UpdateHistory">Update history</a>
 
+### 2016/01/25 [ver 0.2.2](../../releases/tag/v2_0_2) release
+
+* bugfix: about `ofQuaternion`'s `operator>>`, `operator<<` (issued by [musiko](https://github.com/musiko). thanks!!!)
+
 ### 2016/01/04 [ver 0.2.1](../../releases/tag/v2_0_1) release
 
 * **critical bugfix**, hehe
@@ -225,6 +229,10 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 * cleaning up conditional macro about oF0.8.x
 * some bugfix around lambda
 * TODO: update some API Documentations
+
+### 2016/01/25 [ver 0.1.3](../../releases/tag/v0_1_3) release
+
+* bugfix: about `ofQuaternion`'s `operator>>`, `operator<<` (issued by [musiko](https://github.com/musiko). thanks!!!)
 
 ### 2016/01/02 [ver 0.1.2](../../releases/tag/v0_1_2) release
 
@@ -261,6 +269,7 @@ MIT License.
 * [USAMI Takuto](https://github.com/usm916)
 * [HORII Satoshi](https://github.com/satcy)
 * [HANAI Yuuya](https://github.com/hanasaan)
+* [musiko](https://github.com/musiko)
 
 ## <a name="AtTheLast">At the last</a>
 
