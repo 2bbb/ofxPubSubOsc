@@ -196,6 +196,10 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 ## <a name="UpdateHistory">Update history</a>
 
+### 2016/01/25 ver 0.1.3 release
+
+* bugfix: about `ofQuaternion`'s `operator>>`, `operator<<` (issued by [musiko](https://github.com/musiko). thanks!!!)
+
 ### 2016/01/02 ver 0.1.2 release
 
 * this is *final update added new feature, with oF0.8.4 support*
@@ -286,6 +290,7 @@ MIT License.
 * [IWATANI Nariaki](http://github.com/nariakiiwatani)
 * [USAMI Takuto](http://github.com/usm916)
 * [HORII Satoshi](http://github.com/satcy)
+* [musiko](https://github.com/musiko)
 
 ## <a name="AtTheLast">At the last</a>
 
