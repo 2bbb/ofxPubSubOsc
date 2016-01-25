@@ -1,5 +1,9 @@
 # ofxPubSubOsc Update History
 
+## 2016/01/25 [ver 0.2.2](../../releases/tag/v2_0_2), [ver 0.1.3](../../releases/tag/v0_1_3) release
+
+* bugfix: about `ofQuaternion`'s `operator>>`, `operator<<` (issued by [musiko](https://github.com/musiko). thanks!!!)
+
 ## 2016/01/04 [ver 0.2.1](../../releases/tag/v2_0_1) release
 
 * **critical bugfix**, hehe

@@ -20,50 +20,19 @@ namespace ofx {
     
     namespace {
         template <typename T>
-        struct remove_reference {
-            using type = T;
-        };
-        template <typename T>
-        struct remove_reference<T &> {
-            using type = T;
-        };
-#define remove_ref(T) typename ofx::remove_reference<T>::type
-        
-        template <typename T> struct is_integral { static const bool value = false; };
-#define define_is_integral(T) template <> struct is_integral<T> { static const bool value = true; };
-        define_is_integral(bool);
-        define_is_integral(short);
-        define_is_integral(unsigned char);
-        define_is_integral(char);
-        define_is_integral(unsigned short);
-        define_is_integral(int);
-        define_is_integral(unsigned int);
-        define_is_integral(long);
-        define_is_integral(unsigned long);
-        define_is_integral(long long);
-        define_is_integral(unsigned long long);
-#undef define_is_integral
-        
-#define type_ref(T) typename add_reference_if_non_arithmetic<T>::type
+        using remove_ref = typename std::remove_reference<T>::type;
         
         template <typename T>
-        struct is_pointer {
-            static const bool value = false;
-        };
-        
-        template <typename T>
-        struct is_pointer<T *> {
-            static const bool value = true;
-        };
+        using type_ref = typename add_reference_if_non_arithmetic<T>::type;
         
         template <typename T>
         struct is_integral_and_lt_64bit {
-            static const bool value = is_integral<T>::value && (sizeof(T) < 8);
+            static const bool value = std::is_integral<T>::value && (sizeof(T) < 8);
         };
         
         template <typename T>
         struct is_integral_and_geq_64bit {
-            static const bool value = is_integral<T>::value && (8 <= sizeof(T));
+            static const bool value = std::is_integral<T>::value && (8 <= sizeof(T));
         };
     };
     
@@ -228,7 +197,7 @@ namespace ofx {
             }
         protected:
             virtual bool isChanged() { return true; }
-            virtual type_ref(T) get() { return t; }
+            virtual type_ref<T> get() { return t; }
             T &t;
         };
 
@@ -358,9 +327,9 @@ namespace ofx {
             , getter(getter) {}
             
         protected:
-            virtual type_ref(T) get() { return dummy = getter(); }
+            virtual type_ref<T> get() { return dummy = getter(); }
             GetterFunction getter;
-            remove_ref(T) dummy;
+            remove_ref<T> dummy;
         };
         
         template <typename Base, std::size_t size, bool isCheckValue>
@@ -391,10 +360,10 @@ namespace ofx {
             , that(that) {}
             
         protected:
-            virtual type_ref(T) get() { return dummy = (that.*getter)(); }
+            virtual type_ref<T> get() { return dummy = (that.*getter)(); }
             Getter getter;
             C &that;
-            remove_ref(T) dummy;
+            remove_ref<T> dummy;
         };
 
         template <typename Base, std::size_t size, typename C, bool isCheckValue>
@@ -428,10 +397,10 @@ namespace ofx {
             , that(that) {}
             
         protected:
-            virtual type_ref(T) get() { return dummy = (that.*getter)(); }
+            virtual type_ref<T> get() { return dummy = (that.*getter)(); }
             Getter getter;
             const C &that;
-            remove_ref(T) dummy;
+            remove_ref<T> dummy;
         };
         
         template <typename Base, std::size_t size, typename C, bool isCheckValue>
