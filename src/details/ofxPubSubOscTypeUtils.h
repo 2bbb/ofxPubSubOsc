@@ -363,4 +363,26 @@ bool operator!=(const ofBuffer &x, const ofBuffer &y) {
     return !operator==(x, y);
 }
 
+#ifndef bbb_explicit_bool
+#define bbb_explicit_bool
+
+namespace bbb {
+    struct explicit_bool {
+        explicit_bool()
+        : b(false) {}
+        explicit_bool(bool b)
+        : b(b) {}
+        template <typename _>
+        explicit_bool(_) = delete;
+        bool &operator=(bool b) { this->b = b; }
+        
+        operator bool&() { return b; };
+        operator bool() const { return b; };
+        bool get() const { return b; };
+        bool b;
+    };
+};
+
+#endif
+
 #endif /* ofxPubSubOscTypeUtils_h */

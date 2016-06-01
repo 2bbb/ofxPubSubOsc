@@ -522,19 +522,8 @@ inline ofxOscPublisher &ofxGetOscPublisher(const std::string &ip, int port) {
 /// \param whenValueIsChanged if this value to false, then we send value every update
 /// \returns ofxOscPublisherIdentifier
 
-struct explicit_bool {
-    explicit_bool() = delete;
-    explicit_bool(bool b)
-    : b(b) {}
-    template <typename _>
-    explicit_bool(_) = delete;
-    operator bool() const { return b; };
-    bool get() const { return b; };
-    bool b;
-};
-
 template <typename ValueOrFunction>
-inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, const std::string &address, ValueOrFunction &&valueOrFunction, explicit_bool whenValueIsChanged = true)
+inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, const std::string &address, ValueOrFunction &&valueOrFunction, bbb::explicit_bool whenValueIsChanged = true)
 {
     return ofxGetOscPublisher(ip, port).publish(address, std::forward<ValueOrFunction>(valueOrFunction), whenValueIsChanged.get());
 }
@@ -551,7 +540,7 @@ inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, 
 /// \returns ofxOscPublisherIdentifier
 
 template <typename Object, typename Method>
-inline auto ofxPublishOsc(const std::string &ip, int port, const std::string &address, Object &&obj, Method &&meth, bool whenValueIsChanged = true)
+inline auto ofxPublishOsc(const std::string &ip, int port, const std::string &address, Object &&obj, Method &&meth, bbb::explicit_bool whenValueIsChanged = true)
 -> ofx::PubSubOsc::enable_if_t<ofx::PubSubOsc::is_bindable<Object, Method>::value, ofxOscPublisherIdentifier>
 {
     return ofxGetOscPublisher(ip, port).publish(address, ofx::PubSubOsc::bind(std::forward<Object>(obj), std::forward<Method>(meth)), whenValueIsChanged);
