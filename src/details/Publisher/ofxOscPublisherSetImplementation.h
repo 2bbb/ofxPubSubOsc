@@ -81,6 +81,12 @@ namespace ofx {
             for(int i = 0; i < v.size(); i++) { set(m, v[i]); }
         }
         
+        template <typename Func>
+        inline auto set(ofxOscMessage &m, Func f)
+        -> enable_if_t<is_callable<Func>::value> {
+            set(m, f());
+        }
+        
 #pragma mark ofParameter<T> / ofParameterGroup
         
         template <typename U>

@@ -393,7 +393,46 @@ namespace ofx {
                     return bUseBundle();
                 }
                 
+                ofxOscSender &getSender() { return sender; }
+                
+#pragma mark send
+                
+                template <typename ... Args>
+                void send(const std::string &address, Args && ... args) {
+                    ofxOscMessage m = createMessage(address, std::forward<Args>(args) ...);
+                    sender.sendMessage(m);
+                }
+                
             private:
+                template <typename Arg>
+                void createMessageImpl(ofxOscMessage &m, Arg &&arg) {
+                    set(m, std::forward<Arg>(arg));
+                }
+                
+                template <typename Arg, typename ... Args>
+                auto createMessageImpl(ofxOscMessage &m, Arg &&arg, Args && ... args)
+                -> enable_if_t<0 < sizeof...(Args), void>
+                {
+                    set(m, std::forward<Arg>(arg));
+                    createMessageImpl(m, std::forward<Args>(args) ...);
+                }
+                
+                template <typename ... Args>
+                auto createMessage(const std::string &address, Args && ... args)
+                -> enable_if_t<0 < sizeof...(Args), ofxOscMessage>
+                {
+                    ofxOscMessage m;
+                    m.setAddress(address);
+                    createMessageImpl(m, std::forward<Args>(args) ...);
+                    return m;
+                }
+
+                ofxOscMessage createMessage(const std::string &address) {
+                    ofxOscMessage m;
+                    m.setAddress(address);
+                    return m;
+                }
+
                 Publisher(const Destination &destination)
                 : destination(destination) {
                     sender.setup(destination.ip, destination.port);
@@ -705,6 +744,13 @@ inline void ofxUnregisterPublishingOsc() {
 }
 
 /// \}
+
+#pragma mark send
+
+template <typename ... Args>
+void ofxSendOsc(const std::string &ip, int port, const std::string &address, Args && ... args) {
+    ofxGetOscPublisher(ip, port).send(address, std::forward<Args>(args) ...);
+}
 
 #pragma mark using bundle option
 
