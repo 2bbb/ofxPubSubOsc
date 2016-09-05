@@ -129,6 +129,10 @@ unregister all the messages sending to _ip:port_.
 
 **NOTE**: registable type is same to `ofxPublishOsc`. see [more ofxPublishOsc](API_Reference.md#API_ofxPublishOsc).
 
+### <a name="SimpleAPI_ofxSendOsc">ofxSendOsc</a>
+
+* void ofxSendOsc(const string &_ip_, int _port_, const string &_address_, Arguments && ... arguments)
+
 ## <a name="SupportedTypes">Supported types</a>
 
 * Arithmetic is any type of Int32, Int64 or Float
@@ -189,12 +193,29 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 **NOTE**: do NOT use `vector<vector<SupportedType>>`, `vector<SupportedType>[size]`
 
 ### <a name="SupportedTypes_Callback">Callback</a>
-* `T (\*callback)(ofxOscMessage &)`;
-* pair of `U &that`, `T (U::\*callback)(ofxOscMessage &)`;
-* pair of `U \*that`, `T (U::\*callback)(ofxOscMessage &)`;
-* `std::function<void(ofxOscMessage &)>`
+
+#### Subscribe
+
+* `std::function<R(Arguments ...)>`;
+* `std::function<R(ofxOscMessage &)>`
+* pair of `U &that`, `T (U::\*callback)(Arguments ...)`;
+* pair of `U \*that`, `T (U::\*callback)(Arguments ...)`;
+
+`Arguments ...` are all of types we can use in 
+
+#### Publish
+
+* `std::function<T()>`;
+* pair of `U &that`, `T (U::\*callback)()`;
+* pair of `U \*that`, `T (U::\*callback)()`;
 
 ## <a name="UpdateHistory">Update history</a>
+
+### 2016/06/XX ver 0.3.0
+
+* refactor all for C++11
+* add `ofxSendOsc`
+* ofxSubscribeOsc got more flexible.
 
 ### 2016/01/25 [ver 0.2.2](../../releases/tag/v0_2_2) release
 
@@ -207,39 +228,6 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 * enable subscribe method has no argument
 * update exmaples (xcodeproj) for oF0.9.0
 * some cleaning source and doxygen
-
-### 2016/01/02 [ver 0.2.0](../../releases/tag/v0_2_0) release *(this version is broken)*
-
-* *after this release, we will only test on oF0.9.0~*
-* new feature: multi-subscribe, multi-publish
-	* `ofxSubscribeOsc` returns `ofxSubscriberIdentifier`
-	* `ofxPublishOsc` returns `ofxPublisherIdentifier`
-	* TODO: API Reference
-* add iterators to [ofxOscSubscriberManager](API_Reference.md#Advanced_ofxOscSubscriberManager)
-* add iterators to [ofxOscPublisherManager](API_Reference.md#Advanced_ofxOscPublisherManager)
-* add all port operation to ofxUnsubscribeOsc, ofxNotifyToSubscribedOsc, ofxRemoveLeakedOscPicker
-* add ofxSetLeakedOscPickerAll
-* add ofxSubscribeOsc with `std::initializer_list<int> port` and `std::initializer_list<std::string> addresses`
-* add iterators to [ofxOscPublisherManager](API_Reference.md#Advanced_ofxOscPublisherManager)
-* add all port operation to ofxUnpublishOsc, ofxUnregisterPublishingOsc
-* add feature publishing r-value. (i.e., you can do `ofxPublishOsc(host, port, "/bar", "value!!")`)
-* add `const` to lambda callback (proposed by [satoruhiga](https://github.com/satoruhiga). thanks!!)
-* add useful macro `SubscribeOsc(port, name)` is same as `ofxSubscribeOsc(port, "/name", name)` (porposed by [hanasaan](https://github.com/hanasaan). thanks!!)
-* add `std::` prefix
-* cleaning up conditional macro about oF0.8.x
-* some bugfix around lambda
-* TODO: update some API Documentations
-
-### 2016/01/25 [ver 0.1.3](../../releases/tag/v0_1_3) release
-
-* bugfix: about `ofQuaternion`'s `operator>>`, `operator<<` (issued by [musiko](https://github.com/musiko). thanks!!!)
-
-### 2016/01/02 [ver 0.1.2](../../releases/tag/v0_1_2) release
-
-* this is *final update added new feature, with oF0.8.4 support*
-* after this release, "ver 0.1.x will only bugfie about supporting oF0.8.4
-* add new feature ofxNotifyToSubscribedOsc (proposed by [satcy](https://github.com/satcy). thanks!!)
-* some bugfix
 
 ### [Older update histories](Update_History.md)
 
@@ -268,6 +256,7 @@ MIT License.
 * [IWATANI Nariaki](https://github.com/nariakiiwatani)
 * [USAMI Takuto](https://github.com/usm916)
 * [HORII Satoshi](https://github.com/satcy)
+* [Tomoto Yusuke](https://github.com/yusuketomoto)
 * [HANAI Yuuya](https://github.com/hanasaan)
 * [musiko](https://github.com/musiko)
 
