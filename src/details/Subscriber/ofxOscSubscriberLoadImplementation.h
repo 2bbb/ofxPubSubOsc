@@ -187,7 +187,14 @@ namespace ofx {
             }
         }
         
-#pragma mark vector
+#pragma mark container
+        template <typename U, std::size_t size>
+        inline void load(ofxOscMessage &m, std::array<U, size> &v, std::size_t offset = 0) {
+            for(int i = 0; i < min(size, (m.getNumArgs() - offset) / type_traits<U>::size); i++) {
+                load(m, v[i], offset + i * type_traits<U>::size);
+            }
+        }
+        
         template <typename U, std::size_t size>
         inline void load(ofxOscMessage &m, U (&v)[size], std::size_t offset = 0) {
             for(int i = 0; i < min(size, (m.getNumArgs() - offset) / type_traits<U>::size); i++) {
@@ -195,8 +202,17 @@ namespace ofx {
             }
         }
         
-        template <typename U>
-        inline void load(ofxOscMessage &m, std::vector<U> &v, std::size_t offset = 0) {
+        template <typename U, typename Alloc>
+        inline void load(ofxOscMessage &m, std::vector<U, Alloc> &v, std::size_t offset = 0) {
+            std::size_t num = (m.getNumArgs() - offset) / type_traits<U>::size;
+            if(v.size() != num) v.resize(num);
+            for(int i = 0; i < num; i++) {
+                load(m, v[i], offset + i * type_traits<U>::size);
+            }
+        }
+        
+        template <typename U, typename Alloc>
+        inline void load(ofxOscMessage &m, std::deque<U, Alloc> &v, std::size_t offset = 0) {
             std::size_t num = (m.getNumArgs() - offset) / type_traits<U>::size;
             if(v.size() != num) v.resize(num);
             for(int i = 0; i < num; i++) {

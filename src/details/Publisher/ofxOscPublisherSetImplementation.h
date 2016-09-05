@@ -71,13 +71,24 @@ namespace ofx {
             set(m, v.height);
         }
         
+#pragma mark containerz
+        template <typename U, std::size_t size>
+        inline void set(ofxOscMessage &m, const std::array<U, size> &v) {
+            for(int i = 0; i < size; i++) { set(m, v[i]); }
+        }
+        
         template <typename U, std::size_t size>
         inline void set(ofxOscMessage &m, const U (&v)[size]) {
             for(int i = 0; i < size; i++) { set(m, v[i]); }
         }
         
-        template <typename U>
-        inline void set(ofxOscMessage &m, const std::vector<U> &v) {
+        template <typename U, typename Alloc>
+        inline void set(ofxOscMessage &m, const std::vector<U, Alloc> &v) {
+            for(int i = 0; i < v.size(); i++) { set(m, v[i]); }
+        }
+        
+        template <typename U, typename Alloc>
+        inline void set(ofxOscMessage &m, const std::deque<U, Alloc> &v) {
             for(int i = 0; i < v.size(); i++) { set(m, v[i]); }
         }
         
