@@ -23,7 +23,12 @@ namespace ofx {
         namespace Publish {
             struct AbstractParameter {
                 AbstractParameter() : condition(new BasicCondition) {}
-                virtual bool write(ofxOscMessage &m, const std::string &address) = 0;
+                virtual bool write(ofxOscMessage &m, const std::string &address) {
+                    if(!canPublish() || !isChanged()) return false;
+                    writeForce(m, address);
+                    return true;
+                }
+                virtual void writeForce(ofxOscMessage &m, const std::string &address) = 0;
                 void setCondition(ConditionRef ref) { condition = ref; };
                 
                 inline void setEnablePublish(bool bEnablePublish) { condition->setEnablePublish(bEnablePublish); };
@@ -32,6 +37,7 @@ namespace ofx {
                 bool canPublish() {
                     return condition->getCondition();
                 }
+                virtual bool isChanged() { return true; };
             private:
                 ConditionRef condition;
             };
@@ -43,11 +49,9 @@ namespace ofx {
                 Parameter(T &t)
                 : t(t) {}
                 
-                virtual bool write(ofxOscMessage &m, const std::string &address) {
-                    if(!canPublish() || !isChanged()) return false;
+                virtual void writeForce(ofxOscMessage &m, const std::string &address) {
                     m.setAddress(address);
                     set(m, get());
-                    return true;
                 }
             protected:
                 virtual bool isChanged() { return true; }
@@ -79,11 +83,9 @@ namespace ofx {
                 : t(t) { for(std::size_t i = 0; i < size; i++) old[i] = t[i]; }
                 virtual ~Parameter() { };
                 
-                virtual bool write(ofxOscMessage &m, const std::string &address) {
-                    if(!canPublish() || !isChanged()) return false;
+                virtual void writeForce(ofxOscMessage &m, const std::string &address) {
                     m.setAddress(address);
                     set(m, get());
-                    return true;
                 }
                 
             protected:
@@ -114,11 +116,9 @@ namespace ofx {
                 ConstParameter(const T &t)
                 : t(t) {}
                 
-                virtual bool write(ofxOscMessage &m, const std::string &address) {
-                    if(!canPublish() || !isChanged()) return false;
+                virtual void writeForce(ofxOscMessage &m, const std::string &address) {
                     m.setAddress(address);
                     set(m, get());
-                    return true;
                 }
             protected:
                 virtual bool isChanged() { return true; }
@@ -145,11 +145,9 @@ namespace ofx {
                 ConstParameter(const Base (&t)[size])
                 : t(t) {}
                 
-                virtual bool write(ofxOscMessage &m, const std::string &address) {
-                    if(!canPublish() || !isChanged()) return false;
+                virtual void writeForce(ofxOscMessage &m, const std::string &address) {
                     m.setAddress(address);
                     set(m, get());
-                    return true;
                 }
                 
             protected:

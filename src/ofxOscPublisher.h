@@ -344,6 +344,45 @@ namespace ofx {
                     registeredTargets.clear();
                 }
                 
+    #pragma mark publishManually
+                
+                inline void publishManullay(const std::string &address) {
+                    {
+                        Targets::iterator it = registeredTargets.find(address);
+                        if(it != registeredTargets.end()) {
+                            ofxOscMessage m;
+                            for(std::size_t i = 0, size = registeredTargets.count(address); i < size; i++, ++it) {
+                                it->second->writeForce(m, it->first);
+                                sender.sendMessage(m);
+                                m.clear();
+                            }
+                        }
+                    }
+                    
+                    {
+                        Targets::iterator it = targets.find(address);
+                        if(it != targets.end()) {
+                            ofxOscMessage m;
+                            for(std::size_t i = 0, size = targets.count(address); i < size; i++, ++it) {
+                                it->second->writeForce(m, it->first);
+                                sender.sendMessage(m);
+                                m.clear();
+                            }
+                        }
+                    }
+                }
+                
+                inline void publishManullay(const PublishIdentifier &identifier) {
+                    if(!identifier.isValid()) return;
+                    Targets::const_iterator it{findPublished(identifier)};
+                    if(it != targets.end()) {
+                        ofxOscMessage m;
+                        it->second->writeForce(m, it->first);
+                        sender.sendMessage(m);
+                        m.clear();
+                    }
+                }
+                
     #pragma mark status
                 
                 inline bool isPublished() const {
@@ -741,6 +780,22 @@ inline void ofxUnregisterPublishingOsc() {
     for(; it != end; it++) {
         it->second->unregister();
     }
+}
+
+/// \}
+
+#pragma mark publish registered
+                
+/// \name ofxPublishOscManually
+/// \{
+
+inline void ofxPublishOscManually(const std::string &ip, int port, const std::string &address) {
+    ofxGetOscPublisher(ip, port).publishManullay(address);
+}
+
+inline void ofxPublishOscManually(const ofxOscPublisherIdentifier &identifier) {
+    if(!identifier.isValid()) return;
+    ofxGetOscPublisher(identifier.getKey().ip, identifier.getKey().port).publishManullay(identifier);
 }
 
 /// \}
