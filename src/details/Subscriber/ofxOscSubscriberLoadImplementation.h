@@ -25,6 +25,8 @@ namespace ofx {
             else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); \
             else if(m.getArgType(offset) == OFXOSC_TYPE_DOUBLE) v = m.getArgAsDouble(offset); \
             else if(m.getArgType(offset) == OFXOSC_TYPE_STRING) v = ofToDouble(m.getArgAsString(offset)); \
+            else if(m.getArgType(offset) == OFXOSC_TYPE_TRUE) v = true; \
+            else if(m.getArgType(offset) == OFXOSC_TYPE_FALSE) v = false; \
 }
         
         define_set_arithmetic(bool);
