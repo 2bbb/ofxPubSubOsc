@@ -525,11 +525,11 @@ inline void ofxNotifyToSubscribedOsc(ofxOscMessage &m) {
 
 #pragma mark activate / deactivate listening
 
-inline void ofxSetSubscriberActive(int port, bool bActive) {
+inline void ofxSetOscSubscriberActive(int port, bool bActive) {
     ofxGetOscSubscriber(port).setEnable(bActive);
 }
 
-inline bool ofxGetSubscriberActive(int port) {
+inline bool ofxGetOscSubscriberActive(int port) {
     return ofxGetOscSubscriber(port).isEnabled();
 }
 
