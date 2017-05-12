@@ -251,6 +251,9 @@ namespace ofx {
                     }
                 }
                 
+                void setEnable(bool bEnabled) { this->bEnabled = bEnabled; }
+                bool isEnabled() const { return bEnabled; }
+                
                 using Ref = std::shared_ptr<Subscriber>;
             private:
                 Subscriber(int port)
@@ -284,6 +287,7 @@ namespace ofx {
                 Targets targets;
                 ParameterRef leakPicker;
                 std::queue<ofxOscMessage> leakedOscMessages;
+                bool bEnabled{true};
                 
                 friend class SubscriberManager;
             };
@@ -302,11 +306,21 @@ namespace ofx {
                     }
                     return *(managers[port].get());
                 }
+                
+                void setEnable(int port, bool bEnabled) {
+                    getOscSubscriber(port).setEnable(bEnabled);
+                }
+                
+                bool isEnabled(int port) const {
+                    return getOscSubscriber(port).isEnabled();
+                }
             private:
                 using Subscribers = std::map<int, Subscriber::Ref>;
                 void update(ofEventArgs &args) {
                     for(Subscribers::iterator it = managers.begin(); it != managers.end(); ++it) {
-                        it->second->update();
+                        if(it->second->isEnabled()) {
+                            it->second->update();
+                        }
                     }
                 }
                 
@@ -507,6 +521,16 @@ inline void ofxNotifyToSubscribedOsc(ofxOscMessage &m) {
     for(; it != end; ++it) {
         it->second->notify(m);
     }
+}
+
+#pragma mark activate / deactivate listening
+
+inline void ofxSetSubscriberActive(int port, bool bActive) {
+    ofxGetOscSubscriber(port).setEnable(bActive);
+}
+
+inline bool ofxGetSubscriberActive(int port) {
+    return ofxGetOscSubscriber(port).isEnabled();
 }
 
 #pragma mark interface about leaked osc

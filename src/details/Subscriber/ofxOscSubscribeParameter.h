@@ -20,6 +20,10 @@ namespace ofx {
             struct AbstractParameter {
                 virtual void read(ofxOscMessage &message, std::size_t offset = 0) = 0;
                 virtual std::size_t size() const = 0;
+                void setEnable(bool bEnabled) { this->bEnabled = bEnabled; }
+                bool isEnabled() const { return bEnabled; }
+            protected:
+                bool bEnabled{true};
             };
             
             using ParameterRef = std::shared_ptr<AbstractParameter>;
