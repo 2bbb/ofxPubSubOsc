@@ -33,43 +33,43 @@ namespace ofxpubsubosc {
     };
 };
 
-bool operator==(const ofMatrix3x3 &x, const ofMatrix3x3 &y) {
+static bool operator==(const ofMatrix3x3 &x, const ofMatrix3x3 &y) {
     return (x.a == y.a) && (x.b == y.b) && (x.c == y.c)
         && (x.d == y.d) && (x.e == y.e) && (x.f == y.f)
         && (x.g == y.g) && (x.h == y.h) && (x.i == y.i);
 }
 
-bool operator!=(const ofMatrix3x3 &x, const ofMatrix3x3 &y) {
+static bool operator!=(const ofMatrix3x3 &x, const ofMatrix3x3 &y) {
     return !operator==(x, y);
 }
 
-bool operator==(const ofMatrix4x4 &x, const ofMatrix4x4 &y) {
+static bool operator==(const ofMatrix4x4 &x, const ofMatrix4x4 &y) {
     return (x._mat[0][0] == y._mat[0][0]) && (x._mat[0][1] == y._mat[0][1]) && (x._mat[0][2] == y._mat[0][2]) && (x._mat[0][3] == y._mat[0][3])
         && (x._mat[1][0] == y._mat[1][0]) && (x._mat[1][1] == y._mat[1][1]) && (x._mat[1][2] == y._mat[1][2]) && (x._mat[1][3] == y._mat[1][3])
         && (x._mat[2][0] == y._mat[2][0]) && (x._mat[2][1] == y._mat[2][1]) && (x._mat[2][2] == y._mat[2][2]) && (x._mat[2][3] == y._mat[2][3])
         && (x._mat[3][0] == y._mat[3][0]) && (x._mat[3][1] == y._mat[3][1]) && (x._mat[3][2] == y._mat[3][2]) && (x._mat[3][3] == y._mat[3][3]);
 }
 
-bool operator!=(const ofMatrix4x4 &x, const ofMatrix4x4 &y) {
+static bool operator!=(const ofMatrix4x4 &x, const ofMatrix4x4 &y) {
     return !operator==(x, y);
 }
 
-bool operator==(const ofBuffer &x, const ofBuffer &y) {
+static bool operator==(const ofBuffer &x, const ofBuffer &y) {
     return (x.size() == y.size()) && (memcmp(x.getData(), y.getData(), x.size()) == 0);
 }
 
-bool operator!=(const ofBuffer &x, const ofBuffer &y) {
+static bool operator!=(const ofBuffer &x, const ofBuffer &y) {
     return !operator==(x, y);
 }
 
 #if (OF_VERSION_MAJOR == 0) && ((OF_VERSION_MINOR < 9) || ((OF_VERSION_MINOR == 9) && (OF_VERSION_PATCH == 0)))
 
-std::ostream &operator<<(std::ostream &os, const ofQuaternion &q) {
+static std::ostream &operator<<(std::ostream &os, const ofQuaternion &q) {
     os << q.x() << ", " << q.y() << ", " << q.z() << ", " << q.w();
     return os;
 }
 
-std::istream &operator>>(std::istream &is, ofQuaternion &q) {
+static std::istream &operator>>(std::istream &is, ofQuaternion &q) {
     is >> q.x();
     is.ignore(2);
     is >> q.y();
