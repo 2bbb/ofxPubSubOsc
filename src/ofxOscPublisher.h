@@ -971,11 +971,11 @@ namespace ofx {
             using Ref = std::shared_ptr<OscPublisher>;
             
             static void setUseBundle(bool b) {
-                bUseBundle = b;
+                bUseBundle() = b;
             }
             
             static bool isUseBundle() {
-                return bUseBundle;
+                return bUseBundle();
             }
             
         private:
@@ -1007,7 +1007,10 @@ namespace ofx {
             ofxOscSender sender;
             Targets targets;
             Targets registeredTargets;
-            static bool bUseBundle;
+            static bool &bUseBundle() {
+                static bool _;
+                return _;
+            };
             friend class OscPublisherManager;
         };
         
@@ -1063,8 +1066,6 @@ namespace ofx {
         const_reverse_iterator crbegin() const { return publishers.crbegin(); }
         const_reverse_iterator crend() const { return publishers.crend(); }
     };
-    
-    bool OscPublisherManager::OscPublisher::bUseBundle = false;
 };
 #undef type_ref
 
