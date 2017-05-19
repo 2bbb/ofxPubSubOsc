@@ -274,7 +274,9 @@ MIT License.
 ## <a name="AtTheLast">At the last</a>
 
 Please create a new issue if there is a problem.
+
 And please throw a pull request if you have a cool idea!!
 
 If you get happy with using this addon, and you're rich, please donation for support continuous development.
+
 Bitcoin: `386iAzZ7m99sMyUQjM7TrZg1Uft518zpgv`
