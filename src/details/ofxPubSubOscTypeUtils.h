@@ -43,7 +43,7 @@ namespace ofx {
         };
         
         template <typename T>
-        using remove_const_reference = get_type<detail::remove_const_reference<T>>;
+        using remove_const_reference = get_type<PubSubOsc::detail::remove_const_reference<T>>;
         
         template <typename T>
         using remove_ref = get_type<std::remove_reference<T>>;
