@@ -27,7 +27,7 @@ namespace ofx {
             class SubscribeIdentifier {
                 std::string address;
                 ParameterRef ref;
-                int key;
+                std::uint16_t key;
                 
                 void invalidate() {
                     address = "";
@@ -36,7 +36,7 @@ namespace ofx {
                 }
             public:
                 SubscribeIdentifier() : address(""), ref(nullptr) {}
-                SubscribeIdentifier(const std::string &address, const ParameterRef &ref, int key)
+                SubscribeIdentifier(const std::string &address, const ParameterRef &ref, std::uint16_t key)
                 : address(address)
                 , ref(ref)
                 , key(key) {}
@@ -47,7 +47,7 @@ namespace ofx {
                 SubscribeIdentifier &operator=(const SubscribeIdentifier &) = default;
                 SubscribeIdentifier &operator=(SubscribeIdentifier &&) = default;
                 
-                const int getKey() const { return key; };
+                const std::uint16_t getKey() const { return key; };
                 bool isValid() const { return static_cast<bool>(ref); }
                 
                 friend class Subscriber;
@@ -256,7 +256,7 @@ namespace ofx {
                 
                 using Ref = std::shared_ptr<Subscriber>;
             private:
-                Subscriber(int port)
+                Subscriber(std::uint16_t port)
                 : port(port) {
                     receiver.setup(port);
                 }
@@ -282,7 +282,7 @@ namespace ofx {
                     }
                 }
                 
-                int port;
+                std::uint16_t port;
                 ofxOscReceiver receiver;
                 Targets targets;
                 ParameterRef leakPicker;
@@ -299,7 +299,7 @@ namespace ofx {
                     return *sharedInstance;
                 }
                 
-                static Subscriber &getOscSubscriber(int port) {
+                static Subscriber &getOscSubscriber(std::uint16_t port) {
                     Subscribers &managers = getSharedInstance().managers;
                     if(managers.find(port) == managers.end()) {
                         managers.insert(std::make_pair(port, Subscriber::Ref(new Subscriber(port))));
@@ -307,15 +307,15 @@ namespace ofx {
                     return *(managers[port].get());
                 }
                 
-                void setEnable(int port, bool bEnabled) {
+                void setEnable(std::uint16_t port, bool bEnabled) {
                     getOscSubscriber(port).setEnable(bEnabled);
                 }
                 
-                bool isEnabled(int port) const {
+                bool isEnabled(std::uint16_t port) const {
                     return getOscSubscriber(port).isEnabled();
                 }
             private:
-                using Subscribers = std::map<int, Subscriber::Ref>;
+                using Subscribers = std::map<std::uint16_t, Subscriber::Ref>;
                 void update(ofEventArgs &args) {
                     for(Subscribers::iterator it = managers.begin(); it != managers.end(); ++it) {
                         if(it->second->isEnabled()) {
@@ -372,10 +372,10 @@ inline ofxOscSubscriberManager &ofxGetOscSubscriberManager() {
 }
 
 /// \brief get a OscSubscriber.
-/// \param port binded port is typed int
+/// \param port binded port is typed std::uint16_t
 /// \returns ofxOscSubscriber binded to port
 
-inline ofxOscSubscriber &ofxGetOscSubscriber(int port) {
+inline ofxOscSubscriber &ofxGetOscSubscriber(std::uint16_t port) {
     return ofxOscSubscriberManager::getOscSubscriber(port);
 }
 
@@ -385,7 +385,7 @@ inline ofxOscSubscriber &ofxGetOscSubscriber(int port) {
 /// \{
 
 /// \brief bind a referece of value to the argument(s) of OSC messages with an address pattern _address_ incoming to _port_.
-/// \param port binded port is typed int
+/// \param port binded port is typed std::uint16_t
 /// \param address osc address is typed const std::string &
 /// \param value reference of value is typed T &
 /// \returns ofxOscSubscriberIdentifier
@@ -393,14 +393,14 @@ inline ofxOscSubscriber &ofxGetOscSubscriber(int port) {
 #pragma mark reference
 
 template <typename T>
-inline auto ofxSubscribeOsc(int port, const std::string &address, T &value)
+inline auto ofxSubscribeOsc(std::uint16_t port, const std::string &address, T &value)
 -> ofx::PubSubOsc::enable_if_t<!ofx::PubSubOsc::is_callable<T>::value, ofxOscSubscriberIdentifier>
 {
     return ofxGetOscSubscriber(port).subscribe(address, value);
 }
 
 template <typename T>
-inline auto ofxSubscribeOsc(int port, const std::string &address, T callback)
+inline auto ofxSubscribeOsc(std::uint16_t port, const std::string &address, T callback)
 -> ofx::PubSubOsc::enable_if_t<ofx::PubSubOsc::is_callable<T>::value, ofxOscSubscriberIdentifier>
 {
     return ofxGetOscSubscriber(port).subscribe(address, ofx::PubSubOsc::function_traits<T>::cast(callback));
@@ -409,18 +409,18 @@ inline auto ofxSubscribeOsc(int port, const std::string &address, T callback)
 #pragma mark setter function/method
 
 /// \brief bind a callback to the OSC messages with an address pattern _address_ incoming to _port_.
-/// \param port binded port is typed int
+/// \param port binded port is typed std::uint16_t
 /// \param address osc address is typed const std::string &
 /// \param callback is kicked when receive a message to address
 /// \returns ofxOscSubscriberIdentifier
 
 template <typename Ret, typename ... Args>
-inline ofxOscSubscriberIdentifier ofxSubscribeOsc(int port, const std::string &address, std::function<Ret(Args ...)> callback) {
+inline ofxOscSubscriberIdentifier ofxSubscribeOsc(std::uint16_t port, const std::string &address, std::function<Ret(Args ...)> callback) {
     return ofxGetOscSubscriber(port).subscribe(address, callback);
 }
 
 template <typename Obj, typename Meth>
-inline auto ofxSubscribeOsc(int port, const std::string &address, Obj &&obj, Meth &&meth)
+inline auto ofxSubscribeOsc(std::uint16_t port, const std::string &address, Obj &&obj, Meth &&meth)
 -> ofx::PubSubOsc::enable_if_t<ofx::PubSubOsc::is_bindable<Obj, Meth>::value, ofxOscSubscriberIdentifier>
 {
     return ofxGetOscSubscriber(port).subscribe(address, ofx::PubSubOsc::bind(std::forward<Obj>(obj),
@@ -428,7 +428,7 @@ inline auto ofxSubscribeOsc(int port, const std::string &address, Obj &&obj, Met
 }
 
 template <typename T, typename U, typename ... Ts>
-inline auto ofxSubscribeOsc(int port, const std::string &address, T &&t, U &&u, Ts && ... values)
+inline auto ofxSubscribeOsc(std::uint16_t port, const std::string &address, T &&t, U &&u, Ts && ... values)
 -> ofx::PubSubOsc::enable_if_t<!ofx::PubSubOsc::is_bindable<T, U>::value, ofxOscSubscriberIdentifier>
 {
     return ofxGetOscSubscriber(port).subscribe(address, std::forward<T>(t), std::forward<U>(u), std::forward<Ts>(values) ...);
@@ -437,14 +437,14 @@ inline auto ofxSubscribeOsc(int port, const std::string &address, T &&t, U &&u, 
 #pragma mark subscribe multiple port at once
 
 template <typename ... Args>
-inline void ofxSubscribeOsc(const std::initializer_list<int> &ports, const std::string &address, Args & ... args) {
+inline void ofxSubscribeOsc(const std::initializer_list<std::uint16_t> &ports, const std::string &address, Args & ... args) {
     for(auto &port : ports) {
         ofxSubscribeOsc(port, address, args ...);
     }
 }
 
 template <typename ... Args>
-inline void ofxSubscribeOsc(int port, const std::initializer_list<const std::string> &addresses, Args & ... args) {
+inline void ofxSubscribeOsc(std::uint16_t port, const std::initializer_list<const std::string> &addresses, Args & ... args) {
     auto &subscriber = ofxGetOscSubscriber(port);
     for(auto &address : addresses) {
         subscriber.subscribe(address, args ...);
@@ -452,7 +452,7 @@ inline void ofxSubscribeOsc(int port, const std::initializer_list<const std::str
 }
 
 template <typename ... Args>
-inline void ofxSubscribeOsc(const std::initializer_list<int> &ports, const std::initializer_list<const std::string> &addresses, Args & ... args) {
+inline void ofxSubscribeOsc(const std::initializer_list<std::uint16_t> &ports, const std::initializer_list<const std::string> &addresses, Args & ... args) {
     for(auto &port : ports) {
         ofxSubscribeOsc(port, addresses, args ...);
     }
@@ -474,19 +474,19 @@ inline void ofxUnsubscribeOsc(ofxOscSubscriberIdentifier &identifier) {
 
 
 /// \brief unbind from OSC messages with an address pattern _address_ incoming to _port_.
-/// \param port binded port is typed int
+/// \param port binded port is typed std::uint16_t
 /// \param address osc address is typed const std::string &
 /// \returns void
 
-inline void ofxUnsubscribeOsc(int port, const std::string &address) {
+inline void ofxUnsubscribeOsc(std::uint16_t port, const std::string &address) {
     ofxGetOscSubscriber(port).unsubscribe(address);
 }
 
 /// \brief unbind from OSC messages with any address patterns incoming to _port_.
-/// \param port binded port is typed int
+/// \param port binded port is typed std::uint16_t
 /// \returns void
 
-inline void ofxUnsubscribeOsc(int port) {
+inline void ofxUnsubscribeOsc(std::uint16_t port) {
     ofxGetOscSubscriber(port).unsubscribe();
 }
 
@@ -510,7 +510,7 @@ inline void ofxNotifyToSubscribedOsc(ofxOscSubscriberIdentifier &identifier, ofx
     ofxGetOscSubscriber(identifier.getKey()).notify(m);
 }
 
-inline void ofxNotifyToSubscribedOsc(int port, ofxOscMessage &m) {
+inline void ofxNotifyToSubscribedOsc(std::uint16_t port, ofxOscMessage &m) {
     ofxGetOscSubscriber(port).notify(m);
 }
 
@@ -525,11 +525,11 @@ inline void ofxNotifyToSubscribedOsc(ofxOscMessage &m) {
 
 #pragma mark activate / deactivate listening
 
-inline void ofxSetOscSubscriberActive(int port, bool bActive) {
+inline void ofxSetOscSubscriberActive(std::uint16_t port, bool bActive) {
     ofxGetOscSubscriber(port).setEnable(bActive);
 }
 
-inline bool ofxGetOscSubscriberActive(int port) {
+inline bool ofxGetOscSubscriberActive(std::uint16_t port) {
     return ofxGetOscSubscriber(port).isEnabled();
 }
 
@@ -539,17 +539,17 @@ inline bool ofxGetOscSubscriberActive(int port) {
 /// \{
 
 /// \brief bind a callback to the OSC messages with are not match other patterns incoming to port.
-/// \param port binded port is typed int
+/// \param port binded port is typed std::uint16_t
 /// \callback is kicked when receive a leaked addresses
 /// \returns void
 
 template <typename Callback>
-inline void ofxSetLeakedOscPicker(int port, Callback callback) {
+inline void ofxSetLeakedOscPicker(std::uint16_t port, Callback callback) {
     ofxGetOscSubscriber(port).setLeakPicker(callback);
 }
 
 template <typename Obj, typename Meth>
-inline void ofxSetLeakedOscPicker(int port, Obj obj, Meth meth) {
+inline void ofxSetLeakedOscPicker(std::uint16_t port, Obj obj, Meth meth) {
     ofxGetOscSubscriber(port).setLeakPicker(ofx::PubSubOsc::bind(obj, meth));
 }
 
@@ -570,10 +570,10 @@ inline void ofxSetLeakedOscPickerAll(Obj obj, Meth meth) {
 #pragma mark remove leaked osc picker(s)
 
 /// \brief remove a callback receives messages has leaked patterns incoming to port.
-/// \param port binded port is typed int
+/// \param port binded port is typed std::uint16_t
 /// \returns void
 
-inline void ofxRemoveLeakedOscPicker(int port) {
+inline void ofxRemoveLeakedOscPicker(std::uint16_t port) {
     ofxGetOscSubscriber(port).removeLeakPicker();
 }
 

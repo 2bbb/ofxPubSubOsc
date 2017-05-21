@@ -512,7 +512,7 @@ namespace ofx {
                     return *sharedInstance;
                 }
                 
-                static Publisher &getOscPublisher(const std::string &ip, int port) {
+                static Publisher &getOscPublisher(const std::string &ip, std::uint16_t port) {
                     Publishers &publishers = getSharedInstance().publishers;
                     Destination destination(ip, port);
                     if(publishers.find(destination) == publishers.end()) {
@@ -568,7 +568,8 @@ namespace ofx {
 using ofxOscPublisher = ofx::PubSubOsc::Publish::Publisher;
 using ofxOscPublisherManager = ofx::PubSubOsc::Publish::PublisherManager;
 using ofxOscPublisherIdentifier = ofx::PubSubOsc::Publish::PublishIdentifier;
-
+using ofxOscPublisherDestination = ofx::PubSubOsc::Publish::Destination;
+                
 /// \brief get a OscPublisherManager.
 /// \returns ofxOscPublisherManager
 
@@ -578,10 +579,10 @@ inline ofxOscPublisherManager &ofxGetOscPublisherManager() {
 
 /// \brief get a OscPublisher.
 /// \param ip target ip is typed const std::string &
-/// \param port target port is typed int
+/// \param port target port is typed std::uint16_t
 /// \returns ofxOscPublisher binded to ip & port
 
-inline ofxOscPublisher &ofxGetOscPublisher(const std::string &ip, int port) {
+inline ofxOscPublisher &ofxGetOscPublisher(const std::string &ip, std::uint16_t port) {
     return ofxOscPublisherManager::getOscPublisher(ip, port);
 }
 
@@ -594,14 +595,14 @@ inline ofxOscPublisher &ofxGetOscPublisher(const std::string &ip, int port) {
 /// If whenValueIsChanged is set to false, then the binded value is sent every frame after App::update.
 /// template parameter T is suggested by value
 /// \param ip target ip is typed const std::string &
-/// \param port target port is typed int
+/// \param port target port is typed std::uint16_t
 /// \param address osc address is typed const std::string &
 /// \param value reference of value is typed T &
 /// \param whenValueIsChanged if this value to false, then we send value every update
 /// \returns ofxOscPublisherIdentifier
 
 template <typename ValueOrFunction>
-inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, const std::string &address, ValueOrFunction &&valueOrFunction, bbb::explicit_bool whenValueIsChanged = true)
+inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, std::uint16_t port, const std::string &address, ValueOrFunction &&valueOrFunction, bbb::explicit_bool whenValueIsChanged = true)
 {
     return ofxGetOscPublisher(ip, port).publish(address, std::forward<ValueOrFunction>(valueOrFunction), whenValueIsChanged.get());
 }
@@ -610,7 +611,7 @@ inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, 
 /// If whenValueIsChanged is set to false, then the binded value is sent every frame after App::update.
 /// template parameter ObjectPtrOrRef is suggested by that, and Method is suggested by getter.
 /// \param ip target ip is typed const std::string &
-/// \param port target port is typed int
+/// \param port target port is typed std::uint16_t
 /// \param address osc address is typed const std::string &
 /// \param that this object is typed ObjectPtrOrRef, will bind with next parameter method. is called as (that->*getter)() or (that.*getter)().
 /// \param getter this method gives value, is typed T(C::*)()
@@ -618,14 +619,14 @@ inline ofxOscPublisherIdentifier ofxPublishOsc(const std::string &ip, int port, 
 /// \returns ofxOscPublisherIdentifier
 
 template <typename Object, typename Method>
-inline auto ofxPublishOsc(const std::string &ip, int port, const std::string &address, Object &&obj, Method &&meth, bbb::explicit_bool whenValueIsChanged = true)
+inline auto ofxPublishOsc(const std::string &ip, std::uint16_t port, const std::string &address, Object &&obj, Method &&meth, bbb::explicit_bool whenValueIsChanged = true)
 -> ofx::PubSubOsc::enable_if_t<ofx::PubSubOsc::is_bindable<Object, Method>::value, ofxOscPublisherIdentifier>
 {
     return ofxGetOscPublisher(ip, port).publish(address, ofx::PubSubOsc::bind(std::forward<Object>(obj), std::forward<Method>(meth)), whenValueIsChanged);
 }
-
+                
 template <typename ... Args>
-inline void ofxPublishOsc(const std::string &ip, const std::initializer_list<int> ports, Args & ... args) {
+inline void ofxPublishOsc(const std::string &ip, const std::initializer_list<std::uint16_t> ports, Args & ... args) {
     for(auto port : ports) {
         ofxGetOscPublisher(ip, port).publish(args ...);
     }
@@ -663,31 +664,31 @@ inline void ofxPublishOsc(const std::initializer_list<ofx::PubSubOsc::Publish::D
 /// template parameter T is suggested by value
 /// \param condition condition of publish typed bool &
 /// \param ip target ip is typed const std::string &
-/// \param port target port is typed int
+/// \param port target port is typed std::uint16_t
 /// \param address osc address is typed const std::string &
 /// \param value reference of value is typed T &
 /// \param whenValueIsChanged if this value to false, then we send value every update
 /// \returns ofxOscPublisherIdentifier
 
 template <typename ConditionValueRef, typename ValueRefOrGetterFunction>
-inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionValueRef &&condition, const std::string &ip, int port, const std::string &address, ValueRefOrGetterFunction &&valueRefOrGetterFunction) {
+inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionValueRef &&condition, const std::string &ip, std::uint16_t port, const std::string &address, ValueRefOrGetterFunction &&valueRefOrGetterFunction) {
     return ofxGetOscPublisher(ip, port).publishIf(condition, address, valueRefOrGetterFunction);
 }
 
 template <typename ConditionValueRef, typename ObjectPtrOrRef, typename GetterMethod>
-inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionValueRef &&condition, const std::string &ip, int port, const std::string &address, ObjectPtrOrRef &&that, GetterMethod getter) {
+inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionValueRef &&condition, const std::string &ip, std::uint16_t port, const std::string &address, ObjectPtrOrRef &&that, GetterMethod getter) {
     return ofxGetOscPublisher(ip, port).publishIf(condition, address, that, getter);
 }
 
 #pragma mark condition is method
 
 template <typename ConditionObjectPtrOrRef, typename ConditionMethodReturnsBool, typename ValueRefOrFunction>
-inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionObjectPtrOrRef &&condition, ConditionMethodReturnsBool method, const std::string &ip, int port, const std::string &address, ValueRefOrFunction &&valueRefOrGetterFunction) {
+inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionObjectPtrOrRef &&condition, ConditionMethodReturnsBool method, const std::string &ip, std::uint16_t port, const std::string &address, ValueRefOrFunction &&valueRefOrGetterFunction) {
     return ofxGetOscPublisher(ip, port).publishIf(condition, method, address, valueRefOrGetterFunction);
 }
 
 template <typename ConditionObjectPtrOrRef, typename ConditionMethodReturnsBool, typename ObjectPtrOrRef, typename GetterMethod>
-inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionObjectPtrOrRef &&condition, ConditionMethodReturnsBool method, const std::string &ip, int port, const std::string &address, ObjectPtrOrRef &&that, GetterMethod getter) {
+inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionObjectPtrOrRef &&condition, ConditionMethodReturnsBool method, const std::string &ip, std::uint16_t port, const std::string &address, ObjectPtrOrRef &&that, GetterMethod getter) {
     return ofxGetOscPublisher(ip, port).publishIf(condition, method, address, *that, getter);
 }
 
@@ -703,11 +704,11 @@ inline void ofxUnpublishOsc(ofxOscPublisherIdentifier &identifier) {
     ofxGetOscPublisher(identifier.getKey().ip, identifier.getKey().port).unpublish(identifier);
 }
 
-inline void ofxUnpublishOsc(const std::string &ip, int port, const std::string &address) {
+inline void ofxUnpublishOsc(const std::string &ip, std::uint16_t port, const std::string &address) {
     ofxGetOscPublisher(ip, port).unpublish(address);
 }
 
-inline void ofxUnpublishOsc(const std::string &ip, int port) {
+inline void ofxUnpublishOsc(const std::string &ip, std::uint16_t port) {
     ofxGetOscPublisher(ip, port).unpublish();
 }
 
@@ -728,12 +729,12 @@ inline void ofxUnpublishOsc() {
 /// \{
 
 template <typename ValueOrGetterFunctionType>
-inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, int port, const std::string &address, ValueOrGetterFunctionType &&valueOrGetterFunction) {
+inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, std::uint16_t port, const std::string &address, ValueOrGetterFunctionType &&valueOrGetterFunction) {
     return ofxGetOscPublisher(ip, port).doRegister(address, valueOrGetterFunction);
 }
 
 template <typename ObjectPtrOrRef, typename GetterMethod>
-inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, int port, const std::string &address, ObjectPtrOrRef &&that, GetterMethod &&getter) {
+inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip, std::uint16_t port, const std::string &address, ObjectPtrOrRef &&that, GetterMethod &&getter) {
     return ofxGetOscPublisher(ip, port).doRegister(address, that, getter);
 }
 
@@ -744,7 +745,7 @@ inline ofxOscPublisherIdentifier ofxRegisterPublishingOsc(const std::string &ip,
 /// \name ofxPublishRegisteredOsc
 /// \{
 
-inline void ofxPublishRegisteredOsc(const std::string &ip, int port, const std::string &address) {
+inline void ofxPublishRegisteredOsc(const std::string &ip, std::uint16_t port, const std::string &address) {
     ofxGetOscPublisher(ip, port).publishRegistered(address);
 }
 
@@ -765,11 +766,11 @@ inline void ofxUnregisterPublishingOsc(ofxOscPublisherIdentifier &identifier) {
     ofxGetOscPublisher(identifier.getKey().ip, identifier.getKey().port).unregister(identifier);
 }
 
-inline void ofxUnregisterPublishingOsc(const std::string &ip, int port, const std::string &address) {
+inline void ofxUnregisterPublishingOsc(const std::string &ip, std::uint16_t port, const std::string &address) {
     ofxGetOscPublisher(ip, port).unregister(address);
 }
 
-inline void ofxUnregisterPublishingOsc(const std::string &ip, int port) {
+inline void ofxUnregisterPublishingOsc(const std::string &ip, std::uint16_t port) {
     ofxGetOscPublisher(ip, port).unregister();
 }
 
@@ -789,7 +790,7 @@ inline void ofxUnregisterPublishingOsc() {
 /// \name ofxPublishOscManually
 /// \{
 
-inline void ofxPublishOscManually(const std::string &ip, int port, const std::string &address) {
+inline void ofxPublishOscManually(const std::string &ip, std::uint16_t port, const std::string &address) {
     ofxGetOscPublisher(ip, port).publishManullay(address);
 }
 
@@ -803,7 +804,7 @@ inline void ofxPublishOscManually(const ofxOscPublisherIdentifier &identifier) {
 #pragma mark send
 
 template <typename ... Args>
-void ofxSendOsc(const std::string &ip, int port, const std::string &address, Args && ... args) {
+void ofxSendOsc(const std::string &ip, std::uint16_t port, const std::string &address, Args && ... args) {
     ofxGetOscPublisher(ip, port).send(address, std::forward<Args>(args) ...);
 }
 
