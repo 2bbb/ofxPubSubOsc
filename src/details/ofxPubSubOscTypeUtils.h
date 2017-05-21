@@ -213,7 +213,7 @@ namespace ofx {
 
 #define P(n) std::placeholders:: _##n
         
-        template <typename obj, typename meth, std::size_t arg_num = typename get_arg_num_v<meth>()>
+        template <typename obj, typename meth, std::size_t arg_num = get_arg_num_v<meth>()>
         struct binder;
 
         template <typename obj, typename meth>
