@@ -213,70 +213,78 @@ namespace ofx {
 
 #define P(n) std::placeholders:: _##n
         
-        template <typename obj, typename meth>
-        auto bind(obj o, meth m)
-        -> enable_if_t<get_arg_num_v<meth>() == 0, typename function_traits<meth>::function_type> {
-            return std::bind(m, o);
-        }
+        template <typename obj, typename meth, std::size_t arg_num = typename get_arg_num_v<meth>()>
+        struct binder;
 
         template <typename obj, typename meth>
-        auto bind(obj o, meth m)
-        -> enable_if_t<get_arg_num_v<meth>() == 1, typename function_traits<meth>::function_type> {
-            return std::bind(m, o, P(1));
-        }
-        
+        struct binder<obj, meth, 0> {
+            using type = typename function_traits<meth>::function_type;
+            type bind(obj o, meth m) { return std::bind(m, o); }
+        };
+
         template <typename obj, typename meth>
-        auto bind(obj o, meth m)
-        -> enable_if_t<get_arg_num_v<meth>() == 2, typename function_traits<meth>::function_type> {
-            return std::bind(m, o, P(1), P(2));
-        }
-        
+        struct binder<obj, meth, 1> {
+            using type = typename function_traits<meth>::function_type;
+            type bind(obj o, meth m) { return std::bind(m, o, P(1)); }
+        };
+
         template <typename obj, typename meth>
-        auto bind(obj o, meth m)
-        -> enable_if_t<get_arg_num_v<meth>() == 3, typename function_traits<meth>::function_type> {
-            return std::bind(m, o, P(1), P(2), P(3));
-        }
-        
+        struct binder<obj, meth, 2> {
+            using type = typename function_traits<meth>::function_type;
+            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2)); }
+        };
+
         template <typename obj, typename meth>
-        auto bind(obj o, meth m)
-        -> enable_if_t<get_arg_num_v<meth>() == 4, typename function_traits<meth>::function_type> {
-            return std::bind(m, o, P(1), P(2), P(3), P(4));
-        }
-        
+        struct binder<obj, meth, 3> {
+            using type = typename function_traits<meth>::function_type;
+            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3)); }
+        };
+
         template <typename obj, typename meth>
-        auto bind(obj o, meth m)
-        -> enable_if_t<get_arg_num_v<meth>() == 5, typename function_traits<meth>::function_type> {
-            return std::bind(m, o, P(1), P(2), P(3), P(4), P(5));
-        }
-        
+        struct binder<obj, meth, 4> {
+            using type = typename function_traits<meth>::function_type;
+            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4)); }
+        };
+
         template <typename obj, typename meth>
-        auto bind(obj o, meth m)
-        -> enable_if_t<get_arg_num_v<meth>() == 6, typename function_traits<meth>::function_type> {
-            return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6));
-        }
-        
+        struct binder<obj, meth, 5> {
+            using type = typename function_traits<meth>::function_type;
+            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5)); }
+        };
+
         template <typename obj, typename meth>
-        auto bind(obj o, meth m)
-        -> enable_if_t<get_arg_num_v<meth>() == 7, typename function_traits<meth>::function_type> {
-            return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6), P(7));
-        }
-        
+        struct binder<obj, meth, 6> {
+            using type = typename function_traits<meth>::function_type;
+            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6)); }
+        };
+
         template <typename obj, typename meth>
-        auto bind(obj o, meth m)
-        -> enable_if_t<get_arg_num_v<meth>() == 8, typename function_traits<meth>::function_type> {
-            return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8));
-        }
-        
+        struct binder<obj, meth, 7> {
+            using type = typename function_traits<meth>::function_type;
+            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6), P(7)); }
+        };
+
         template <typename obj, typename meth>
-        auto bind(obj o, meth m)
-        -> enable_if_t<get_arg_num_v<meth>() == 9, typename function_traits<meth>::function_type> {
-            return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9));
-        }
-        
+        struct binder<obj, meth, 8> {
+            using type = typename function_traits<meth>::function_type;
+            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8)); }
+        };
+
         template <typename obj, typename meth>
-        auto bind(obj o, meth m)
-        -> enable_if_t<get_arg_num_v<meth>() == 10, typename function_traits<meth>::function_type> {
-            return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10));
+        struct binder<obj, meth, 9> {
+            using type = typename function_traits<meth>::function_type;
+            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9)); }
+        };
+
+        template <typename obj, typename meth>
+        struct binder<obj, meth, 10> {
+            using type = typename function_traits<meth>::function_type;
+            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10)); }
+        };
+
+        template <typename obj, typename meth>
+        typename binder<obj, meth>::type bind(obj o, meth m) {
+            return binder<obj, meth>::bind(o, m);
         }
         
 #undef P
