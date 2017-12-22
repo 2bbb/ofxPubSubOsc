@@ -802,7 +802,7 @@ namespace ofx {
 #pragma mark unpublish
             
             void unpublish(const std::string &address) {
-                if(targets.find(address) == targets.end()) targets.erase(address);
+                if(targets.find(address) != targets.end()) targets.erase(address);
             }
             
             void unpublish(Identifier &identifier) {
