@@ -14,11 +14,12 @@
 
 #include "ofVectorMath.h"
 #include "ofFileUtils.h"
-#include "ofxOscMessageEx.h"
 
 #include "ofxOscArrayPublisher.h"
 
 namespace ofx {
+    using ofxOscMessageEx = class OscMessageEx;
+    
     namespace PubSubOsc {
         template <typename T>
         struct type_traits {
