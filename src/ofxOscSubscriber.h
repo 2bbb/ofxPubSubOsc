@@ -14,6 +14,8 @@
 
 #include "ofxOsc.h"
 
+#include "ofxOscMessageEx.h"
+
 #include "ofxOscSubscriberLoadImplementation.h"
 #include "ofxOscSubscribeParameter.h"
 
@@ -189,8 +191,8 @@ namespace ofx {
                 }
                 
                 template <typename R>
-                inline void setLeakPicker(std::function<R(ofxOscMessage &)> callback) {
-                    setLeakPicker(ParameterRef(new SetterFunctionParameter<R, ofxOscMessage &>(callback)));
+                inline void setLeakPicker(std::function<R(ofxOscMessageEx &)> callback) {
+                    setLeakPicker(ParameterRef(new SetterFunctionParameter<R, ofxOscMessageEx &>(callback)));
                 }
                 
                 template <typename T>
@@ -215,7 +217,7 @@ namespace ofx {
                 }
                 
                 void clearLeakedOscMessages() {
-                    std::queue<ofxOscMessage> empty;
+                    std::queue<ofxOscMessageEx> empty;
                     std::swap(leakedOscMessages, empty);
                 }
                 
@@ -223,7 +225,7 @@ namespace ofx {
                     return !static_cast<bool>(leakPicker) && !leakedOscMessages.empty();
                 }
                 
-                inline bool getNextLeakedOscMessage(ofxOscMessage &m) {
+                inline bool getNextLeakedOscMessage(ofxOscMessageEx &m) {
                     if(hasWaitingLeakedOscMessages()) {
                         m.copy(leakedOscMessages.front());
                         leakedOscMessages.pop();
@@ -233,7 +235,7 @@ namespace ofx {
                     }
                 }
                 
-                void notify(ofxOscMessage & m) {
+                void notify(ofxOscMessageEx &m) {
                     const std::string &address = m.getAddress();
                     Targets::iterator it = targets.find(address);
                     if(it != targets.end()) {
@@ -243,7 +245,7 @@ namespace ofx {
                     }
                 }
                 
-                void notify(const SubscribeIdentifier &identifier, ofxOscMessage &m) {
+                void notify(const SubscribeIdentifier &identifier, ofxOscMessageEx &m) {
                     if(!identifier.isValid()) return;
                     Targets::const_iterator it{findSubscribed(identifier)};
                     if(it != targets.end() && it->first == m.getAddress()) {
@@ -263,7 +265,7 @@ namespace ofx {
                 
                 void update() {
                     clearLeakedOscMessages();
-                    ofxOscMessage m;
+                    ofxOscMessageEx m;
                     while(receiver.hasWaitingMessages()) {
                         receiver.getNextMessage(m);
                         const std::string &address = m.getAddress();
@@ -286,7 +288,7 @@ namespace ofx {
                 ofxOscReceiver receiver;
                 Targets targets;
                 ParameterRef leakPicker;
-                std::queue<ofxOscMessage> leakedOscMessages;
+                std::queue<ofxOscMessageEx> leakedOscMessages;
                 bool bEnabled{true};
                 
                 friend class SubscriberManager;
@@ -506,15 +508,15 @@ inline void ofxUnsubscribeOsc() {
 
 #pragma mark notify messages manually
 
-inline void ofxNotifyToSubscribedOsc(ofxOscSubscriberIdentifier &identifier, ofxOscMessage &m) {
+inline void ofxNotifyToSubscribedOsc(ofxOscSubscriberIdentifier &identifier, ofxOscMessageEx &m) {
     ofxGetOscSubscriber(identifier.getKey()).notify(m);
 }
 
-inline void ofxNotifyToSubscribedOsc(std::uint16_t port, ofxOscMessage &m) {
+inline void ofxNotifyToSubscribedOsc(std::uint16_t port, ofxOscMessageEx &m) {
     ofxGetOscSubscriber(port).notify(m);
 }
 
-inline void ofxNotifyToSubscribedOsc(ofxOscMessage &m) {
+inline void ofxNotifyToSubscribedOsc(ofxOscMessageEx &m) {
     ofxOscSubscriberManager &manager = ofxGetOscSubscriberManager();
     ofxOscSubscriberManager::iterator it  = manager.begin(),
     end = manager.end();

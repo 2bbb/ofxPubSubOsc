@@ -121,27 +121,27 @@ namespace ofx {
         
         template <typename class_type, typename ret, typename ... arguments>
         struct function_traits<ret(class_type::*)(arguments ...) const>
-        : detail::function_traits<ret, arguments ...> {};
+        : PubSubOsc::detail::function_traits<ret, arguments ...> {};
         
         template <typename class_type, typename ret, typename ... arguments>
         struct function_traits<ret(class_type::*)(arguments ...)>
-        : detail::function_traits<ret, arguments ...> {};
+        : PubSubOsc::detail::function_traits<ret, arguments ...> {};
         
         template <typename ret, typename ... arguments>
         struct function_traits<ret(*)(arguments ...)>
-        : detail::function_traits<ret, arguments ...> {};
+        : PubSubOsc::detail::function_traits<ret, arguments ...> {};
         
         template <typename ret, typename ... arguments>
         struct function_traits<ret(*&)(arguments ...)>
-        : detail::function_traits<ret, arguments ...> {};
+        : PubSubOsc::detail::function_traits<ret, arguments ...> {};
         
         template <typename ret, typename ... arguments>
         struct function_traits<ret(arguments ...)>
-        : detail::function_traits<ret, arguments ...> {};
+        : PubSubOsc::detail::function_traits<ret, arguments ...> {};
         
         template <typename ret, typename ... arguments>
         struct function_traits<std::function<ret(arguments ...)>>
-        : detail::function_traits<ret, arguments ...> {};
+        : PubSubOsc::detail::function_traits<ret, arguments ...> {};
         
         template<typename T>
         using result_type = typename function_traits<T>::result_type;
@@ -310,7 +310,7 @@ namespace ofx {
             };
             
             template <typename type, type n>
-            using make_integer_sequence = get_type<detail::make_integer_sequence<type, n>>;
+            using make_integer_sequence = get_type<sequences::detail::make_integer_sequence<type, n>>;
             
             template <std::size_t ... ns>
             using index_sequence = integer_sequence<std::size_t, ns ...>;
@@ -382,7 +382,7 @@ namespace bbb {
         : b(b) {}
         template <typename _>
         explicit_bool(_) = delete;
-        bool &operator=(bool b) { this->b = b; }
+        bool &operator=(bool b) { return this->b = b; ; }
         
         operator bool&() { return b; };
         operator bool() const { return b; };

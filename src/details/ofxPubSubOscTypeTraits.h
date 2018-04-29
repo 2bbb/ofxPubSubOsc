@@ -14,7 +14,7 @@
 
 #include "ofVectorMath.h"
 #include "ofFileUtils.h"
-#include "ofxOscMessage.h"
+#include "ofxOscMessageEx.h"
 
 #include "ofxOscArrayPublisher.h"
 
@@ -37,6 +37,13 @@ namespace ofx {
         template <>
         struct type_traits<ofxOscMessage> {
             using inner_type = ofxOscMessage;
+            static constexpr std::size_t size = 0;
+            static constexpr bool has_array_operator = false;
+        };
+        
+        template <>
+        struct type_traits<ofxOscMessageEx> {
+            using inner_type = ofxOscMessageEx;
             static constexpr std::size_t size = 0;
             static constexpr bool has_array_operator = false;
         };

@@ -10,7 +10,7 @@
 #ifndef ofxOscSubscriberLoadImplementation_h
 #define ofxOscSubscriberLoadImplementation_h
 
-#include "ofxOscMessage.h"
+#include "ofxOscMessageEx.h"
 
 #include "ofxPubSubOscSettings.h"
 #include "ofxPubSubOscTypeUtils.h"
@@ -19,7 +19,7 @@
 namespace ofx {
     namespace PubSubOsc {
 #define define_set_arithmetic(type) \
-        inline void load(ofxOscMessage &m, type &v, std::size_t offset = 0) { \
+        inline void load(ofxOscMessageEx &m, type &v, std::size_t offset = 0) { \
             if(m.getArgType(offset) == OFXOSC_TYPE_INT32) v = m.getArgAsInt32(offset); \
             else if(m.getArgType(offset) == OFXOSC_TYPE_INT64) v = m.getArgAsInt64(offset); \
             else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = m.getArgAsFloat(offset); \
@@ -45,7 +45,7 @@ namespace ofx {
         define_set_arithmetic(double);
 #undef define_set_arithmetic
         
-        inline void load(ofxOscMessage &m, std::string &v, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, std::string &v, std::size_t offset = 0) {
             if(m.getArgType(offset) == OFXOSC_TYPE_STRING) v = m.getArgAsString(offset);
             else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = ofToString(m.getArgAsFloat(offset));
             else if(m.getArgType(offset) == OFXOSC_TYPE_DOUBLE) v = ofToString(m.getArgAsDouble(offset));
@@ -54,13 +54,20 @@ namespace ofx {
             else v = m.getArgAsString(offset);
         }
         
-        inline void load(ofxOscMessage &m, ofBuffer &v, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, ofBuffer &v, std::size_t offset = 0) {
             v = m.getArgAsBlob(offset);
         }
         
+        inline void load(ofxOscMessageEx &m, ofxOscMessage &v, std::size_t offset = 0) {
+            v = m;
+        }
+        inline void load(ofxOscMessageEx &m, ofxOscMessageEx &v, std::size_t offset = 0) {
+            v = m;
+        }
+
 #pragma mark ofColor_
         template <typename U>
-        inline void loadColor(ofxOscMessage &m, ofColor_<U> &v, U defaultValue, std::size_t offset = 0) {
+        inline void loadColor(ofxOscMessageEx &m, ofColor_<U> &v, U defaultValue, std::size_t offset = 0) {
             if(m.getNumArgs() == 1) {
                 load(m, v.r, offset);
                 load(m, v.g, offset);
@@ -79,47 +86,47 @@ namespace ofx {
             }
         }
         
-        inline void load(ofxOscMessage &m, ofColor &v, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, ofColor &v, std::size_t offset = 0) {
             loadColor<unsigned char>(m, v, 255, offset);
         }
-        inline void load(ofxOscMessage &m, ofShortColor &v, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, ofShortColor &v, std::size_t offset = 0) {
             loadColor<unsigned short>(m, v, 65535, offset);
         }
-        inline void load(ofxOscMessage &m, ofFloatColor &v, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, ofFloatColor &v, std::size_t offset = 0) {
             loadColor<float>(m, v, 1.0f, offset);
         }
         
 #pragma mark oF container type
         template <std::size_t n, typename U>
-        inline void loadVec(ofxOscMessage &m, U &v, std::size_t offset = 0) {
+        inline void loadVec(ofxOscMessageEx &m, U &v, std::size_t offset = 0) {
             for(int i = 0; i < min(static_cast<std::size_t>(m.getNumArgs() - offset), n); i++) {
                 load(m, v[i], offset + i);
             }
         }
         
-        inline void load(ofxOscMessage &m, ofVec2f &v, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, ofVec2f &v, std::size_t offset = 0) {
             loadVec<2>(m, v, offset);
         }
-        inline void load(ofxOscMessage &m, ofVec3f &v, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, ofVec3f &v, std::size_t offset = 0) {
             loadVec<3>(m, v, offset);
         }
-        inline void load(ofxOscMessage &m, ofVec4f &v, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, ofVec4f &v, std::size_t offset = 0) {
             loadVec<4>(m, v, offset);
         }
-        inline void load(ofxOscMessage &m, ofQuaternion &v, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, ofQuaternion &v, std::size_t offset = 0) {
             loadVec<4>(m, v, offset);
         }
-        inline void load(ofxOscMessage &m, ofMatrix3x3 &v, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, ofMatrix3x3 &v, std::size_t offset = 0) {
             loadVec<9>(m, v, offset);
         }
         
-        inline void load(ofxOscMessage &m, ofMatrix4x4 &v, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, ofMatrix4x4 &v, std::size_t offset = 0) {
             for(int j = 0; j < 4; j++) for(int i = 0; i < 4; i++) {
                 load(m, v(i, j), offset + 4 * j + i);
             }
         }
         
-        inline void load(ofxOscMessage &m, ofRectangle &v, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, ofRectangle &v, std::size_t offset = 0) {
             load(m, v.x,      offset + 0);
             load(m, v.y,      offset + 1);
             load(m, v.width,  offset + 2);
@@ -129,13 +136,13 @@ namespace ofx {
 #pragma mark ofParameter<T> / ofParameterGroup
         
         template <typename U>
-        inline void load(ofxOscMessage &m, ofParameter<U> &p, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, ofParameter<U> &p, std::size_t offset = 0) {
             U u;
             load(m, u, offset);
             p.set(u);
         }
         
-        inline void load(ofxOscMessage &m, ofAbstractParameter &p, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, ofAbstractParameter &p, std::size_t offset = 0) {
 #define type_convert(type_) if(p.type() == typeid(ofParameter<type_>).name()) { load(m, p.cast<type_>(), offset); return; }
             type_convert(float);
             type_convert(double);
@@ -167,7 +174,7 @@ namespace ofx {
 #undef type_convert
         }
         
-        inline void load(ofxOscMessage &m, ofParameterGroup &pg, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, ofParameterGroup &pg, std::size_t offset = 0) {
             if(m.getArgType(0) == OFXOSC_TYPE_INT32) {
                 if(pg.size() <= m.getArgAsInt32(0)) {
                     ofLogWarning("ofxOscSubscriber") << "ofAbstractParameterGroup: not contain index \"" << m.getArgAsInt32(0) << "\"";
@@ -191,21 +198,21 @@ namespace ofx {
         
 #pragma mark container
         template <typename U, std::size_t size>
-        inline void load(ofxOscMessage &m, std::array<U, size> &v, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, std::array<U, size> &v, std::size_t offset = 0) {
             for(int i = 0; i < min(size, (m.getNumArgs() - offset) / type_traits<U>::size); i++) {
                 load(m, v[i], offset + i * type_traits<U>::size);
             }
         }
         
         template <typename U, std::size_t size>
-        inline void load(ofxOscMessage &m, U (&v)[size], std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, U (&v)[size], std::size_t offset = 0) {
             for(int i = 0; i < min(size, (m.getNumArgs() - offset) / type_traits<U>::size); i++) {
                 load(m, v[i], offset + i * type_traits<U>::size);
             }
         }
         
         template <typename U, typename Alloc>
-        inline void load(ofxOscMessage &m, std::vector<U, Alloc> &v, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, std::vector<U, Alloc> &v, std::size_t offset = 0) {
             std::size_t num = (m.getNumArgs() - offset) / type_traits<U>::size;
             if(v.size() != num) v.resize(num);
             for(int i = 0; i < num; i++) {
@@ -214,7 +221,7 @@ namespace ofx {
         }
         
         template <typename U, typename Alloc>
-        inline void load(ofxOscMessage &m, std::deque<U, Alloc> &v, std::size_t offset = 0) {
+        inline void load(ofxOscMessageEx &m, std::deque<U, Alloc> &v, std::size_t offset = 0) {
             std::size_t num = (m.getNumArgs() - offset) / type_traits<U>::size;
             if(v.size() != num) v.resize(num);
             for(int i = 0; i < num; i++) {
