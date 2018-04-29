@@ -33,7 +33,7 @@ namespace ofx {
             struct Parameter : AbstractParameter, type_traits<T> {
                 Parameter(T &t) : t(t) {}
                 virtual void read(ofxOscMessageEx &message, std::size_t offset = 0) override
-                    { load(message, t, offset); }
+                    { PubSubOsc::load(message, t, offset); }
                 virtual std::size_t size() const override { return type_traits<T>::size; };
                 
             private:
