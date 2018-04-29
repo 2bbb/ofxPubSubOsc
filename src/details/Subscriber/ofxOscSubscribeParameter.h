@@ -60,7 +60,7 @@ namespace ofx {
                                    std::tuple<Ts ...> &t,
                                    std::size_t offset) {
                     std::size_t o{0};
-                    std::vector<std::size_t>{(load(m, std::get<Indices>(t), offset + o), o += type_traits<Ts>::size) ...};
+                    std::vector<std::size_t>{(PubSubOsc::load(m, std::get<Indices>(t), offset + o), o += type_traits<Ts>::size) ...};
                 }
                 
                 template <typename ... Ts>
