@@ -32,7 +32,7 @@ namespace ofx {
         
         template <typename type>
         OscMessageEx &add(const type &v) {
-            PubSubOsc::set(*this, v);
+            PubSubOsc::set(static_cast<ofxOscMessage &>(*this), v);
             return *this;
         }
         
