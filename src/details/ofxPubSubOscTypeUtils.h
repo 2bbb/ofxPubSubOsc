@@ -13,7 +13,10 @@
 #include <type_traits>
 #include <tuple>
 
+#include <glm/glm.hpp>
+
 #include "ofxPubSubOscSettings.h"
+#include "ofVectorMath.h"
 
 namespace ofx {
     namespace PubSubOsc {
@@ -339,6 +342,52 @@ namespace ofx {
         };
         using namespace applying;
     };
+    
+#pragma mark glm
+#ifdef GLM_VERSION
+    template <typename>
+    struct is_glm_vec : std::false_type {};
+    template <typename T, glm::precision Q>
+    struct is_glm_vec<glm::tvec1<T, Q>> : std::true_type {};
+    template <typename T, glm::precision Q>
+    struct is_glm_vec<glm::tvec2<T, Q>> : std::true_type {};
+    template <typename T, glm::precision Q>
+    struct is_glm_vec<glm::tvec3<T, Q>> : std::true_type {};
+    template <typename T, glm::precision Q>
+    struct is_glm_vec<glm::tvec4<T, Q>> : std::true_type {};
+    
+    template <typename>
+    struct get_glm_vec_size;
+    template <typename T, glm::precision Q>
+    struct get_glm_vec_size<glm::tvec1<T, Q>> : std::integral_constant<std::size_t, 1> {};
+    template <typename T, glm::precision Q>
+    struct get_glm_vec_size<glm::tvec2<T, Q>> : std::integral_constant<std::size_t, 2> {};
+    template <typename T, glm::precision Q>
+    struct get_glm_vec_size<glm::tvec3<T, Q>> : std::integral_constant<std::size_t, 3> {};
+    template <typename T, glm::precision Q>
+    struct get_glm_vec_size<glm::tvec4<T, Q>> : std::integral_constant<std::size_t, 4> {};
+
+    template <typename>
+    struct is_glm_mat : std::false_type {};
+    template <typename T, glm::precision Q>
+    struct is_glm_mat<glm::tmat2x2<T, Q>> : std::true_type {};
+    template <typename T, glm::precision Q>
+    struct is_glm_mat<glm::tmat2x3<T, Q>> : std::true_type {};
+    template <typename T, glm::precision Q>
+    struct is_glm_mat<glm::tmat2x4<T, Q>> : std::true_type {};
+    template <typename T, glm::precision Q>
+    struct is_glm_mat<glm::tmat3x2<T, Q>> : std::true_type {};
+    template <typename T, glm::precision Q>
+    struct is_glm_mat<glm::tmat3x3<T, Q>> : std::true_type {};
+    template <typename T, glm::precision Q>
+    struct is_glm_mat<glm::tmat3x4<T, Q>> : std::true_type {};
+    template <typename T, glm::precision Q>
+    struct is_glm_mat<glm::tmat4x2<T, Q>> : std::true_type {};
+    template <typename T, glm::precision Q>
+    struct is_glm_mat<glm::tmat4x3<T, Q>> : std::true_type {};
+    template <typename T, glm::precision Q>
+    struct is_glm_mat<glm::tmat4x4<T, Q>> : std::true_type {};
+#endif
 };
 
 

@@ -12,6 +12,8 @@
 
 #include <array>
 
+#include <glm/glm.hpp>
+
 #include "ofVectorMath.h"
 #include "ofFileUtils.h"
 
@@ -21,7 +23,7 @@ namespace ofx {
     using ofxOscMessageEx = class OscMessageEx;
     
     namespace PubSubOsc {
-        template <typename T>
+        template <typename T, typename enabler = void>
         struct type_traits {
             using inner_type = T;
             static constexpr std::size_t size = 1;
@@ -124,6 +126,30 @@ namespace ofx {
             static constexpr bool has_array_operator = false;
         };
         
+#pragma mark glm
+#ifdef GLM_VERSION
+        template <typename glm_vec_t>
+        struct type_traits<glm_vec_t, enable_if_t<is_glm_vec<glm_vec_t>::value>> {
+            using inner_type = typename glm_vec_t::value_type;
+            static constexpr std::size_t size = get_glm_vec_size<glm_vec_t>::value;
+            static constexpr bool has_array_operator = true;
+        };
+        
+        template<typename glm_mat_t>
+        struct type_traits<glm_mat_t, enable_if_t<is_glm_mat<glm_mat_t>::value>> {
+            using inner_type = typename glm_mat_t::col_type;
+            static constexpr std::size_t size = get_glm_vec_size<typename glm_mat_t::row_type>::value;
+            static constexpr bool has_array_operator = true;
+        };
+        
+        template <typename T, glm::precision P>
+        struct type_traits<glm::tquat<T, P>> {
+            using inner_type = T;
+            static constexpr std::size_t size = 4;
+            static constexpr bool has_array_operator = true;
+        };
+#endif
+
         template <>
         struct type_traits<ofRectangle> {
             using inner_type = float;
