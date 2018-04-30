@@ -91,13 +91,13 @@ namespace ofx {
             protected:
                 virtual bool isChanged() {
                     bool isChange = false;
-                    for(int i = 0; i < size; i++) {
+                    for(std::size_t i = 0; i < size; i++) {
                         isChange = isChange || (old[i] != get()[i]);
                         if(isChange) break;
                     }
                     
                     if(isChange) {
-                        for(int i = 0; i < size; i++) {
+                        for(std::size_t i = 0; i < size; i++) {
                             old[i] = get()[i];
                         }
                         return true;

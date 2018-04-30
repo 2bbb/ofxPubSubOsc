@@ -151,7 +151,7 @@ namespace ofx {
             
             inline void load(ofxOscMessageEx &m, std::vector<ParameterRef> &v, std::size_t offset = 0) {
                 std::size_t o = 0;
-                for(int i = 0; i < v.size(); i++) {
+                for(std::size_t i = 0; i < v.size(); i++) {
                     if(m.getNumArgs() < offset + o + v[i]->size()) {
                         ofLogWarning("ofxPubSubOsc::Subscriber") << "less args";
                         break;

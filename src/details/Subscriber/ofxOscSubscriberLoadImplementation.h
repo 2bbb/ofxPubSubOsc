@@ -100,7 +100,7 @@ namespace ofx {
 #pragma mark oF container type
         template <std::size_t n, typename U>
         inline void loadVec(const ofxOscMessage &m, U &v, std::size_t offset = 0) {
-            for(int i = 0; i < min(static_cast<std::size_t>(m.getNumArgs() - offset), n); i++) {
+            for(std::size_t i = 0; i < std::min(static_cast<std::size_t>(m.getNumArgs() - offset), n); i++) {
                 load(m, v[i], offset + i);
             }
         }
@@ -122,7 +122,7 @@ namespace ofx {
         }
         
         inline void load(const ofxOscMessage &m, ofMatrix4x4 &v, std::size_t offset = 0) {
-            for(int j = 0; j < 4; j++) for(int i = 0; i < 4; i++) {
+            for(std::size_t j = 0; j < 4; j++) for(std::size_t i = 0; i < 4; i++) {
                 load(m, v(i, j), offset + 4 * j + i);
             }
         }
@@ -224,14 +224,14 @@ namespace ofx {
 #pragma mark container
         template <typename U, std::size_t size>
         inline void load(const ofxOscMessage &m, std::array<U, size> &v, std::size_t offset = 0) {
-            for(int i = 0; i < min(size, (m.getNumArgs() - offset) / type_traits<U>::size); i++) {
+            for(std::size_t i = 0; i < min(size, (m.getNumArgs() - offset) / type_traits<U>::size); i++) {
                 load(m, v[i], offset + i * type_traits<U>::size);
             }
         }
         
         template <typename U, std::size_t size>
         inline void load(const ofxOscMessage &m, U (&v)[size], std::size_t offset = 0) {
-            for(int i = 0; i < min(size, (m.getNumArgs() - offset) / type_traits<U>::size); i++) {
+            for(std::size_t i = 0; i < min(size, (m.getNumArgs() - offset) / type_traits<U>::size); i++) {
                 load(m, v[i], offset + i * type_traits<U>::size);
             }
         }
@@ -240,7 +240,7 @@ namespace ofx {
         inline void load(const ofxOscMessage &m, std::vector<U, Alloc> &v, std::size_t offset = 0) {
             std::size_t num = (m.getNumArgs() - offset) / type_traits<U>::size;
             if(v.size() != num) v.resize(num);
-            for(int i = 0; i < num; i++) {
+            for(std::size_t i = 0; i < num; i++) {
                 load(m, v[i], offset + i * type_traits<U>::size);
             }
         }
@@ -249,7 +249,7 @@ namespace ofx {
         inline void load(const ofxOscMessage &m, std::deque<U, Alloc> &v, std::size_t offset = 0) {
             std::size_t num = (m.getNumArgs() - offset) / type_traits<U>::size;
             if(v.size() != num) v.resize(num);
-            for(int i = 0; i < num; i++) {
+            for(std::size_t i = 0; i < num; i++) {
                 load(m, v[i], offset + i * type_traits<U>::size);
             }
         }

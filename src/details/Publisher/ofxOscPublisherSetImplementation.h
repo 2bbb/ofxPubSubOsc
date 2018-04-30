@@ -42,11 +42,11 @@ namespace ofx {
         
         template <std::size_t n, typename T>
         inline void setVec(ofxOscMessage &m, const T &v) {
-            for(int i = 0; i < n; i++) { set(m, v[i]); }
+            for(std::size_t i = 0; i < n; i++) { set(m, v[i]); }
         }
         
         template <typename PixType>
-        inline void set(ofxOscMessage &m, const ofColor_<PixType> &v) {  setVec<4>(m, v); }
+        inline void set(ofxOscMessage &m, const ofColor_<PixType> &v) { setVec<4>(m, v); }
         inline void set(ofxOscMessage &m, const ofVec2f &v) { setVec<2>(m, v); }
         inline void set(ofxOscMessage &m, const ofVec3f &v) { setVec<3>(m, v); }
         inline void set(ofxOscMessage &m, const ofVec4f &v) { setVec<4>(m, v); }
@@ -65,7 +65,9 @@ namespace ofx {
         }
         
         inline void set(ofxOscMessage &m, const ofMatrix4x4 &v) {
-            for(int j = 0; j < 4; j++) for(int i = 0; i < 4; i++) set(m, v(i, j));
+            for(std::size_t j = 0; j < 4; j++) for(std::size_t i = 0; i < 4; i++) set(m, v(i, j));
+        }
+        
 #pragma mark glm
 #ifdef GLM_VERSION
         template <typename glm_vec_t>
@@ -100,22 +102,22 @@ namespace ofx {
 #pragma mark containerz
         template <typename U, std::size_t size>
         inline void set(ofxOscMessage &m, const std::array<U, size> &v) {
-            for(int i = 0; i < size; i++) { set(m, v[i]); }
+            for(std::size_t i = 0; i < size; i++) { set(m, v[i]); }
         }
         
         template <typename U, std::size_t size>
         inline void set(ofxOscMessage &m, const U (&v)[size]) {
-            for(int i = 0; i < size; i++) { set(m, v[i]); }
+            for(std::size_t i = 0; i < size; i++) { set(m, v[i]); }
         }
         
         template <typename U, typename Alloc>
         inline void set(ofxOscMessage &m, const std::vector<U, Alloc> &v) {
-            for(int i = 0; i < v.size(); i++) { set(m, v[i]); }
+            for(std::size_t i = 0; i < v.size(); i++) { set(m, v[i]); }
         }
         
         template <typename U, typename Alloc>
         inline void set(ofxOscMessage &m, const std::deque<U, Alloc> &v) {
-            for(int i = 0; i < v.size(); i++) { set(m, v[i]); }
+            for(std::size_t i = 0; i < v.size(); i++) { set(m, v[i]); }
         }
         
         template <typename Func>

@@ -179,9 +179,9 @@ namespace ofx {
             ArrayBuffer() : v(malloc(sizeof(T) * s)) {}
             virtual ~ArrayBuffer() { free(v); v = NULL; }
             
-            array_t operator=(const ArrayPublisher<T, s> &arr) { for(int i = 0; i < size(); i++) v[i] = arr[i]; return get(); };
-            bool operator!=(const ArrayPublisher<T, s> &arr) const { for(int i = 0; i < size(); i++) if(v[i] != arr[i]) return true; return false; };
-            bool operator==(const ArrayPublisher<T, s> &arr) const { for(int i = 0; i < size(); i++) if(v[i] != arr[i]) return false; return true; };
+            array_t operator=(const ArrayPublisher<T, s> &arr) { for(std::size_t i = 0; i < size(); i++) v[i] = arr[i]; return get(); };
+            bool operator!=(const ArrayPublisher<T, s> &arr) const { for(std::size_t i = 0; i < size(); i++) if(v[i] != arr[i]) return true; return false; };
+            bool operator==(const ArrayPublisher<T, s> &arr) const { for(std::size_t i = 0; i < size(); i++) if(v[i] != arr[i]) return false; return true; };
             T operator[](std::size_t n) const { return v[n]; };
             T &operator[](std::size_t n) { return v[n]; };
             
