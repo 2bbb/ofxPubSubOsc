@@ -68,6 +68,7 @@ namespace ofx {
         
 #pragma mark glm
 #ifdef GLM_VERSION
+#   if GLM_VERSION < 990
         template <typename glm_vec_t>
         inline auto set(ofxOscMessage &m, glm_vec_t &v)
             -> PubSubOsc::enable_if_t<is_glm_vec<glm_vec_t>::value>
@@ -88,6 +89,22 @@ namespace ofx {
         inline void set(ofxOscMessage &m, glm::tquat<T, P> &v) {
             setVec<4>(m, v);
         }
+#   else
+        template <std::size_t N, typename T, glm::qualifier Q>
+        inline void set(ofxOscMessage &m, glm::vec<N, T, Q> &v) {
+            setVec<N>(m, v);
+        }
+        
+        template <std::size_t M, std::size_t N, typename T, glm::qualifier Q>
+        inline void set(ofxOscMessage &m, glm::mat<M, N, T, Q> &v) {
+            for(std::size_t i = 0; i < M; i++) setVec<N>(m, v[i]);
+        }
+        
+        template <typename T, glm::precision P>
+        inline void set(ofxOscMessage &m, glm::tquat<T, P> &v) {
+            setVec<4>(m, v);
+        }
+#   endif
 #endif
 
         inline void set(ofxOscMessage &m, const ofRectangle &v) {

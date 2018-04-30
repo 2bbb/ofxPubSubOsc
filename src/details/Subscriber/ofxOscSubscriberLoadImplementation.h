@@ -127,6 +127,7 @@ namespace ofx {
         
 #pragma mark glm
 #ifdef GLM_VERSION
+#   if GLM_VERSION < 990
         template <typename glm_vec_t>
         inline auto load(const ofxOscMessage &m, glm_vec_t &v, std::size_t offset = 0)
             -> PubSubOsc::enable_if_t<is_glm_vec<glm_vec_t>::value>
@@ -147,6 +148,24 @@ namespace ofx {
         inline void load(ofxOscMessage &m, glm::tquat<T, P> &v) {
             loadVec<4>(m, v);
         }
+#   else
+        template <std::size_t N, typename T, glm::qualifier Q>
+        inline void load(const ofxOscMessage &m, glm::vec<N, T, Q> &v, std::size_t offset = 0)
+        {
+            loadVec<N>(m, v, offset);
+        }
+        
+        template <std::size_t M, std::size_t N, typename T, glm::qualifier Q>
+        inline void load(const ofxOscMessage &m, glm::mat<M, N, T, Q> &v, std::size_t offset = 0)
+        {
+            for(std::size_t i = 0; i < M; i++) loadVec<N>(m, v[i], offset + N * i);
+        }
+        
+        template <typename T, glm::precision P>
+        inline void load(ofxOscMessage &m, glm::tquat<T, P> &v) {
+            loadVec<4>(m, v);
+        }
+#   endif
 #endif
         
         inline void load(const ofxOscMessage &m, ofRectangle &v, std::size_t offset = 0) {

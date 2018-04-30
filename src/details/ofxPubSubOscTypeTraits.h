@@ -127,6 +127,7 @@ namespace ofx {
         
 #pragma mark glm
 #ifdef GLM_VERSION
+#   if GLM_VERSION < 990
         template <typename glm_vec_t>
         struct type_traits<glm_vec_t, enable_if_t<is_glm_vec<glm_vec_t>::value>> {
             using inner_type = typename glm_vec_t::value_type;
@@ -140,7 +141,21 @@ namespace ofx {
             static constexpr std::size_t size = get_glm_vec_size<typename glm_mat_t::row_type>::value;
             static constexpr bool has_array_operator = true;
         };
+#   else
+        template <std::size_t N, typename T, glm::qualifier Q>
+        struct type_traits<glm::vec<N, T, Q>> {
+            using inner_type = T;
+            static constexpr std::size_t size = N;
+            static constexpr bool has_array_operator = true;
+        };
         
+        template <std::size_t M, std::size_t N, typename T, glm::qualifier Q>
+        struct type_traits<glm::mat<M, N, T, Q>> {
+            using inner_type = typename glm::mat<M, N, T, Q>::col_type;
+            static constexpr std::size_t size = M;
+            static constexpr bool has_array_operator = true;
+        };
+#   endif
         template <typename T, glm::precision P>
         struct type_traits<glm::tquat<T, P>> {
             using inner_type = T;
