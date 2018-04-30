@@ -10,6 +10,10 @@
 #ifndef ofxOscSubscriberLoadImplementation_h
 #define ofxOscSubscriberLoadImplementation_h
 
+#include <cmath>
+
+#include <glm/glm.hpp>
+
 #include "ofxOscMessage.h"
 
 #include "ofxPubSubOscSettings.h"
@@ -122,6 +126,30 @@ namespace ofx {
                 load(m, v(i, j), offset + 4 * j + i);
             }
         }
+        
+#pragma mark glm
+#ifdef GLM_VERSION
+        template <typename glm_vec_t>
+        inline auto load(const ofxOscMessage &m, glm_vec_t &v, std::size_t offset = 0)
+            -> PubSubOsc::enable_if_t<is_glm_vec<glm_vec_t>::value>
+        {
+            loadVec<get_glm_vec_size<glm_vec_t>::value>(m, v, offset);
+        }
+        
+        template <typename glm_mat_t>
+        inline auto load(const ofxOscMessage &m, glm_mat_t &v, std::size_t offset = 0)
+            -> PubSubOsc::enable_if_t<is_glm_mat<glm_mat_t>::value>
+        {
+            constexpr std::size_t row_length = get_glm_vec_size<typename glm_mat_t::row_type>::value;
+            constexpr std::size_t col_length = get_glm_vec_size<typename glm_mat_t::col_type>::value;
+            for(std::size_t i = 0; i < row_length; i++) loadVec<col_length>(m, v[i], offset + col_length * i);
+        }
+        
+        template <typename T, glm::precision P>
+        inline void load(ofxOscMessage &m, glm::tquat<T, P> &v) {
+            loadVec<4>(m, v);
+        }
+#endif
         
         inline void load(const ofxOscMessage &m, ofRectangle &v, std::size_t offset = 0) {
             load(m, v.x,      offset + 0);

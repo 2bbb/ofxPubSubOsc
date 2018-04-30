@@ -10,6 +10,10 @@
 #ifndef ofxOscPublisherSetImplementation_h
 #define ofxOscPublisherSetImplementation_h
 
+#include <cmath>
+
+#include <glm/glm.hpp>
+
 #include "ofxOscMessage.h"
 
 #include "ofxPubSubOscSettings.h"
@@ -62,8 +66,30 @@ namespace ofx {
         
         inline void set(ofxOscMessage &m, const ofMatrix4x4 &v) {
             for(int j = 0; j < 4; j++) for(int i = 0; i < 4; i++) set(m, v(i, j));
+#pragma mark glm
+#ifdef GLM_VERSION
+        template <typename glm_vec_t>
+        inline auto set(ofxOscMessage &m, glm_vec_t &v)
+            -> PubSubOsc::enable_if_t<is_glm_vec<glm_vec_t>::value>
+        {
+            setVec<get_glm_vec_size<glm_vec_t>::value>(m, v);
         }
         
+        template <typename glm_mat_t>
+        inline auto set(ofxOscMessage &m, glm_mat_t &v)
+            -> PubSubOsc::enable_if_t<is_glm_mat<glm_mat_t>::value>
+        {
+            constexpr std::size_t row_length = get_glm_vec_size<typename glm_mat_t::row_type>::value;
+            constexpr std::size_t col_length = get_glm_vec_size<typename glm_mat_t::col_type>::value;
+            for(std::size_t i = 0; i < row_length; i++) setVec<col_length>(m, v[i]);
+        }
+        
+        template <typename T, glm::precision P>
+        inline void set(ofxOscMessage &m, glm::tquat<T, P> &v) {
+            setVec<4>(m, v);
+        }
+#endif
+
         inline void set(ofxOscMessage &m, const ofRectangle &v) {
             set(m, v.x);
             set(m, v.y);
