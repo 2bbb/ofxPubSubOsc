@@ -12,11 +12,10 @@
 
 #include <array>
 
-#include <glm/glm.hpp>
-
 #include "ofVectorMath.h"
 #include "ofFileUtils.h"
 
+#include "ofxPubSubOscSettings.h"
 #include "ofxOscArrayPublisher.h"
 
 namespace ofx {

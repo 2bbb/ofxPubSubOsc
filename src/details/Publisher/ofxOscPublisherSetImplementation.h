@@ -12,8 +12,6 @@
 
 #include <cmath>
 
-#include <glm/glm.hpp>
-
 #include "ofxOscMessage.h"
 
 #include "ofxPubSubOscSettings.h"

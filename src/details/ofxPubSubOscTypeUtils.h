@@ -13,8 +13,6 @@
 #include <type_traits>
 #include <tuple>
 
-#include <glm/glm.hpp>
-
 #include "ofxPubSubOscSettings.h"
 #include "ofVectorMath.h"
 

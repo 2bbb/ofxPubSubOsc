@@ -24,4 +24,8 @@
 
 #define OFX_PUBSUBOSC_DEBUG 0
 
+#if 10 <= OF_VERSION_MINOR
+#   include <glm/glm.hpp>
+#endif
+
 #endif
