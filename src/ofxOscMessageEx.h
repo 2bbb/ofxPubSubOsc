@@ -25,7 +25,7 @@ namespace ofx {
         template <typename ... arguments>
         OscMessageEx(const std::string &address, const arguments & ... args) {
             setAddress(address);
-            const auto &_ = {add(args) ...};
+            const std::vector<ofxOscMessageEx &> &_ = {add(args) ...};
         }
         
 #pragma mark add / operator<<

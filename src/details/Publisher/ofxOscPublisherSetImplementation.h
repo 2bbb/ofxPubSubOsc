@@ -70,14 +70,14 @@ namespace ofx {
 #ifdef GLM_VERSION
 #   if GLM_VERSION < 990
         template <typename glm_vec_t>
-        inline auto set(ofxOscMessage &m, glm_vec_t &v)
+        inline auto set(ofxOscMessage &m, const glm_vec_t &v)
             -> PubSubOsc::enable_if_t<is_glm_vec<glm_vec_t>::value>
         {
             setVec<get_glm_vec_size<glm_vec_t>::value>(m, v);
         }
         
         template <typename glm_mat_t>
-        inline auto set(ofxOscMessage &m, glm_mat_t &v)
+        inline auto set(ofxOscMessage &m, const glm_mat_t &v)
             -> PubSubOsc::enable_if_t<is_glm_mat<glm_mat_t>::value>
         {
             constexpr std::size_t row_length = get_glm_vec_size<typename glm_mat_t::row_type>::value;
@@ -86,22 +86,22 @@ namespace ofx {
         }
         
         template <typename T, glm::precision P>
-        inline void set(ofxOscMessage &m, glm::tquat<T, P> &v) {
+        inline void set(ofxOscMessage &m, const glm::tquat<T, P> &v) {
             setVec<4>(m, v);
         }
 #   else
         template <std::size_t N, typename T, glm::qualifier Q>
-        inline void set(ofxOscMessage &m, glm::vec<N, T, Q> &v) {
+        inline void set(ofxOscMessage &m, const glm::vec<N, T, Q> &v) {
             setVec<N>(m, v);
         }
         
         template <std::size_t M, std::size_t N, typename T, glm::qualifier Q>
-        inline void set(ofxOscMessage &m, glm::mat<M, N, T, Q> &v) {
+        inline void set(ofxOscMessage &m, const glm::mat<M, N, T, Q> &v) {
             for(std::size_t i = 0; i < M; i++) setVec<N>(m, v[i]);
         }
         
         template <typename T, glm::precision P>
-        inline void set(ofxOscMessage &m, glm::tquat<T, P> &v) {
+        inline void set(ofxOscMessage &m, const glm::tquat<T, P> &v) {
             setVec<4>(m, v);
         }
 #   endif
