@@ -8,11 +8,11 @@ easy utility for publish/subscribe OSC message.
 
 ## Notice
 
-* this addon is tested with oF0.9.0~
+* this addon is tested with oF0.9.8~
 * if you use oF0.9.0~, then you can use `std::function<void(ofxOscMessage &)>`! detail: [API Reference](API_Reference.md#API_lambda_callback)
 * **if you use oF~0.8.4, then you can use [branch:v0_1_x_oF084](../../tree/v0_1_x_oF084)**
-* if you have challange spirit, please use dev/main branch.
-* if you want to join development ofxPubSubOsc, open the issue and post the PR for [dev/main](tree/dev/main).
+* if you have challange spirit, please use dev/vX.Y.Z branch.
+* if you want to join development ofxPubSubOsc, open the issue and post the PR for dev/vX.Y.Z.
 
 ## TOC
 
@@ -71,6 +71,8 @@ public:
 ```
 
 ## <a name="SimpleAPI">Simple API Reference</a>
+
+_API Reference is imperfect now._
 
 #### If you want to use advanced features, see [Advanced](API_Reference.md)
 
@@ -211,11 +213,14 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 ## <a name="UpdateHistory">Update history</a>
 
-### 2016/06/XX ver 0.3.0
+### 2018/05/08 ver 0.3.0
 
 * refactor all for C++11
 * add `ofxSendOsc`
 * ofxSubscribeOsc got more flexible.
+  * multi arguments
+  * multi arguments callback
+* add `ofxOscMessageEx`
 
 ### 2016/01/25 [ver 0.2.2](../../releases/tag/v0_2_2) release
 
