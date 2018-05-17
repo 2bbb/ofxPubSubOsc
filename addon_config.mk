@@ -20,8 +20,8 @@ meta:
 	ADDON_AUTHOR = ISHII 2bit
 	ADDON_TAGS = "network"
 	ADDON_URL = http://github.com/2bbb/ofxPubSubOsc
-	ADDON_GIT_URL = git://github.com/2bbb/ofxPubSubOsc.git
-	ADDON_MINIMUM_OF_VERSION = 0.9.0
+	# ADDON_GIT_URL = git://github.com/2bbb/ofxPubSubOsc.git
+	# ADDON_MINIMUM_OF_VERSION = 0.9.0
 
 common:
 	# dependencies with other addons, a list of them separated by spaces 
