@@ -13,6 +13,7 @@
 #include <array>
 
 #include "ofVectorMath.h"
+#include "ofRectangle.h"
 #include "ofFileUtils.h"
 
 #include "ofxPubSubOscSettings.h"
