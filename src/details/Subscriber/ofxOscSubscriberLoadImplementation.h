@@ -145,7 +145,7 @@ namespace ofx {
         }
         
         template <typename T, glm::precision P>
-        inline void load(ofxOscMessage &m, glm::tquat<T, P> &v) {
+        inline void load(const ofxOscMessage &m, glm::tquat<T, P> &v, std::size_t offset = 0) {
             loadVec<4>(m, v);
         }
 #   else
