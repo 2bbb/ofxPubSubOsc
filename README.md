@@ -264,6 +264,7 @@ MIT License.
 * [Tomoto Yusuke](https://github.com/yusuketomoto)
 * [HANAI Yuuya](https://github.com/hanasaan)
 * [musiko](https://github.com/musiko)
+* [TAESU Yuma](https://github.com/yumataesu)
 
 ## <a name="AtTheLast">At the last</a>
 
