@@ -11,6 +11,7 @@
 #define ofxOscSubscriberLoadImplementation_h
 
 #include <cmath>
+#include <algorithm>
 
 #include "ofxOscMessage.h"
 
@@ -241,14 +242,14 @@ namespace ofx {
 #pragma mark container
         template <typename U, std::size_t size>
         inline void load(const ofxOscMessage &m, std::array<U, size> &v, std::size_t offset = 0) {
-            for(std::size_t i = 0; i < min(size, (m.getNumArgs() - offset) / type_traits<U>::size); i++) {
+            for(std::size_t i = 0; i < std::min(size, (m.getNumArgs() - offset) / type_traits<U>::size); i++) {
                 load(m, v[i], offset + i * type_traits<U>::size);
             }
         }
         
         template <typename U, std::size_t size>
         inline void load(const ofxOscMessage &m, U (&v)[size], std::size_t offset = 0) {
-            for(std::size_t i = 0; i < min(size, (m.getNumArgs() - offset) / type_traits<U>::size); i++) {
+            for(std::size_t i = 0; i < std::min(size, (m.getNumArgs() - offset) / type_traits<U>::size); i++) {
                 load(m, v[i], offset + i * type_traits<U>::size);
             }
         }
