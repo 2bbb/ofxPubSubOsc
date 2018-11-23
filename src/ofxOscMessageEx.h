@@ -72,6 +72,14 @@ namespace ofx {
         inline OscArgConverter operator[](std::size_t index) const {
             return {*this, index};
         }
+        
+        std::uint16_t getWaitingPort() const
+        { return waitingPort; };
+        void setWaitingPort(std::uint16_t port)
+        { waitingPort = port; };
+        
+    protected:
+        std::uint16_t waitingPort{0};
     };
 };
 

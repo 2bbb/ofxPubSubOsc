@@ -268,6 +268,7 @@ namespace ofx {
                     ofxOscMessageEx m;
                     while(receiver.hasWaitingMessages()) {
                         receiver.getNextMessage(m);
+                        m.setWaitingPort(port);
                         const std::string &address = m.getAddress();
                         Targets::iterator it = targets.find(address);
                         if(it != targets.end()) {
