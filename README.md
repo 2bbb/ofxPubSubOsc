@@ -247,8 +247,8 @@ MIT License.
 
 ## <a name="Author">Author</a>
 
-* ISHII 2bit [bufferRenaiss co., ltd.]
-* ishii[at]buffer-renaiss.com
+* ISHII 2bit [ISHII Tsuubito Program Office]
+* i[at]2bit.jp
 
 ## <a name="SuppotingContributor">Supporting Contributor</a>
 
@@ -261,10 +261,11 @@ MIT License.
 * [IWATANI Nariaki](https://github.com/nariakiiwatani)
 * [USAMI Takuto](https://github.com/usm916)
 * [HORII Satoshi](https://github.com/satcy)
-* [Tomoto Yusuke](https://github.com/yusuketomoto)
+* [TOMOTO Yusuke](https://github.com/yusuketomoto)
 * [HANAI Yuuya](https://github.com/hanasaan)
 * [musiko](https://github.com/musiko)
 * [TAESU Yuma](https://github.com/yumataesu)
+* [HAYASAKA AKira](https://github.com/Akira-Hayasaka)
 
 ## <a name="AtTheLast">At the last</a>
 
