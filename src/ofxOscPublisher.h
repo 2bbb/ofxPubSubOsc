@@ -310,7 +310,7 @@ namespace ofx {
                     }
                     ofxOscMessage m;
                     for(std::size_t i = 0, size = registeredTargets.count(address); i < size; i++, ++it) {
-                        if(it->second->write(m, it->first)) sender.sendMessage(m);
+                        if(it->second->write(m, it->first)) sender.sendMessage(m, isWrapInBundle());
                         m.clear();
                     }
                 }
@@ -320,7 +320,7 @@ namespace ofx {
                     Targets::const_iterator it{findRegistered(identifier)};
                     if(it != registeredTargets.end()) {
                         ofxOscMessage m;
-                        if(it->second->write(m, it->first)) sender.sendMessage(m);
+                        if(it->second->write(m, it->first)) sender.sendMessage(m, isWrapInBundle());
                         m.clear();
                     }
                 }
@@ -353,7 +353,7 @@ namespace ofx {
                             ofxOscMessage m;
                             for(std::size_t i = 0, size = registeredTargets.count(address); i < size; i++, ++it) {
                                 it->second->writeForce(m, it->first);
-                                sender.sendMessage(m);
+                                sender.sendMessage(m, isWrapInBundle());
                                 m.clear();
                             }
                         }
@@ -365,7 +365,7 @@ namespace ofx {
                             ofxOscMessage m;
                             for(std::size_t i = 0, size = targets.count(address); i < size; i++, ++it) {
                                 it->second->writeForce(m, it->first);
-                                sender.sendMessage(m);
+                                sender.sendMessage(m, isWrapInBundle());
                                 m.clear();
                             }
                         }
@@ -378,7 +378,7 @@ namespace ofx {
                     if(it != targets.end()) {
                         ofxOscMessage m;
                         it->second->writeForce(m, it->first);
-                        sender.sendMessage(m);
+                        sender.sendMessage(m, isWrapInBundle());
                         m.clear();
                     }
                 }
@@ -419,6 +419,19 @@ namespace ofx {
                 
                 using Ref = std::shared_ptr<Publisher>;
                 
+                static bool &bWrapInBundle() {
+                    static bool b{true};
+                    return b;
+                }
+                
+                static void setWrapInBundle(bool b) {
+                    bWrapInBundle() = b;
+                }
+                
+                static bool isWrapInBundle() {
+                    return bWrapInBundle();
+                }
+                
                 static bool &bUseBundle() {
                     static bool b;
                     return b;
@@ -439,7 +452,7 @@ namespace ofx {
                 template <typename ... Args>
                 void send(const std::string &address, Args && ... args) {
                     ofxOscMessage m = createMessage(address, std::forward<Args>(args) ...);
-                    sender.sendMessage(m);
+                    sender.sendMessage(m, isWrapInBundle());
                 }
                 
             private:
@@ -490,7 +503,7 @@ namespace ofx {
                         return;
                     }
                     for(Targets::iterator it = targets.begin(); it != targets.end(); ++it) {
-                        if(it->second->write(m, it->first)) sender.sendMessage(m);
+                        if(it->second->write(m, it->first)) sender.sendMessage(m, isWrapInBundle());
                         m.clear();
                     }
                     
@@ -806,6 +819,12 @@ inline void ofxPublishOscManually(const ofxOscPublisherIdentifier &identifier) {
 template <typename ... Args>
 void ofxSendOsc(const std::string &ip, std::uint16_t port, const std::string &address, Args && ... args) {
     ofxGetOscPublisher(ip, port).send(address, std::forward<Args>(args) ...);
+}
+
+#pragma mark using bundle option
+                
+inline void ofxSetPublisherWrapInBundle(bool bWrapInBundle) {
+    ofxOscPublisher::setWrapInBundle(bWrapInBundle);
 }
 
 #pragma mark using bundle option
