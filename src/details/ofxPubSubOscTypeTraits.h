@@ -143,14 +143,14 @@ namespace ofx {
             static constexpr bool has_array_operator = true;
         };
 #   else
-        template <std::size_t N, typename T, glm::qualifier Q>
+        template <glm::length_t N, typename T, glm::qualifier Q>
         struct type_traits<glm::vec<N, T, Q>> {
             using inner_type = T;
             static constexpr std::size_t size = N;
             static constexpr bool has_array_operator = true;
         };
         
-        template <std::size_t M, std::size_t N, typename T, glm::qualifier Q>
+        template <glm::length_t M, glm::length_t N, typename T, glm::qualifier Q>
         struct type_traits<glm::mat<M, N, T, Q>> {
             using inner_type = typename glm::mat<M, N, T, Q>::col_type;
             static constexpr std::size_t size = M;

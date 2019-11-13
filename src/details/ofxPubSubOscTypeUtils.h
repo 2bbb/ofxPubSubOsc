@@ -387,13 +387,13 @@ namespace ofx {
     template <typename T, glm::precision Q>
     struct is_glm_mat<glm::tmat4x4<T, Q>> : std::true_type {};
 #   else
-    template <std::size_t N, typename T, glm::qualifier Q>
+    template <glm::length_t N, typename T, glm::qualifier Q>
     struct is_glm_vec<glm::vec<N, T, Q>> : std::true_type {};
     
-    template <std::size_t N, typename T, glm::qualifier Q>
+    template <glm::length_t N, typename T, glm::qualifier Q>
     struct get_glm_vec_size<glm::vec<N, T, Q>> : std::integral_constant<std::size_t, N> {};
 
-    template <std::size_t M, std::size_t N, typename T, glm::qualifier Q>
+    template <glm::length_t M, glm::length_t N, typename T, glm::qualifier Q>
     struct is_glm_mat<glm::mat<M, N, T, Q>> : std::true_type {};
 #   endif
 #endif

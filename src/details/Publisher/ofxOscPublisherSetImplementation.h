@@ -90,12 +90,12 @@ namespace ofx {
             setVec<4>(m, v);
         }
 #   else
-        template <std::size_t N, typename T, glm::qualifier Q>
+        template <glm::length_t N, typename T, glm::qualifier Q>
         inline void set(ofxOscMessage &m, const glm::vec<N, T, Q> &v) {
             setVec<N>(m, v);
         }
         
-        template <std::size_t M, std::size_t N, typename T, glm::qualifier Q>
+        template <glm::length_t M, glm::length_t N, typename T, glm::qualifier Q>
         inline void set(ofxOscMessage &m, const glm::mat<M, N, T, Q> &v) {
             for(std::size_t i = 0; i < M; i++) setVec<N>(m, v[i]);
         }

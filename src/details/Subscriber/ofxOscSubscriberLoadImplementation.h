@@ -150,13 +150,13 @@ namespace ofx {
             loadVec<4>(m, v);
         }
 #   else
-        template <std::size_t N, typename T, glm::qualifier Q>
+        template <glm::length_t N, typename T, glm::qualifier Q>
         inline void load(const ofxOscMessage &m, glm::vec<N, T, Q> &v, std::size_t offset = 0)
         {
             loadVec<N>(m, v, offset);
         }
         
-        template <std::size_t M, std::size_t N, typename T, glm::qualifier Q>
+        template <glm::length_t M, glm::length_t N, typename T, glm::qualifier Q>
         inline void load(const ofxOscMessage &m, glm::mat<M, N, T, Q> &v, std::size_t offset = 0)
         {
             for(std::size_t i = 0; i < M; i++) loadVec<N>(m, v[i], offset + N * i);
