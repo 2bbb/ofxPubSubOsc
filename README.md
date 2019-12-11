@@ -266,6 +266,7 @@ MIT License.
 * [musiko](https://github.com/musiko)
 * [TAESU Yuma](https://github.com/yumataesu)
 * [HAYASAKA AKira](https://github.com/Akira-Hayasaka)
+* [ASAI](https://github.com/asaiyuta)
 
 ## <a name="AtTheLast">At the last</a>
 
