@@ -192,6 +192,13 @@ namespace ofx {
             static constexpr std::size_t size = type_traits<T>::size * array_size;
             static constexpr bool has_array_operator = true;
         };
+        
+        template <typename T, std::size_t array_size>
+        struct type_traits<std::array<T, array_size>> {
+            using inner_type = T;
+            static constexpr std::size_t size = type_traits<T>::size * array_size;
+            static constexpr bool has_array_operator = true;
+        };
     };
 };
 
