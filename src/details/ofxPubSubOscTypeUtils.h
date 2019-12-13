@@ -183,17 +183,17 @@ namespace ofx {
         : public std::true_type {};
 
         template <typename obj, typename res, typename ... args>
-        struct is_bindable<obj, res(obj::*)(args ...)>
+        struct is_bindable<obj &, res(obj::*)(args ...)>
         : public std::true_type {};
 
         template <typename obj, typename res, typename ... args>
-        struct is_bindable<obj, res(obj::*)(args ...) const>
+        struct is_bindable<obj &, res(obj::*)(args ...) const>
         : public std::true_type {};
 
         template <typename obj, typename res, typename ... args>
-        struct is_bindable<const obj, res(obj::*)(args ...) const>
+        struct is_bindable<const obj &, res(obj::*)(args ...) const>
         : public std::true_type {};
-        
+
         template <typename meth>
         struct get_arg_num;
         
@@ -220,67 +220,67 @@ namespace ofx {
         template <typename obj, typename meth>
         struct binder<obj, meth, 0> {
             using type = typename function_traits<meth>::function_type;
-            type bind(obj o, meth m) { return std::bind(m, o); }
+            static type bind(obj o, meth m) { return std::bind(m, o); }
         };
 
         template <typename obj, typename meth>
         struct binder<obj, meth, 1> {
             using type = typename function_traits<meth>::function_type;
-            type bind(obj o, meth m) { return std::bind(m, o, P(1)); }
+            static type bind(obj o, meth m) { return std::bind(m, o, P(1)); }
         };
 
         template <typename obj, typename meth>
         struct binder<obj, meth, 2> {
             using type = typename function_traits<meth>::function_type;
-            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2)); }
+            static type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2)); }
         };
 
         template <typename obj, typename meth>
         struct binder<obj, meth, 3> {
             using type = typename function_traits<meth>::function_type;
-            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3)); }
+            static type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3)); }
         };
 
         template <typename obj, typename meth>
         struct binder<obj, meth, 4> {
             using type = typename function_traits<meth>::function_type;
-            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4)); }
+            static type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4)); }
         };
 
         template <typename obj, typename meth>
         struct binder<obj, meth, 5> {
             using type = typename function_traits<meth>::function_type;
-            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5)); }
+            static type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5)); }
         };
 
         template <typename obj, typename meth>
         struct binder<obj, meth, 6> {
             using type = typename function_traits<meth>::function_type;
-            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6)); }
+            static type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6)); }
         };
 
         template <typename obj, typename meth>
         struct binder<obj, meth, 7> {
             using type = typename function_traits<meth>::function_type;
-            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6), P(7)); }
+            static type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6), P(7)); }
         };
 
         template <typename obj, typename meth>
         struct binder<obj, meth, 8> {
             using type = typename function_traits<meth>::function_type;
-            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8)); }
+            static type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8)); }
         };
 
         template <typename obj, typename meth>
         struct binder<obj, meth, 9> {
             using type = typename function_traits<meth>::function_type;
-            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9)); }
+            static type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9)); }
         };
 
         template <typename obj, typename meth>
         struct binder<obj, meth, 10> {
             using type = typename function_traits<meth>::function_type;
-            type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10)); }
+            static type bind(obj o, meth m) { return std::bind(m, o, P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10)); }
         };
 
         template <typename obj, typename meth>
