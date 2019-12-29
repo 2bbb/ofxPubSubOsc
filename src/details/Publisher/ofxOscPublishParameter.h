@@ -21,6 +21,14 @@
 namespace ofx {
     namespace PubSubOsc {
         namespace Publish {
+            template <typename T>
+            bool neq(const T &x, const T &y)
+            { return x != y; }
+            
+            template <typename T>
+            bool neq(const ofParameter<T> &x, const ofParameter<T> &y)
+            { return x.get() != y.get(); }
+            
             struct AbstractParameter {
                 AbstractParameter() : condition(new BasicCondition) {}
                 virtual bool write(ofxOscMessage &m, const std::string &address) {
@@ -43,7 +51,7 @@ namespace ofx {
             };
             
             using ParameterRef = std::shared_ptr<AbstractParameter>;
-
+            
             template <typename T, bool isCheckValue>
             struct Parameter : AbstractParameter {
                 Parameter(T &t)
@@ -65,8 +73,8 @@ namespace ofx {
                 : Parameter<T, false>(t) {}
                 
             protected:
-                virtual bool isChanged() {
-                    if(old != this->get()) {
+                virtual typename std::enable_if<is_ofParameter<T>::value, bool>::type isChanged() {
+                    if(neq(old, this->get())) {
                         old = this->get();
                         return true;
                     } else {
