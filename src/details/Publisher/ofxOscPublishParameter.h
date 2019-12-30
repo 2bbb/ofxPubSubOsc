@@ -73,7 +73,7 @@ namespace ofx {
                 : Parameter<T, false>(t) {}
                 
             protected:
-                virtual typename std::enable_if<is_ofParameter<T>::value, bool>::type isChanged() {
+                virtual bool isChanged() {
                     if(neq(old, this->get())) {
                         old = this->get();
                         return true;
