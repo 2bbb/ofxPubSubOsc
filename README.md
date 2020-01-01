@@ -267,6 +267,7 @@ MIT License.
 * [TAESU Yuma](https://github.com/yumataesu)
 * [HAYASAKA AKira](https://github.com/Akira-Hayasaka)
 * [ASAI](https://github.com/asaiyuta)
+* [Aris Bezas](https://github.com/igoumeninja)
 
 ## <a name="AtTheLast">At the last</a>
 
