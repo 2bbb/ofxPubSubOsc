@@ -265,7 +265,7 @@ MIT License.
 * [HANAI Yuuya](https://github.com/hanasaan)
 * [musiko](https://github.com/musiko)
 * [TAESU Yuma](https://github.com/yumataesu)
-* [HAYASAKA AKira](https://github.com/Akira-Hayasaka)
+* [HAYASAKA Akira](https://github.com/Akira-Hayasaka)
 * [ASAI](https://github.com/asaiyuta)
 * [Aris Bezas](https://github.com/igoumeninja)
 
