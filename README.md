@@ -268,6 +268,7 @@ MIT License.
 * [HAYASAKA Akira](https://github.com/Akira-Hayasaka)
 * [ASAI](https://github.com/asaiyuta)
 * [Aris Bezas](https://github.com/igoumeninja)
+* [moebiussurfing](https://github.com/moebiussurfing)
 
 ## <a name="AtTheLast">At the last</a>
 

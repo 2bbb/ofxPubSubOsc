@@ -165,6 +165,10 @@ namespace ofx {
                     return {address, ref, port};
                 }
                 
+                inline void subscribeAll(const std::function<void(const ofxOscMessageEx &, bool)> &callback) {
+                    allMessagesReceivers.push_back(callback);
+                }
+                
 #pragma mark unscribe
                 
                 inline void unsubscribe(const std::string &address) {
@@ -271,8 +275,10 @@ namespace ofx {
                         m.setWaitingPort(port);
                         const std::string &address = m.getAddress();
                         Targets::iterator it = targets.find(address);
-                        if(it != targets.end()) {
-                            for(std::size_t i = 0; i < targets.count(address); i++, ++it) {
+                        bool is_leaked = it == targets.end();
+                        if(!is_leaked) {
+                            for(std::size_t i = 0; i < targets.count(address); ++i, ++it)
+                            {
                                 it->second->read(m);
                             }
                         } else {
@@ -282,6 +288,40 @@ namespace ofx {
                                 leakedOscMessages.push(m);
                             }
                         }
+                        for(auto &cb : allMessagesReceivers) {
+                            cb(m, is_leaked);
+                        }
+                    }
+                }
+                
+                void update(const std::vector<std::function<void(const ofxOscMessageEx &, bool)>> &everyMessagesCallbacks)
+                {
+                    clearLeakedOscMessages();
+                    ofxOscMessageEx m;
+                    while(receiver.hasWaitingMessages()) {
+                        receiver.getNextMessage(m);
+                        m.setWaitingPort(port);
+                        const std::string &address = m.getAddress();
+                        Targets::iterator it = targets.find(address);
+                        bool is_leaked = it == targets.end();
+                        if(!is_leaked) {
+                            for(std::size_t i = 0; i < targets.count(address); ++i, ++it)
+                            {
+                                it->second->read(m);
+                            }
+                        } else {
+                            if(leakPicker) {
+                                leakPicker->read(m);
+                            } else {
+                                leakedOscMessages.push(m);
+                            }
+                        }
+                        for(const auto &cb : everyMessagesCallbacks) {
+                            cb(m, is_leaked);
+                        }
+                        for(const auto &cb : allMessagesReceivers) {
+                            cb(m, is_leaked);
+                        }
                     }
                 }
                 
@@ -290,6 +330,7 @@ namespace ofx {
                 Targets targets;
                 ParameterRef leakPicker;
                 std::queue<ofxOscMessageEx> leakedOscMessages;
+                std::vector<std::function<void(const ofxOscMessageEx &, bool)>> allMessagesReceivers;
                 bool bEnabled{true};
                 
                 friend class SubscriberManager;
@@ -317,12 +358,21 @@ namespace ofx {
                 bool isEnabled(std::uint16_t port) const {
                     return getOscSubscriber(port).isEnabled();
                 }
+                
+                inline void subscribeAll(const std::function<void(const ofxOscMessageEx &, bool)> &callback) {
+                    everyMessagesReceivers.push_back(callback);
+                }
+
             private:
                 using Subscribers = std::map<std::uint16_t, Subscriber::Ref>;
                 void update(ofEventArgs &args) {
                     for(Subscribers::iterator it = managers.begin(); it != managers.end(); ++it) {
                         if(it->second->isEnabled()) {
-                            it->second->update();
+                            if(everyMessagesReceivers.size()) {
+                                it->second->update(everyMessagesReceivers);
+                            } else {
+                                it->second->update();
+                            }
                         }
                     }
                 }
@@ -336,6 +386,7 @@ namespace ofx {
                 }
                 Subscribers managers;
                 
+                std::vector<std::function<void(const ofxOscMessageEx &, bool)>> everyMessagesReceivers;
 #pragma mark iterator
             public:
                 using iterator = Subscribers::iterator;
@@ -459,6 +510,18 @@ inline void ofxSubscribeOsc(const std::initializer_list<std::uint16_t> &ports, c
     for(auto &port : ports) {
         ofxSubscribeOsc(port, addresses, args ...);
     }
+}
+
+#pragma mark subscribe all messages
+
+inline void ofxSubscribeAllOscForPort(std::uint16_t port, const std::function<void(const ofxOscMessageEx &, bool)> &callback)
+{
+    ofxGetOscSubscriber(port).subscribeAll(callback);
+}
+
+inline void ofxSubscribeAllOsc(const std::function<void(const ofxOscMessageEx &, bool)> &callback)
+{
+    ofxGetOscSubscriberManager().subscribeAll(callback);
 }
 
 /// \}
