@@ -276,16 +276,18 @@ namespace ofx {
                         const std::string &address = m.getAddress();
                         Targets::iterator it = targets.find(address);
                         bool is_leaked = it == targets.end();
-                        if(!is_leaked) {
-                            for(std::size_t i = 0; i < targets.count(address); ++i, ++it)
-                            {
-                                it->second->read(m);
-                            }
-                        } else {
-                            if(leakPicker) {
-                                leakPicker->read(m);
+                        if(isEnabled()) {
+                            if(!is_leaked) {
+                                for(std::size_t i = 0; i < targets.count(address); ++i, ++it)
+                                {
+                                    it->second->read(m);
+                                }
                             } else {
-                                leakedOscMessages.push(m);
+                                if(leakPicker) {
+                                    leakPicker->read(m);
+                                } else {
+                                    leakedOscMessages.push(m);
+                                }
                             }
                         }
                         for(auto &cb : allMessagesReceivers) {
