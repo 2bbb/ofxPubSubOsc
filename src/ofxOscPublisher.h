@@ -455,6 +455,11 @@ namespace ofx {
                     sender.sendMessage(m, isWrapInBundle());
                 }
                 
+                void monitorAllPublishedOsc(std::function<void(const ofxOscMessageEx &, const Destination &)> callback)
+                {
+                    monitors.push_back(callback);
+                }
+
             private:
                 template <typename Arg>
                 void createMessageImpl(ofxOscMessage &m, Arg &&arg) {
@@ -495,7 +500,10 @@ namespace ofx {
                     if(isUseBundle()) {
                         ofxOscBundle bundle;
                         for(Targets::iterator it = targets.begin(); it != targets.end(); ++it) {
-                            if(it->second->write(m, it->first)) bundle.addMessage(m);
+                            if(it->second->write(m, it->first)) {
+                                bundle.addMessage(m);
+                                for(auto &monitor : monitors) monitor(m, destination);
+                            }
                             m.clear();
                         }
                         if(bundle.getMessageCount()) sender.sendBundle(bundle);
@@ -503,16 +511,45 @@ namespace ofx {
                         return;
                     }
                     for(Targets::iterator it = targets.begin(); it != targets.end(); ++it) {
-                        if(it->second->write(m, it->first)) sender.sendMessage(m, isWrapInBundle());
+                        if(it->second->write(m, it->first)) {
+                            sender.sendMessage(m, isWrapInBundle());
+                            for(auto &monitor : monitors) monitor(m, destination);
+                        }
                         m.clear();
                     }
-                    
                 }
-                
+                void update(const std::vector<std::function<void(const ofxOscMessageEx &m, const Destination &)>> &allMonitors)
+                {
+                    ofxOscMessage m;
+                    if(isUseBundle()) {
+                        ofxOscBundle bundle;
+                        for(Targets::iterator it = targets.begin(); it != targets.end(); ++it) {
+                            if(it->second->write(m, it->first)) {
+                                bundle.addMessage(m);
+                                for(auto &monitor : monitors) monitor(m, destination);
+                                for(auto &monitor : allMonitors) monitor(m, destination);
+                            }
+                            m.clear();
+                        }
+                        if(bundle.getMessageCount()) sender.sendBundle(bundle);
+                        bundle.clear();
+                        return;
+                    }
+                    for(Targets::iterator it = targets.begin(); it != targets.end(); ++it) {
+                        if(it->second->write(m, it->first)) {
+                            sender.sendMessage(m, isWrapInBundle());
+                            for(auto &monitor : monitors) monitor(m, destination);
+                            for(auto &monitor : allMonitors) monitor(m, destination);
+                        }
+                        m.clear();
+                    }
+                }
+
                 Destination destination;
                 ofxOscSender sender;
                 Targets targets;
                 Targets registeredTargets;
+                std::vector<std::function<void(const ofxOscMessageEx &, const Destination &)>> monitors;
                 friend class PublisherManager;
             };
             
@@ -534,9 +571,20 @@ namespace ofx {
                     return *(publishers[destination].get());
                 }
                 
+                void monitorAllPublishedOsc(std::function<void(const ofxOscMessageEx &, const Destination &)> callback)
+                {
+                    monitors.push_back(callback);
+                }
+                
                 void update(ofEventArgs &args) {
-                    for(Publishers::iterator it = publishers.begin(); it != publishers.end(); ++it) {
-                        it->second->update();
+                    if(monitors.size()) {
+                        for(Publishers::iterator it = publishers.begin(); it != publishers.end(); ++it) {
+                            it->second->update(monitors);
+                        }
+                    } else {
+                        for(Publishers::iterator it = publishers.begin(); it != publishers.end(); ++it) {
+                            it->second->update();
+                        }
                     }
                 }
                 PublisherManager() {
@@ -546,7 +594,8 @@ namespace ofx {
                     ofRemoveListener(ofEvents().update, this, &PublisherManager::update, OF_EVENT_ORDER_AFTER_APP);
                 }
                 Publishers publishers;
-                
+                std::vector<std::function<void(const ofxOscMessageEx &, const Destination &)>> monitors;
+
     #pragma mark iterator
             public:
                 using iterator = Publishers::iterator;
@@ -706,6 +755,18 @@ inline ofxOscPublisherIdentifier ofxPublishOscIf(ConditionObjectPtrOrRef &&condi
 }
 
 /// \}
+
+#pragma mark monitoring all published messages
+
+inline void ofxMonitorAllPublishedOscForDestination(const std::string &ip, std::uint16_t port, const std::function<void(const ofxOscMessageEx &, const ofxOscPublisherDestination &)> &callback)
+{
+    ofxGetOscPublisher(ip, port).monitorAllPublishedOsc(callback);
+}
+
+inline void ofxMonitorAllPublishedOsc(const std::function<void(const ofxOscMessageEx &, const ofxOscPublisherDestination &)> &callback)
+{
+    ofxGetOscPublisherManager().monitorAllPublishedOsc(callback);
+}
 
 #pragma mark unpublish
 
