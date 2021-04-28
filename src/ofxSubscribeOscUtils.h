@@ -175,6 +175,12 @@ namespace ofx {
                 return *this;
             }
             
+            /**
+             adress: string
+             v: reference of number type
+             min: minimum value of clamp
+             max: maximum value of clamp
+             */
             template <typename number_type, typename min_t, typename max_t>
             auto between(const std::string &address,
                          number_type &v,
@@ -184,7 +190,7 @@ namespace ofx {
                     !is_callable<number_type>::value,
                     SubscribeOscHelper &
                 >
-            { return subscribe(address, SubscribeUtils::clamper(v, min, max)); }
+            { return subscribe(address, SubscribeOscUtils::clamper(v, min, max)); }
 
             template <typename callback_t, typename min_t, typename max_t>
             auto between(const std::string &address,
@@ -195,7 +201,7 @@ namespace ofx {
                     is_callable<callback_t>::value,
                     SubscribeOscHelper &
                 >
-            { return subscribe(address, SubscribeUtils::clamper(callback, min, max)); }
+            { return subscribe(address, SubscribeOscUtils::clamper(callback, min, max)); }
 
             template <typename number_type, typename min_t>
             auto over(const std::string &address,
@@ -205,7 +211,7 @@ namespace ofx {
                     !is_callable<number_type>::value,
                     SubscribeOscHelper &
                 >
-            { return subscribe(address, SubscribeUtils::over(v, min)); }
+            { return subscribe(address, SubscribeOscUtils::over(v, min)); }
 
             template <typename callback_t, typename min_t>
             auto over(const std::string &address,
@@ -215,7 +221,7 @@ namespace ofx {
                     is_callable<callback_t>::value,
                     SubscribeOscHelper &
                 >
-            { return subscribe(address, SubscribeUtils::over(callback, min)); }
+            { return subscribe(address, SubscribeOscUtils::over(callback, min)); }
 
             template <typename number_type, typename max_t>
             auto under(const std::string &address,
@@ -225,7 +231,7 @@ namespace ofx {
                     !is_callable<number_type>::value,
                     SubscribeOscHelper &
                 >
-            { return subscribe(address, SubscribeUtils::under(v, max)); }
+            { return subscribe(address, SubscribeOscUtils::under(v, max)); }
 
             template <typename callback_t, typename max_t>
             auto under(const std::string &address,
@@ -235,7 +241,7 @@ namespace ofx {
                     is_callable<callback_t>::value,
                     SubscribeOscHelper &
                 >
-            { return subscribe(address, SubscribeUtils::under(callback, max)); }
+            { return subscribe(address, SubscribeOscUtils::under(callback, max)); }
             
             template <typename value_type, typename container_t>
             auto contains(const std::string &address,
@@ -245,7 +251,7 @@ namespace ofx {
                     !is_callable<value_type>::value && is_kind_of_containers<container_t>::value,
                     SubscribeOscHelper &
                 >
-            { return subscribe(address, SubscribeUtils::contains(v, set)); }
+            { return subscribe(address, SubscribeOscUtils::contains(v, set)); }
             
             template <typename value_type, typename container_value_t>
             auto contains(const std::string &address,
@@ -255,7 +261,7 @@ namespace ofx {
                     !is_callable<value_type>::value,
                     SubscribeOscHelper &
                 >
-            { return subscribe(address, SubscribeUtils::contains(v, set)); }
+            { return subscribe(address, SubscribeOscUtils::contains(v, set)); }
 
             template <
                 typename callback_t,
@@ -269,7 +275,7 @@ namespace ofx {
                     is_callable<callback_t>::value && is_kind_of_containers<container_t>::value,
                     SubscribeOscHelper &
                 >
-            { return subscribe(address, SubscribeUtils::contains(callback, set)); }
+            { return subscribe(address, SubscribeOscUtils::contains(callback, set)); }
 
             template <
                 typename callback_t,
@@ -283,7 +289,7 @@ namespace ofx {
                     is_callable<callback_t>::value,
                     SubscribeOscHelper &
                 >
-            { return subscribe(address, SubscribeUtils::contains(callback, set)); }
+            { return subscribe(address, SubscribeOscUtils::contains(callback, set)); }
 
             SubscribeOscHelper createChild(const std::string &childPath)
             { return { this, port, path + childPath }; }
