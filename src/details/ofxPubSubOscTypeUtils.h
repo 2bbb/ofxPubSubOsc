@@ -50,20 +50,28 @@ namespace ofx {
         using remove_ref = get_type<std::remove_reference<T>>;
         
         template <typename T>
-        using add_reference_if_non_arithmetic = std::conditional<std::is_arithmetic<T>::value, T, T&>;
+        using add_reference_if_non_arithmetic = std::conditional<std::is_arithmetic<T>::value, T, T &>;
         
         template <typename T>
         using type_ref = typename add_reference_if_non_arithmetic<T>::type;
         
         template <typename T>
-        struct is_integral_and_lt_64bit {
-            static const bool value = std::is_integral<T>::value && (sizeof(T) < 8);
-        };
+        struct is_integral_and_lt_64bit
+        : std::integral_constant<bool, std::is_integral<T>::value && (sizeof(T) < 8)>
+        {};
         
         template <typename T>
-        struct is_integral_and_geq_64bit {
-            static const bool value = std::is_integral<T>::value && (8 <= sizeof(T));
-        };
+        struct is_integral_and_geq_64bit
+        : std::integral_constant<bool, std::is_integral<T>::value && (8 <= sizeof(T))>
+        {};
+
+        template <typename type, typename = void>
+        struct is_kind_of_containers
+        : std::false_type {};
+        
+        template <typename container_t>
+        struct is_kind_of_containers<container_t, decltype(std::declval<container_t>().cbegin())>
+        : std::true_type {};
 
 #pragma mark function
         
@@ -77,30 +85,25 @@ namespace ofx {
         };
         
         template <typename R, typename ... Arguments>
-        struct is_callable<R(*)(Arguments ...)> {
-            static constexpr bool value = true;
-        };
+        struct is_callable<R(*)(Arguments ...)>
+        : std::true_type {};
         
         template <typename R, typename ... Arguments>
-        struct is_callable<R(*&)(Arguments ...)> {
-            static constexpr bool value = true;
-        };
+        struct is_callable<R(*&)(Arguments ...)>
+        : std::true_type {};
         
         template <typename R, typename ... Arguments>
-        struct is_callable<R(&)(Arguments ...)> {
-            static constexpr bool value = true;
-        };
+        struct is_callable<R(&)(Arguments ...)>
+        : std::true_type {};
+
+        template <typename R, typename ... Arguments>
+        struct is_callable<R(Arguments ...)>
+        : std::true_type {};
         
         template <typename R, typename ... Arguments>
-        struct is_callable<R(Arguments ...)> {
-            static constexpr bool value = true;
-        };
-        
-        template <typename R, typename ... Arguments>
-        struct is_callable<std::function<R(Arguments ...)>> {
-            static constexpr bool value = true;
-        };
-        
+        struct is_callable<std::function<R(Arguments ...)>>
+        : std::true_type {};
+
         namespace detail {
             template <typename ret, typename ... arguments>
             struct function_traits {
