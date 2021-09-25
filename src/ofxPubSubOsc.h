@@ -11,7 +11,7 @@
 #define ofxPubSubOsc_h
 
 #include "ofxOscSubscriber.h"
-#include "ofxSubscribeOscHelper.h"
+#include "ofxSubscribeOscUtils.h"
 #include "ofxOscPublisher.h"
 
 namespace ofx {
