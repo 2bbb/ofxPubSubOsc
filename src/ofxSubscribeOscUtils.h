@@ -192,6 +192,12 @@ namespace ofx {
                 >
             { return subscribe(address, SubscribeOscUtils::clamper(v, min, max)); }
 
+            /**
+             adress: string
+             callback: callback function
+             min: minimum value of clamp
+             max: maximum value of clamp
+             */
             template <typename callback_t, typename min_t, typename max_t>
             auto between(const std::string &address,
                          callback_t callback,
@@ -202,7 +208,12 @@ namespace ofx {
                     SubscribeOscHelper &
                 >
             { return subscribe(address, SubscribeOscUtils::clamper(callback, min, max)); }
-
+            
+            /**
+             adress: string
+             v: reference of number type
+             min: minimum value of clamp
+             */
             template <typename number_type, typename min_t>
             auto over(const std::string &address,
                       number_type &v,
@@ -212,7 +223,12 @@ namespace ofx {
                     SubscribeOscHelper &
                 >
             { return subscribe(address, SubscribeOscUtils::over(v, min)); }
-
+            
+            /**
+             adress: string
+             callback: callback function
+             min: minimum value of clamp
+             */
             template <typename callback_t, typename min_t>
             auto over(const std::string &address,
                       callback_t callback,
@@ -222,7 +238,12 @@ namespace ofx {
                     SubscribeOscHelper &
                 >
             { return subscribe(address, SubscribeOscUtils::over(callback, min)); }
-
+            
+            /**
+             adress: string
+             v: reference of number type
+             max: maximum value of clamp
+             */
             template <typename number_type, typename max_t>
             auto under(const std::string &address,
                        number_type &v,
@@ -232,7 +253,12 @@ namespace ofx {
                     SubscribeOscHelper &
                 >
             { return subscribe(address, SubscribeOscUtils::under(v, max)); }
-
+            
+            /**
+             adress: string
+             callback: callback function
+             max: maximum value of clamp
+             */
             template <typename callback_t, typename max_t>
             auto under(const std::string &address,
                        callback_t callback,
@@ -243,6 +269,11 @@ namespace ofx {
                 >
             { return subscribe(address, SubscribeOscUtils::under(callback, max)); }
             
+            /**
+             adress: string
+             v: reference value
+             container: set of values
+             */
             template <typename value_type, typename container_t>
             auto contains(const std::string &address,
                           value_type &v,
@@ -253,6 +284,11 @@ namespace ofx {
                 >
             { return subscribe(address, SubscribeOscUtils::contains(v, set)); }
             
+            /**
+             adress: string
+             callback: callback function if match
+             container: set of values
+             */
             template <typename value_type, typename container_value_t>
             auto contains(const std::string &address,
                           value_type &v,
@@ -305,7 +341,7 @@ namespace ofx {
                             std::uint16_t port,
                             const std::string &path)
             : parent{parent}
-            { setup(port, path); }
+            { setup(port, path); };
             std::uint16_t port;
             std::string path;
             SubscribeOscHelper *parent{nullptr};
