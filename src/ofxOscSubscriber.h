@@ -239,9 +239,9 @@ namespace ofx {
                     }
                 }
                 
-                void notify(ofxOscMessageEx &m) {
+                void notify(const ofxOscMessageEx &m) const {
                     const std::string &address = m.getAddress();
-                    Targets::iterator it = targets.find(address);
+                    Targets::const_iterator it = targets.find(address);
                     if(it != targets.end()) {
                         for(std::size_t i = 0; i < targets.count(address); i++, ++it) {
                             it->second->read(m);
@@ -249,7 +249,9 @@ namespace ofx {
                     }
                 }
                 
-                void notify(const SubscribeIdentifier &identifier, ofxOscMessageEx &m) {
+                void notify(const SubscribeIdentifier &identifier,
+                            const ofxOscMessageEx &m) const
+                {
                     if(!identifier.isValid()) return;
                     Targets::const_iterator it{findSubscribed(identifier)};
                     if(it != targets.end() && it->first == m.getAddress()) {
@@ -574,11 +576,15 @@ inline void ofxUnsubscribeOsc() {
 
 #pragma mark notify messages manually
 
-inline void ofxNotifyToSubscribedOsc(ofxOscSubscriberIdentifier &identifier, ofxOscMessageEx &m) {
+inline void ofxNotifyToSubscribedOsc(ofxOscSubscriberIdentifier &identifier,
+                                     const ofxOscMessageEx &m)
+{
     ofxGetOscSubscriber(identifier.getKey()).notify(m);
 }
 
-inline void ofxNotifyToSubscribedOsc(std::uint16_t port, ofxOscMessageEx &m) {
+inline void ofxNotifyToSubscribedOsc(std::uint16_t port,
+                                     const ofxOscMessageEx &m)
+{
     ofxGetOscSubscriber(port).notify(m);
 }
 
