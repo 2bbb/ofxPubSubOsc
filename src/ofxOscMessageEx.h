@@ -23,16 +23,16 @@ namespace ofx {
         OscMessageEx(const ofxOscMessage &m)
         : ofxOscMessage(m) {};
         template <typename ... arguments>
-        OscMessageEx(const std::string &address, const arguments & ... args) {
+        OscMessageEx(const std::string &address, arguments && ... args) {
             setAddress(address);
-            const std::vector<ofxOscMessageEx &> &_ = {add(args) ...};
+            char _[] = { (add(std::forward<arguments>(args)), '\0') ... };
         }
         
 #pragma mark add / operator<<
         
         template <typename type>
         OscMessageEx &add(const type &v) {
-            PubSubOsc::set(static_cast<ofxOscMessage &>(*this), v);
+            PubSubOsc::set(*this, v);
             return *this;
         }
         
@@ -55,7 +55,7 @@ namespace ofx {
             inline type as() const
             {
                 type v;
-                PubSubOsc::load(static_cast<const ofxOscMessage &>(m), v, index);
+                PubSubOsc::load(m, v, index);
                 return v;
             };
             
