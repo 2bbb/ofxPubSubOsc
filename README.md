@@ -213,6 +213,14 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 ## <a name="UpdateHistory">Update history</a>
 
+### 2021/09/26 ver 0.3.2
+
+* fixed constructor of ofxOscMessageEx
+* fixed some constness about notify, read
+
+### 2020/04/15 ver 0.3.1
+* added ofxSubscribeAllOsc, ofxSubscribeAllOscForPort
+
 ### 2018/05/08 ver 0.3.0
 
 * refactor all for C++11
