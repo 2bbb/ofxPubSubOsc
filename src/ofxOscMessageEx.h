@@ -40,6 +40,17 @@ namespace ofx {
         OscMessageEx &operator<<(const type &v)
         { return add(v); }
         
+        template <typename type>
+        inline operator type() const { return as<type>(); }
+        
+        template <typename type>
+        inline type as() const
+        {
+            type v;
+            PubSubOsc::load(*this, v, 0);
+            return v;
+        };
+
 #pragma mark operator[]
         
         struct OscArgConverter {
