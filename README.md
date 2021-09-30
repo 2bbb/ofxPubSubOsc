@@ -213,7 +213,11 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 ## <a name="UpdateHistory">Update history</a>
 
-### 2021/09/26 ver 0.3.2
+### 2021/09/30 ver 0.3.3
+
+* fixed bug on ver 0.3.2
+
+### 2021/09/26 ver 0.3.2 *[Deprecated!!]*
 
 * fixed constructor of ofxOscMessageEx
 * fixed some constness about notify, read
