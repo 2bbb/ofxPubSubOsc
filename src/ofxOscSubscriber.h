@@ -206,6 +206,11 @@ namespace ofx {
                 }
                 
                 template <typename R>
+                inline void setLeakPicker(std::function<R(ofxOscMessageEx)> callback) {
+                    setLeakPicker(ParameterRef(new SetterFunctionParameter<R, ofxOscMessageEx>(callback)));
+                }
+
+                template <typename R>
                 inline void setLeakPicker(std::function<R(const ofxOscMessage &)> callback)
                 {
                     setLeakPicker(ParameterRef(new SetterFunctionParameter<R, const ofxOscMessage &>(callback)));
@@ -214,6 +219,11 @@ namespace ofx {
                 template <typename R>
                 inline void setLeakPicker(std::function<R(ofxOscMessage &)> callback) {
                     setLeakPicker(ParameterRef(new SetterFunctionParameter<R, ofxOscMessage &>(callback)));
+                }
+
+                template <typename R>
+                inline void setLeakPicker(std::function<R(ofxOscMessage)> callback) {
+                    setLeakPicker(ParameterRef(new SetterFunctionParameter<R, ofxOscMessage>(callback)));
                 }
 
                 template <typename T>
