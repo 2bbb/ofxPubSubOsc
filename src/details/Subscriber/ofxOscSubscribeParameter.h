@@ -56,7 +56,7 @@ namespace ofx {
             namespace detail {
                 template <typename ... Ts, std::size_t ... Indices>
                 void read_to_tuple(index_sequence<Indices ...> &&,
-                                   ofxOscMessageEx &m,
+                                   const ofxOscMessageEx &m,
                                    std::tuple<Ts ...> &t,
                                    std::size_t offset) {
                     std::size_t o{0};
@@ -64,7 +64,7 @@ namespace ofx {
                 }
                 
                 template <typename ... Ts>
-                void read_to_tuple(ofxOscMessageEx &m, std::tuple<Ts ...> &t, std::size_t offset) {
+                void read_to_tuple(const ofxOscMessageEx &m, std::tuple<Ts ...> &t, std::size_t offset) {
                     read_to_tuple(index_sequence_for<Ts ...>(), m, t, offset);
                 }
             };
