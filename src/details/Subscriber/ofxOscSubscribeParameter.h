@@ -145,11 +145,11 @@ namespace ofx {
             
             
 #pragma mark load for ParameterRef
-            inline void load(ofxOscMessageEx &m, ParameterRef &ref, std::size_t offset = 0) {
+            inline void load(const ofxOscMessageEx &m, ParameterRef &ref, std::size_t offset = 0) {
                 ref->read(m, offset);
             }
             
-            inline void load(ofxOscMessageEx &m, std::vector<ParameterRef> &v, std::size_t offset = 0) {
+            inline void load(const ofxOscMessageEx &m, std::vector<ParameterRef> &v, std::size_t offset = 0) {
                 std::size_t o = 0;
                 for(std::size_t i = 0; i < v.size(); i++) {
                     if(m.getNumArgs() < offset + o + v[i]->size()) {
