@@ -38,7 +38,7 @@ namespace ofx {
                 Parameter(T &t) : t(t) {}
                 virtual void read(const ofxOscMessageEx &message,
                                   std::size_t offset = 0) override
-                    { PubSubOsc::load(message, t, offset); }
+                { PubSubOsc::load(message, t, offset); }
                 virtual std::size_t size() const override { return type_traits<T>::size; };
                 
             private:
@@ -54,7 +54,7 @@ namespace ofx {
                 TupleParameter(std::vector<ParameterRef> &&t) : t(std::move(t)) {}
                 virtual void read(const ofxOscMessageEx &message,
                                   std::size_t offset = 0) override
-                    { load(message, t, offset); }
+                { load(message, t, offset); }
                 virtual std::size_t size() const override { return type_traits<std::tuple<Ts ...>>::size; };
                 
             private:
@@ -67,15 +67,17 @@ namespace ofx {
                 void read_to_tuple(index_sequence<Indices ...> &&,
                                    const ofxOscMessageEx &m,
                                    std::tuple<Ts ...> &t,
-                                   std::size_t offset) {
+                                   std::size_t offset)
+                {
                     std::size_t o{0};
                     std::vector<std::size_t>{(PubSubOsc::load(m, std::get<Indices>(t), offset + o), o += type_traits<Ts>::size) ...};
                 }
                 
                 template <typename ... Ts>
-                void read_to_tuple(const ofxOscMessageEx &m, std::tuple<Ts ...> &t, std::size_t offset) {
-                    read_to_tuple(index_sequence_for<Ts ...>(), m, t, offset);
-                }
+                void read_to_tuple(const ofxOscMessageEx &m,
+                                   std::tuple<Ts ...> &t,
+                                   std::size_t offset)
+                { read_to_tuple(index_sequence_for<Ts ...>(), m, t, offset); }
             };
             
             template <typename R, typename ... Ts>
@@ -84,9 +86,11 @@ namespace ofx {
                 , type_traits<std::tuple<Ts ...>>
             {
                 using Setter = std::function<R(Ts ...)>;
-                SetterFunctionParameter(Setter setter) : setter(setter) {};
+                SetterFunctionParameter(Setter setter) : setter(std::move(setter)) {};
                 
-                virtual void read(const ofxOscMessageEx &message, std::size_t offset = 0) override {
+                virtual void read(const ofxOscMessageEx &message,
+                                  std::size_t offset = 0) override
+                {
                     std::tuple<remove_const_reference<Ts> ...> t;
                     Subscribe::detail::read_to_tuple<remove_const_reference<Ts> ...>(message, t, offset);
                     apply<R, Ts ...>(setter, t);
@@ -103,11 +107,11 @@ namespace ofx {
                 , type_traits<ofxOscMessageEx>
             {
                 using Setter = std::function<R(const ofxOscMessageEx &)>;
-                SetterFunctionParameter(Setter setter) : setter(setter) {};
+                SetterFunctionParameter(Setter setter) : setter(std::move(setter)) {};
                 
-                virtual void read(const ofxOscMessageEx &message, std::size_t offset = 0) override {
-                    setter(message);
-                }
+                virtual void read(const ofxOscMessageEx &message,
+                                  std::size_t offset = 0) override
+                { setter(message); }
                 virtual std::size_t size() const override { return type_traits<ofxOscMessageEx>::size; };
                 
             private:
@@ -120,7 +124,7 @@ namespace ofx {
                 , type_traits<ofxOscMessageEx>
             {
                 using Setter = std::function<R(ofxOscMessageEx &)>;
-                SetterFunctionParameter(Setter setter) : setter(setter) {};
+                SetterFunctionParameter(Setter setter) : setter(std::move(setter)) {};
                 
                 virtual void read(const ofxOscMessageEx &message,
                                   std::size_t offset = 0) override
@@ -140,7 +144,7 @@ namespace ofx {
                 , type_traits<ofxOscMessage>
             {
                 using Setter = std::function<R(const ofxOscMessage &)>;
-                SetterFunctionParameter(Setter setter) : setter(setter) {};
+                SetterFunctionParameter(Setter setter) : setter(std::move(setter)) {};
                 
                 virtual void read(const ofxOscMessageEx &message,
                                   std::size_t offset = 0) override
@@ -157,7 +161,7 @@ namespace ofx {
                 , type_traits<ofxOscMessage>
             {
                 using Setter = std::function<R(ofxOscMessage &)>;
-                SetterFunctionParameter(Setter setter) : setter(setter) {};
+                SetterFunctionParameter(Setter setter) : setter(std::move(setter)) {};
                 
                 virtual void read(const ofxOscMessageEx &message,
                                   std::size_t offset = 0) override
@@ -179,7 +183,7 @@ namespace ofx {
                 , type_traits<std::tuple<T, Ts ...>>
             {
                 using Setter = std::function<void(T, Ts ...)>;
-                SetterFunctionParameter(Setter setter) : setter(setter) {};
+                SetterFunctionParameter(Setter setter) : setter(std::move(setter)) {};
                 
                 virtual void read(const ofxOscMessageEx &message,
                                   std::size_t offset = 0) override
@@ -200,7 +204,7 @@ namespace ofx {
                 , type_traits<void>
             {
                 using Setter = std::function<R()>;
-                SetterFunctionParameter(Setter setter) : setter(setter) {};
+                SetterFunctionParameter(Setter setter) : setter(std::move(setter)) {};
                 
                 virtual void read(const ofxOscMessageEx &message,
                                   std::size_t offset = 0) override
