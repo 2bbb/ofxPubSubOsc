@@ -10,8 +10,9 @@ public:
         m.addIntArg(4);
         // or simply
         m.add(5);
+        m.add(glm::vec2{6.0, 7ul});
         // or like stream
-        m << 6 << 7.0f;
+        m << 8.0f << glm::vec2{9.0f, 10.0f} << "string";
         
         // get by subscript
         int x = m[0];
