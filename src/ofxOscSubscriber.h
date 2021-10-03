@@ -393,10 +393,34 @@ namespace ofx {
                 inline void subscribeAll(const std::function<void(const ofxOscMessageEx &, bool)> &callback) {
                     everyMessagesReceivers.push_back(callback);
                 }
-
+                
+                inline void onBeforeUpdate(const std::function<void()> &callback)
+                { beforeUpdateCallbacks.push_back(callback); }
+                
+                inline void onAfterUpdate(const std::function<void()> &callback)
+                { afterUpdateCallbacks.push_back(callback); }
+                
             private:
                 using Subscribers = std::map<std::uint16_t, Subscriber::Ref>;
+                
+                void beforeUpdate() const {
+                    std::for_each(beforeUpdateCallbacks.cbegin(),
+                                  beforeUpdateCallbacks.cend(),
+                                  [](const std::function<void()> &callback) {
+                                      callback();
+                                  });
+                }
+                
+                void afterUpdate() const {
+                    std::for_each(afterUpdateCallbacks.cbegin(),
+                                  afterUpdateCallbacks.cend(),
+                                  [](const std::function<void()> &callback) {
+                                      callback();
+                                  });
+                }
+                
                 void update(ofEventArgs &args) {
+                    beforeUpdate();
                     for(Subscribers::iterator it = managers.begin(); it != managers.end(); ++it) {
                         if(it->second->isEnabled()) {
                             if(everyMessagesReceivers.size()) {
@@ -406,6 +430,7 @@ namespace ofx {
                             }
                         }
                     }
+                    afterUpdate();
                 }
                 
                 SubscriberManager() {
@@ -418,6 +443,9 @@ namespace ofx {
                 Subscribers managers;
                 
                 std::vector<std::function<void(const ofxOscMessageEx &, bool)>> everyMessagesReceivers;
+                std::vector<std::function<void()>> beforeUpdateCallbacks;
+                std::vector<std::function<void()>> afterUpdateCallbacks;
+
 #pragma mark iterator
             public:
                 using iterator = Subscribers::iterator;
