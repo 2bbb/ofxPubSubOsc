@@ -213,7 +213,19 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
 
 ## <a name="UpdateHistory">Update history</a>
 
-### 2018/05/08 ver 0.3.0
+### 2021/09/30 [ver 0.3.3](../../releases/tag/v0_3_3)
+
+* fixed bug on ver 0.3.2  (issued by [hanasaan](https://github.com/hanasaan). thanks!!!)
+
+### 2021/09/26 ver 0.3.2 *[Deprecated!!]*
+
+* fixed constructor of ofxOscMessageEx
+* fixed some constness about notify, read
+
+### 2020/04/15 [ver 0.3.1](../../releases/tag/v0_3_1)
+* added ofxSubscribeAllOsc, ofxSubscribeAllOscForPort
+
+### 2018/05/08 [ver 0.3.0](../../releases/tag/v0_3_0)
 
 * refactor all for C++11
 * add `ofxSendOsc`
@@ -221,18 +233,6 @@ if you use `vector<SomeType> vec;`, when `vec` will be resized every receiving O
   * multi arguments
   * multi arguments callback
 * add `ofxOscMessageEx`
-
-### 2016/01/25 [ver 0.2.2](../../releases/tag/v0_2_2) release
-
-* bugfix: about `ofQuaternion`'s `operator>>`, `operator<<` (issued by [musiko](https://github.com/musiko). thanks!!!)
-
-### 2016/01/04 [ver 0.2.1](../../releases/tag/v0_2_1) release
-
-* **critical bugfix**, hehe
-* enable subscribe lambda has argument is not ofxOscMessage.
-* enable subscribe method has no argument
-* update exmaples (xcodeproj) for oF0.9.0
-* some cleaning source and doxygen
 
 ### [Older update histories](Update_History.md)
 

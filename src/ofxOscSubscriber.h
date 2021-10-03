@@ -195,10 +195,37 @@ namespace ofx {
                 }
                 
                 template <typename R>
+                inline void setLeakPicker(std::function<R(const ofxOscMessageEx &)> callback)
+                {
+                    setLeakPicker(ParameterRef(new SetterFunctionParameter<R, const ofxOscMessageEx &>(callback)));
+                }
+
+                template <typename R>
                 inline void setLeakPicker(std::function<R(ofxOscMessageEx &)> callback) {
                     setLeakPicker(ParameterRef(new SetterFunctionParameter<R, ofxOscMessageEx &>(callback)));
                 }
                 
+                template <typename R>
+                inline void setLeakPicker(std::function<R(ofxOscMessageEx)> callback) {
+                    setLeakPicker(ParameterRef(new SetterFunctionParameter<R, ofxOscMessageEx>(callback)));
+                }
+
+                template <typename R>
+                inline void setLeakPicker(std::function<R(const ofxOscMessage &)> callback)
+                {
+                    setLeakPicker(ParameterRef(new SetterFunctionParameter<R, const ofxOscMessage &>(callback)));
+                }
+
+                template <typename R>
+                inline void setLeakPicker(std::function<R(ofxOscMessage &)> callback) {
+                    setLeakPicker(ParameterRef(new SetterFunctionParameter<R, ofxOscMessage &>(callback)));
+                }
+
+                template <typename R>
+                inline void setLeakPicker(std::function<R(ofxOscMessage)> callback) {
+                    setLeakPicker(ParameterRef(new SetterFunctionParameter<R, ofxOscMessage>(callback)));
+                }
+
                 template <typename T>
                 inline void setLeakPicker(T &t) {
                     setLeakPicker(function_traits<T>::cast(t));
@@ -588,7 +615,7 @@ inline void ofxNotifyToSubscribedOsc(std::uint16_t port,
     ofxGetOscSubscriber(port).notify(m);
 }
 
-inline void ofxNotifyToSubscribedOsc(ofxOscMessageEx &m) {
+inline void ofxNotifyToSubscribedOsc(const ofxOscMessageEx &m) {
     ofxOscSubscriberManager &manager = ofxGetOscSubscriberManager();
     ofxOscSubscriberManager::iterator it  = manager.begin(),
     end = manager.end();

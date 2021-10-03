@@ -1,5 +1,17 @@
 # ofxPubSubOsc Update History
 
+## 2016/01/25 [ver 0.2.2](../../releases/tag/v0_2_2) release
+
+* bugfix: about `ofQuaternion`'s `operator>>`, `operator<<` (issued by [musiko](https://github.com/musiko). thanks!!!)
+
+## 2016/01/04 [ver 0.2.1](../../releases/tag/v0_2_1) release
+
+* **critical bugfix**, hehe
+* enable subscribe lambda has argument is not ofxOscMessage.
+* enable subscribe method has no argument
+* update exmaples (xcodeproj) for oF0.9.0
+* some cleaning source and doxygen
+
 ## 2016/01/25 [ver 0.2.2](../../releases/tag/v0_2_2), [ver 0.1.3](../../releases/tag/v0_1_3) release
 
 * bugfix: about `ofQuaternion`'s `operator>>`, `operator<<` (issued by [musiko](https://github.com/musiko). thanks!!!)
