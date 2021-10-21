@@ -29,10 +29,10 @@ namespace ofx {
             
             template <typename callback_t, typename min_t, typename max_t>
             inline auto clamper(callback_t callback, min_t min, max_t max)
-                -> enable_if_t<
+                -> typename enable_if_t<
                     is_callable<callback_t>::value,
-                    typename function_traits<callback_t>::function_type
-                >
+                    function_traits<callback_t>
+                >::function_type
             {
                 using value_t = typename function_traits<callback_t>::template argument_type<0>;
                 return [callback, min, max] (value_t w) {
@@ -54,10 +54,10 @@ namespace ofx {
             
             template <typename callback_t, typename min_t>
             inline auto over(callback_t callback, min_t min)
-                -> enable_if_t<
+                -> typename enable_if_t<
                     is_callable<callback_t>::value,
-                    typename function_traits<callback_t>::function_type
-                >
+                    function_traits<callback_t>
+                >::function_type
             {
                 using value_t = typename function_traits<callback_t>::template argument_type<0>;
                 return [callback, min] (value_t w) {
@@ -79,10 +79,10 @@ namespace ofx {
             
             template <typename callback_t, typename max_t>
             inline auto under(callback_t callback, max_t max)
-                -> enable_if_t<
+                -> typename enable_if_t<
                     is_callable<callback_t>::value,
-                    typename function_traits<callback_t>::function_type
-                >
+                    function_traits<callback_t>
+                >::function_type
             {
                 using value_t = typename function_traits<callback_t>::template argument_type<0>;
                 return [callback, max] (value_t w) {
@@ -124,10 +124,10 @@ namespace ofx {
             >
             inline auto contains(callback_t callback,
                                  const container_t &set)
-                -> enable_if_t<
+                -> typename enable_if_t<
                     is_callable<callback_t>::value && is_kind_of_containers<container_t>::value,
-                    typename function_traits<callback_t>::function_type
-                >
+                    function_traits<callback_t>
+                >::function_type
             {
                 return [callback, set] (value_t w) {
                     if(std::find(set.cbegin(), set.cend(), w) != set.end()) callback(w);
@@ -141,10 +141,10 @@ namespace ofx {
             >
             inline auto contains(callback_t callback,
                                  const std::initializer_list<container_value_t> &init_list)
-                -> enable_if_t<
+                -> typename enable_if_t<
                     is_callable<callback_t>::value,
-                    typename function_traits<callback_t>::function_type
-                >
+                    function_traits<callback_t>
+                >::function_type
             {
                 std::vector<container_value_t> set{init_list};
                 return [callback, set] (value_t w) {
