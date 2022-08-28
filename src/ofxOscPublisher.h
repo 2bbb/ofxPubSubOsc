@@ -17,6 +17,8 @@
 #include "ofxOscPublishParameter.h"
 #include "ofxOscPublisherStructs.h"
 
+#include <set>
+
 namespace ofx {
     namespace PubSubOsc {
         namespace Publish {
@@ -381,6 +383,24 @@ namespace ofx {
                         sender.sendMessage(m, isWrapInBundle());
                         m.clear();
                     }
+                }
+                
+    #pragma mark published addresses
+                
+                inline std::vector<std::string> getPublishedAddresses() const {
+                    std::set<std::string> addresses;
+                    for(auto it : targets) {
+                        addresses.insert(it.first);
+                    }
+                    return { addresses.begin(), addresses.end() };
+                }
+                
+                inline std::vector<std::string> getRegisteredAddresses() const {
+                    std::set<std::string> addresses;
+                    for(auto it : registeredTargets) {
+                        addresses.insert(it.first);
+                    }
+                    return { addresses.begin(), addresses.end() };
                 }
                 
     #pragma mark status
