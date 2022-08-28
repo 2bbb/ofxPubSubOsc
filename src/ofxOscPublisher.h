@@ -481,6 +481,9 @@ namespace ofx {
                 }
 
             private:
+                Publisher(const Publisher &) = delete;
+                Publisher &operator=(const Publisher &) = delete;
+                
                 template <typename Arg>
                 void createMessageImpl(ofxOscMessage &m, Arg &&arg) {
                     set(m, std::forward<Arg>(arg));
