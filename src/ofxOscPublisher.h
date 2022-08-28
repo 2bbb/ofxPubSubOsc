@@ -898,6 +898,16 @@ inline void ofxPublishOscManually(const ofxOscPublisherIdentifier &identifier) {
 
 /// \}
 
+#pragma mark published addresses
+
+inline std::vector<std::string> ofxGetPublishedAddresses(const std::string &ip, std::uint16_t port) {
+    return ofxGetOscPublisher(ip, port).getPublishedAddresses();
+}
+
+inline std::vector<std::string> ofxGetRegisteredAddresses(const std::string &ip, std::uint16_t port) {
+    return ofxGetOscPublisher(ip, port).getRegisteredAddresses();
+}
+
 #pragma mark send
 
 template <typename ... Args>
