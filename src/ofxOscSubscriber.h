@@ -19,6 +19,8 @@
 #include "ofxOscSubscriberLoadImplementation.h"
 #include "ofxOscSubscribeParameter.h"
 
+#include <set>
+
 namespace ofx {
     namespace PubSubOsc {
         namespace Subscribe {
@@ -188,6 +190,17 @@ namespace ofx {
                     targets.clear();
                 }
                 
+#pragma mark addressses
+
+                inline std::vector<std::string> getSubscribedAddresses() const
+                {
+                    std::set<std::string> addresses;
+                    for(auto it : targets) {
+                        addresses.insert(it.first);
+                    }
+                    return { addresses.begin(), addresses.end() };
+                }
+
 #pragma mark leakPicker
                 
                 inline void setLeakPicker(ParameterRef ref) {
@@ -660,6 +673,12 @@ inline void ofxSetOscSubscriberActive(std::uint16_t port, bool bActive) {
 
 inline bool ofxGetOscSubscriberActive(std::uint16_t port) {
     return ofxGetOscSubscriber(port).isEnabled();
+}
+
+#pragma mark published addresses
+
+inline std::vector<std::string> ofxGetSubscribedAddresses(std::uint16_t port) {
+    return ofxGetOscSubscriber(port).getSubscribedAddresses();
 }
 
 #pragma mark interface about leaked osc
