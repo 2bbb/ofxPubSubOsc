@@ -481,9 +481,6 @@ namespace ofx {
                 }
 
             private:
-                Publisher(const Publisher &) = delete;
-                Publisher &operator=(const Publisher &) = delete;
-                
                 template <typename Arg>
                 void createMessageImpl(ofxOscMessage &m, Arg &&arg) {
                     set(m, std::forward<Arg>(arg));
@@ -517,7 +514,10 @@ namespace ofx {
                 : destination(destination) {
                     sender.setup(destination.ip, destination.port);
                 }
-                
+                Publisher() = delete;
+                Publisher(const Publisher &) = delete;
+                Publisher &operator=(const Publisher &) = delete;
+
                 void update() {
                     ofxOscMessage m;
                     if(isUseBundle()) {
@@ -613,6 +613,8 @@ namespace ofx {
                 PublisherManager() {
                     ofAddListener(ofEvents().update, this, &PublisherManager::update, OF_EVENT_ORDER_AFTER_APP);
                 }
+                PublisherManager(const PublisherManager &) = delete;
+                PublisherManager &operator=(const PublisherManager &) = delete;
                 virtual ~PublisherManager() {
                     ofRemoveListener(ofEvents().update, this, &PublisherManager::update, OF_EVENT_ORDER_AFTER_APP);
                 }
