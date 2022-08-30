@@ -296,6 +296,10 @@ namespace ofx {
                     receiver.setup(port);
                 }
                 
+                Subscriber() = delete;
+                Subscriber(const Subscriber &) = delete;
+                Subscriber &operator=(const Subscriber &) = delete;
+
                 void update() {
                     clearLeakedOscMessages();
                     ofxOscMessageEx m;
@@ -415,6 +419,8 @@ namespace ofx {
                 virtual ~SubscriberManager() {
                     ofRemoveListener(ofEvents().update, this, &SubscriberManager::update, OF_EVENT_ORDER_BEFORE_APP);
                 }
+                SubscriberManager(const SubscriberManager &) = delete;
+                SubscriberManager &operator=(const SubscriberManager &) = delete;
                 Subscribers managers;
                 
                 std::vector<std::function<void(const ofxOscMessageEx &, bool)>> everyMessagesReceivers;
