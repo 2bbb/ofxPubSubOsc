@@ -449,6 +449,10 @@ namespace ofx {
                 
 #pragma mark send
                 
+                void send(const ofxOscMessage &m) {
+                    sender.sendMessage(m, isWrapInBundle());
+                }
+                
                 template <typename ... Args>
                 void send(const std::string &address, Args && ... args) {
                     ofxOscMessage m = createMessage(address, std::forward<Args>(args) ...);
@@ -876,6 +880,10 @@ inline void ofxPublishOscManually(const ofxOscPublisherIdentifier &identifier) {
 /// \}
 
 #pragma mark send
+
+void ofxSendOsc(const std::string &ip, std::uint16_t port, const ofxOscMessage &mess) {
+    ofxGetOscPublisher(ip, port).send(mess);
+}
 
 template <typename ... Args>
 void ofxSendOsc(const std::string &ip, std::uint16_t port, const std::string &address, Args && ... args) {
