@@ -10,13 +10,18 @@
 #ifndef ofxOscPublisherSetImplementation_h
 #define ofxOscPublisherSetImplementation_h
 
-#include <cmath>
+#include "ofxPubSubOscTypeTraits.h"
+#include "ofxPubSubOscTypeUtils.h"
+#include "ofxPubSubOscSettings.h"
 
 #include "ofxOscMessage.h"
 
-#include "ofxPubSubOscSettings.h"
-#include "ofxPubSubOscTypeUtils.h"
-#include "ofxPubSubOscTypeTraits.h"
+#include "ofColor.h"
+#include "ofParameter.h"
+#include "ofParameterGroup.h"
+#include "ofUtils.h"
+
+#include <cmath>
 
 namespace ofx {
     namespace PubSubOsc {

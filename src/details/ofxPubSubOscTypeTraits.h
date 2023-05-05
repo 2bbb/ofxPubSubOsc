@@ -10,14 +10,16 @@
 #ifndef ofxPubSubOscTypeTraits_h
 #define ofxPubSubOscTypeTraits_h
 
-#include <array>
+#include "ofxOscArrayPublisher.h"
+#include "ofxPubSubOscSettings.h"
+
+#include "ofColor.h"
 
 #include "ofVectorMath.h"
 #include "ofRectangle.h"
 #include "ofFileUtils.h"
 
-#include "ofxPubSubOscSettings.h"
-#include "ofxOscArrayPublisher.h"
+#include <array>
 
 namespace ofx {
     using ofxOscMessageEx = class OscMessageEx;
