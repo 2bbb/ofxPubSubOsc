@@ -34,7 +34,10 @@ namespace ofx {
         inline auto set(ofxOscMessage &m, T v)
         -> enable_if_t<is_integral_and_geq_64bit<T>::value>
         { m.addInt64Arg(v); }
-        
+
+        inline void set(ofxOscMessage &m, const ofxOscMessage &v) { m = v; }
+        inline void set(ofxOscMessage &m, ofxOscMessage &&v) { std::swap(m, v); }
+
 #define define_set_float(type) inline void set(ofxOscMessage &m, type v) { m.addFloatArg(v); }
         define_set_float(float);
         define_set_float(double);
