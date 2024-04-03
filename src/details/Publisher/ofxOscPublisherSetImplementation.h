@@ -126,10 +126,19 @@ namespace ofx {
         }
         
         template <typename U, std::size_t size>
-        inline void set(ofxOscMessage &m, const U (&v)[size]) {
+        inline auto set(ofxOscMessage &m, const U (&v)[size])
+            -> typename std::enable_if<!std::is_same<U, char>::value>::type
+        {
             for(std::size_t i = 0; i < size; i++) { set(m, v[i]); }
         }
         
+        template <typename U, std::size_t size>
+        inline auto set(ofxOscMessage &m, const U (&v)[size])
+            -> typename std::enable_if<std::is_same<U, char>::value>::type
+        {
+            m.addStringArg(v);
+        }
+
         template <typename U, typename Alloc>
         inline void set(ofxOscMessage &m, const std::vector<U, Alloc> &v) {
             for(std::size_t i = 0; i < v.size(); i++) { set(m, v[i]); }
