@@ -30,7 +30,7 @@ namespace ofx {
             else if(m.getArgType(offset) == OFXOSC_TYPE_STRING) v = ofToDouble(m.getArgAsString(offset)); \
             else if(m.getArgType(offset) == OFXOSC_TYPE_TRUE) v = true; \
             else if(m.getArgType(offset) == OFXOSC_TYPE_FALSE) v = false; \
-}
+        }
         
         define_set_arithmetic(bool);
         define_set_arithmetic(char);
@@ -97,27 +97,27 @@ namespace ofx {
         }
         
 #pragma mark oF container type
-        template <std::size_t n, typename U>
+        template <std::size_t n, typename U, typename size_type = std::size_t>
         inline void loadVec(const ofxOscMessage &m, U &v, std::size_t offset = 0) {
-            for(std::size_t i = 0; i < std::min(static_cast<std::size_t>(m.getNumArgs() - offset), n); i++) {
+            for(size_type i = 0; i < std::min<std::size_t>(m.getNumArgs() - offset, n); i++) {
                 load(m, v[i], offset + i);
             }
         }
         
         inline void load(const ofxOscMessage &m, ofVec2f &v, std::size_t offset = 0) {
-            loadVec<2>(m, v, offset);
+            loadVec<2, ofVec2f, int>(m, v, offset);
         }
         inline void load(const ofxOscMessage &m, ofVec3f &v, std::size_t offset = 0) {
-            loadVec<3>(m, v, offset);
+            loadVec<3, ofVec3f, int>(m, v, offset);
         }
         inline void load(const ofxOscMessage &m, ofVec4f &v, std::size_t offset = 0) {
-            loadVec<4>(m, v, offset);
+            loadVec<4, ofVec4f, int>(m, v, offset);
         }
         inline void load(const ofxOscMessage &m, ofQuaternion &v, std::size_t offset = 0) {
-            loadVec<4>(m, v, offset);
+            loadVec<4, ofQuaternion, int>(m, v, offset);
         }
         inline void load(const ofxOscMessage &m, ofMatrix3x3 &v, std::size_t offset = 0) {
-            loadVec<9>(m, v, offset);
+            loadVec<9, ofMatrix3x3, int>(m, v, offset);
         }
         
         inline void load(const ofxOscMessage &m, ofMatrix4x4 &v, std::size_t offset = 0) {
@@ -153,18 +153,18 @@ namespace ofx {
         template <glm::length_t N, typename T, glm::qualifier Q>
         inline void load(const ofxOscMessage &m, glm::vec<N, T, Q> &v, std::size_t offset = 0)
         {
-            loadVec<N>(m, v, offset);
+            loadVec<N, glm::vec<N, T, Q>, glm::length_t>(m, v, offset);
         }
         
         template <glm::length_t M, glm::length_t N, typename T, glm::qualifier Q>
         inline void load(const ofxOscMessage &m, glm::mat<M, N, T, Q> &v, std::size_t offset = 0)
         {
-            for(std::size_t i = 0; i < M; i++) loadVec<N>(m, v[i], offset + N * i);
+            for(std::size_t i = 0; i < M; i++) loadVec<N, glm::vec<N, T, Q>, glm::length_t>(m, v[i], offset + N * i);
         }
         
         template <typename T, glm::precision P>
         inline void load(const ofxOscMessage &m, glm::tquat<T, P> &v, std::size_t offset = 0) {
-            loadVec<4>(m, v);
+            loadVec<4, glm::tquat<T, P>, glm::length_t>(m, v);
         }
 #   endif
 #endif
