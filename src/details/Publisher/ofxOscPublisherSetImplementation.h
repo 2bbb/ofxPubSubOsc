@@ -25,8 +25,6 @@
 
 namespace ofx {
     namespace PubSubOsc {
-        inline void set(ofxOscMessage &m, const ofxOscMessage &v) { m = v; }
-        
         template <typename T>
         inline auto set(ofxOscMessage &m, T v)
         -> enable_if_t<is_integral_and_lt_64bit<T>::value>
