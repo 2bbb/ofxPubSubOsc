@@ -440,7 +440,7 @@ namespace ofx {
                 using Ref = std::shared_ptr<Publisher>;
                 
                 static bool &bWrapInBundle() {
-                    static bool b{true};
+                    static bool b{false};
                     return b;
                 }
                 
