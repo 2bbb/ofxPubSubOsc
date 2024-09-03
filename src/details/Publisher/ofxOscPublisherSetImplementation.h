@@ -38,10 +38,15 @@ namespace ofx {
         inline void set(ofxOscMessage &m, const ofxOscMessage &v) { m = v; }
         inline void set(ofxOscMessage &m, ofxOscMessage &&v) { std::swap(m, v); }
 
-#define define_set_float(type) inline void set(ofxOscMessage &m, type v) { m.addFloatArg(v); }
+#if defined(OFXPUBSUBOSC_SEND_DOUBLE_AS_DOUBLE) && OFXPUBSUBOSC_SEND_DOUBLE_AS_DOUBLE
+        void set(ofxOscMessage &m, float v) { m.addFloatArg(v); }
+        void set(ofxOscMessage &m, double v) { m.addDoubleArg(v); }
+#else
+#   define define_set_float(type) inline void set(ofxOscMessage &m, type v) { m.addFloatArg(v); }
         define_set_float(float);
         define_set_float(double);
-#undef define_set_float
+#   undef define_set_float
+#endif
         inline void set(ofxOscMessage &m, const std::string &v) { m.addStringArg(v); }
         inline void set(ofxOscMessage &m, const ofBuffer &v) { m.addBlobArg(v); };
         
