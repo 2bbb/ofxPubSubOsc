@@ -886,12 +886,13 @@ inline void ofxPublishOscManually(const ofxOscPublisherIdentifier &identifier) {
 
 #pragma mark send
 
-void ofxSendOsc(const std::string &ip, std::uint16_t port, const ofxOscMessage &mess) {
-    ofxGetOscPublisher(ip, port).send(mess);
+inline void ofxSendOsc(const std::string &ip, std::uint16_t port, const ofxOscMessage &m) {
+    auto &sender = ofxGetOscPublisher(ip, port).getSender();
+    sender.sendMessage(m, ofx::PubSubOsc::Publish::Publisher::isWrapInBundle());
 }
 
 template <typename ... Args>
-void ofxSendOsc(const std::string &ip, std::uint16_t port, const std::string &address, Args && ... args) {
+inline void ofxSendOsc(const std::string &ip, std::uint16_t port, const std::string &address, Args && ... args) {
     ofxGetOscPublisher(ip, port).send(address, std::forward<Args>(args) ...);
 }
 
