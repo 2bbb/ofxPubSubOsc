@@ -123,6 +123,37 @@ namespace ofx {
         }
         
 #pragma mark containerz
+        
+        template <typename T, typename U>
+        inline void set(ofxOscMessage &m, const std::pair<T, U> &v) {
+            set(m, v.first);
+            set(m, v.second);
+        }
+        
+        namespace details {
+            template <std::size_t index, typename ... Ts>
+            inline auto set_recursive(ofxOscMessage &m,
+                                      const std::tuple<Ts ...> &v)
+                -> typename std::enable_if<index == sizeof...(Ts) - 1>::type
+            {
+                set(m, std::get<index>(v));
+            }
+            
+            template <std::size_t index, typename ... Ts>
+            inline auto set_recursive(ofxOscMessage &m,
+                                      const std::tuple<Ts ...> &v)
+                -> typename std::enable_if<index < sizeof...(Ts) - 1>::type
+            {
+                set(m, std::get<index>(v));
+                set_recursive<index + 1>(m, v);
+            }
+        }
+        
+        template <typename ... Ts>
+        inline void set(ofxOscMessage &m, const std::tuple<Ts ...> &v) {
+            details::set_recursive<0>(m, v);
+        }
+        
         template <typename U, std::size_t size>
         inline void set(ofxOscMessage &m, const std::array<U, size> &v) {
             for(std::size_t i = 0; i < size; i++) { set(m, v[i]); }

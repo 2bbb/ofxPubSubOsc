@@ -240,6 +240,40 @@ namespace ofx {
         }
         
 #pragma mark container
+        
+        template <typename T, typename U>
+        inline void load(const ofxOscMessage &m, std::pair<T, U> &v, std::size_t offset = 0) {
+            load(m, v.first, offset);
+            load(m, v.second, offset + type_traits<T>::size);
+        }
+        
+        namespace details {
+            template <std::size_t index, typename ... Ts>
+            inline auto load_recursive(const ofxOscMessage &m,
+                                       std::tuple<Ts ...> &v,
+                                       std::size_t offset)
+                -> typename std::enable_if<index == sizeof...(Ts) - 1>::type
+            {
+                load(m, std::get<index>(v), offset);
+            }
+            
+            template <std::size_t index, typename ... Ts>
+            inline auto load_recursive(const ofxOscMessage &m,
+                                       std::tuple<Ts ...> &v,
+                                       std::size_t offset)
+                -> typename std::enable_if<index < sizeof...(Ts) - 1>::type
+            {
+                using value_type = remove_const_reference<decltype(std::get<index>(v))>;
+                load(m, std::get<index>(v), offset);
+                load_recursive<index + 1>(m, v, offset + type_traits<value_type>::size);
+            }
+        }
+        
+        template <typename ... Ts>
+        inline void load(const ofxOscMessage &m, std::tuple<Ts ...> &v, std::size_t offset = 0) {
+            details::load_recursive<0>(m, v, offset);
+        }
+
         template <typename U, std::size_t size>
         inline void load(const ofxOscMessage &m, std::array<U, size> &v, std::size_t offset = 0) {
             for(std::size_t i = 0; i < std::min(size, (m.getNumArgs() - offset) / type_traits<U>::size); i++) {

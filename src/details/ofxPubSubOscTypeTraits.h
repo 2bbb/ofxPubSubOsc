@@ -72,6 +72,13 @@ namespace ofx {
             static constexpr bool has_array_operator = false;
         };
         
+        template <typename T, typename U>
+        struct type_traits<std::pair<T, U>> {
+            using inner_type = std::pair<T, U>;
+            static constexpr std::size_t size = PubSubOsc::detail::size_sum<T, U>::value;
+            static constexpr bool has_array_operator = false;
+        };
+
         template <typename ... Ts>
         struct type_traits<std::tuple<Ts ...>> {
             using inner_type = std::tuple<Ts ...>;
