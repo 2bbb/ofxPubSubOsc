@@ -156,32 +156,32 @@ namespace ofx {
             details::set_recursive<0>(m, v);
         }
         
-        template <typename U, std::size_t size>
-        inline void set(ofxOscMessage &m, const std::array<U, size> &v) {
+        template <typename T, std::size_t size>
+        inline void set(ofxOscMessage &m, const std::array<T, size> &v) {
             for(std::size_t i = 0; i < size; i++) { set(m, v[i]); }
         }
         
-        template <typename U, std::size_t size>
-        inline auto set(ofxOscMessage &m, const U (&v)[size])
-            -> typename std::enable_if<!std::is_same<U, char>::value>::type
+        template <typename T, std::size_t size>
+        inline auto set(ofxOscMessage &m, const T (&v)[size])
+            -> typename std::enable_if<!std::is_same<T, char>::value>::type
         {
             for(std::size_t i = 0; i < size; i++) { set(m, v[i]); }
         }
         
-        template <typename U, std::size_t size>
-        inline auto set(ofxOscMessage &m, const U (&v)[size])
-            -> typename std::enable_if<std::is_same<U, char>::value>::type
+        template <typename T, std::size_t size>
+        inline auto set(ofxOscMessage &m, const T (&v)[size])
+            -> typename std::enable_if<std::is_same<T, char>::value>::type
         {
             m.addStringArg(v);
         }
 
-        template <typename U, typename Alloc>
-        inline void set(ofxOscMessage &m, const std::vector<U, Alloc> &v) {
+        template <typename T, typename Alloc>
+        inline void set(ofxOscMessage &m, const std::vector<T, Alloc> &v) {
             for(std::size_t i = 0; i < v.size(); i++) { set(m, v[i]); }
         }
         
-        template <typename U, typename Alloc>
-        inline void set(ofxOscMessage &m, const std::deque<U, Alloc> &v) {
+        template <typename T, typename Alloc>
+        inline void set(ofxOscMessage &m, const std::deque<T, Alloc> &v) {
             for(std::size_t i = 0; i < v.size(); i++) { set(m, v[i]); }
         }
         
@@ -193,8 +193,8 @@ namespace ofx {
         
 #pragma mark ofParameter<T> / ofParameterGroup
         
-        template <typename U>
-        inline void set(ofxOscMessage &m, const ofParameter<U> &p) {
+        template <typename T>
+        inline void set(ofxOscMessage &m, const ofParameter<T> &p) {
             set(m, p.get());
         }
         

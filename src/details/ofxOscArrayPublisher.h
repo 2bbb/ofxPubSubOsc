@@ -149,12 +149,12 @@ namespace ofx {
             
             ArrayPublisher(T (*getter)())
             : stream(PubSubOsc::detail::pointer_stream_factory(getter)) {}
-            template <typename U>
             
+            template <typename U>
             ArrayPublisher(U &that, T (U::*getter)())
             : stream(PubSubOsc::detail::pointer_stream_factory(that, getter)) {}
-            template <typename U>
             
+            template <typename U>
             ArrayPublisher(const U &that, T (U::*getter)() const)
             : stream(PubSubOsc::detail::pointer_stream_factory(that, getter)) {}
             virtual ~ArrayPublisher() { }
