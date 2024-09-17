@@ -21,6 +21,10 @@
 
 namespace ofx {
     namespace PubSubOsc {
+        template <typename T>
+        inline auto load(const ofxOscMessage &m, T &v, std::size_t offset = 0)
+        -> PubSubOsc::enable_if_t<PubSubOsc::has_from_osc<T>::value>;
+
 #define define_set_arithmetic(type) \
         inline void load(const ofxOscMessage &m, type &v, std::size_t offset = 0) { \
             if(m.getArgType(offset) == OFXOSC_TYPE_INT32) v = m.getArgAsInt32(offset); \
@@ -252,21 +256,13 @@ namespace ofx {
             inline auto load_recursive(const ofxOscMessage &m,
                                        std::tuple<Ts ...> &v,
                                        std::size_t offset)
-                -> typename std::enable_if<index == sizeof...(Ts) - 1>::type
-            {
-                load(m, std::get<index>(v), offset);
-            }
+            -> typename std::enable_if<index == sizeof...(Ts) - 1>::type;
             
             template <std::size_t index, typename ... Ts>
             inline auto load_recursive(const ofxOscMessage &m,
                                        std::tuple<Ts ...> &v,
                                        std::size_t offset)
-                -> typename std::enable_if<index < sizeof...(Ts) - 1>::type
-            {
-                using value_type = remove_const_reference<decltype(std::get<index>(v))>;
-                load(m, std::get<index>(v), offset);
-                load_recursive<index + 1>(m, v, offset + type_traits<value_type>::size);
-            }
+            -> typename std::enable_if<index < sizeof...(Ts) - 1>::type;
         }
         
         template <typename ... Ts>
@@ -303,6 +299,51 @@ namespace ofx {
             if(v.size() != num) v.resize(num);
             for(std::size_t i = 0; i < num; i++) {
                 load(m, v[i], offset + i * type_traits<U>::size);
+            }
+        }
+        
+        namespace detail {
+            template <typename>
+            struct remove_tuple_reference;
+            
+            template <typename ... Ts>
+            struct remove_tuple_reference<std::tuple<Ts & ...>> {
+                using type = std::tuple<Ts ...>;
+            };
+            
+            template <typename T>
+            using remove_tuple_reference_t = typename remove_tuple_reference<T>::type;
+        }
+        
+        template <typename T>
+        inline auto load(const ofxOscMessage &m, T &v, std::size_t offset)
+        -> PubSubOsc::enable_if_t<PubSubOsc::has_from_osc<T>::value>
+        {
+            using value_type = typename PubSubOsc::function_traits<decltype(&T::fromOsc)>::result_type;
+            PubSubOsc::detail::remove_tuple_reference_t<value_type> vv;
+            load(m, vv);
+            v.fromOsc() = vv;
+        }
+        
+        namespace details {
+            template <std::size_t index, typename ... Ts>
+            inline auto load_recursive(const ofxOscMessage &m,
+                                       std::tuple<Ts ...> &v,
+                                       std::size_t offset)
+                -> typename std::enable_if<index == sizeof...(Ts) - 1>::type
+            {
+                load(m, std::get<index>(v), offset);
+            }
+            
+            template <std::size_t index, typename ... Ts>
+            inline auto load_recursive(const ofxOscMessage &m,
+                                       std::tuple<Ts ...> &v,
+                                       std::size_t offset)
+                -> typename std::enable_if<index < sizeof...(Ts) - 1>::type
+            {
+                using value_type = remove_const_reference<decltype(std::get<index>(v))>;
+                load(m, std::get<index>(v), offset);
+                load_recursive<index + 1>(m, v, offset + type_traits<value_type>::size);
             }
         }
     };

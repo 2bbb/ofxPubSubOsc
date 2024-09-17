@@ -10,6 +10,7 @@
 #ifndef ofxPubSubOscTypeTraits_h
 #define ofxPubSubOscTypeTraits_h
 
+#include "ofxPubSubOscTypeUtils.h"
 #include "ofxOscArrayPublisher.h"
 #include "ofxPubSubOscSettings.h"
 
@@ -208,6 +209,107 @@ namespace ofx {
             static constexpr std::size_t size = type_traits<T>::size * array_size;
             static constexpr bool has_array_operator = true;
         };
+        
+#pragma mark has std::tuple<...> toOsc() const
+        
+        template <typename T, typename ... Us>
+        struct is_correct_to_osc_types : std::false_type {};
+        
+        template <typename T, typename ... Us>
+        struct is_correct_to_osc_types<std::tuple<Us ...> (T::*)() const> : std::true_type {};
+
+        template <typename T, typename enabler = void>
+        struct type_traits_has_to_osc;
+
+        template <typename T, typename = void>
+        struct has_to_osc
+        : std::false_type {};
+        
+        template <typename T>
+        struct has_to_osc<
+            T,
+            PubSubOsc::void_t<
+                decltype(&T::toOsc),
+                PubSubOsc::is_callable<decltype(&T::toOsc)>,
+                PubSubOsc::enable_if_t<is_correct_to_osc_types<decltype(&T::toOsc)>::value>
+            >
+        >
+        : std::true_type {
+            using result_type = typename PubSubOsc::function_traits<decltype(&T::toOsc)>::result_type;
+        };
+        
+        template <typename T>
+        struct type_traits_has_to_osc<
+            T,
+            PubSubOsc::enable_if_t<PubSubOsc::has_to_osc<T>::value>
+        >
+        : PubSubOsc::type_traits<typename PubSubOsc::has_to_osc<T>::result_type> {};
+        
+        template <typename T>
+        struct publisher_type_traits
+        : std::conditional<
+            PubSubOsc::has_to_osc<T>::value,
+            type_traits_has_to_osc<T>,
+            type_traits<T>
+        >::type {};
+        
+#define ofxPubSubOscMakePublishable(...) \
+        auto toOsc() const -> decltype(std::make_tuple( __VA_ARGS__ )) { return { __VA_ARGS__ }; };
+
+#pragma mark has std::tuple<... &> fromOsc()
+        
+        template <typename T, typename ... Us>
+        struct is_correct_from_osc_types : std::false_type {};
+        
+        template <typename T, typename ... Us>
+        struct is_correct_from_osc_types<std::tuple<Us & ...> (T::*)()> : std::true_type {};
+
+        template <typename T, typename = void>
+        struct has_from_osc
+        : std::false_type {};
+        
+        template <typename T>
+        struct has_from_osc<
+            T,
+            PubSubOsc::void_t<
+                decltype(&T::fromOsc),
+                PubSubOsc::is_callable<decltype(&T::fromOsc)>,
+                PubSubOsc::enable_if_t<is_correct_from_osc_types<decltype(&T::fromOsc)>::value>
+            >
+        >
+        : std::true_type {
+            using result_type = typename PubSubOsc::function_traits<decltype(&T::toOsc)>::result_type;
+        };
+        
+        template <typename T, typename enabler = void>
+        struct type_traits_has_from_osc;
+
+        template <typename T>
+        struct type_traits_has_from_osc<
+            T,
+            PubSubOsc::enable_if_t<PubSubOsc::has_from_osc<T>::value>
+        >
+        : PubSubOsc::type_traits<typename PubSubOsc::has_from_osc<T>::result_type> {};
+        
+        template <typename T>
+        struct subscriber_type_traits
+        : std::conditional<
+            PubSubOsc::has_from_osc<T>::value,
+            type_traits_has_from_osc<T>,
+            type_traits<T>
+        >::type {};
+        
+        template <typename ... Ts>
+        auto makeRefTuple(Ts & ... vs)
+            -> std::tuple<Ts & ...>
+        { return { std::ref(vs) ... }; };
+        
+#define ofxPubSubOscMakeSubscribable(...) \
+        auto fromOsc() -> decltype(ofx::PubSubOsc::makeRefTuple(__VA_ARGS__)) { return { __VA_ARGS__ }; }
+        
+#define ofxPubSubOscify(...) \
+        ofxPubSubOscMakePublishable(__VA_ARGS__); \
+        ofxPubSubOscMakeSubscribable(__VA_ARGS__);
     };
 };
 

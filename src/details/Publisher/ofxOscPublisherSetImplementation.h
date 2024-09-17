@@ -26,13 +26,17 @@
 namespace ofx {
     namespace PubSubOsc {
         template <typename T>
+        inline auto set(ofxOscMessage &m, const T &v)
+        -> PubSubOsc::enable_if_t<PubSubOsc::has_to_osc<T>::value>;
+
+        template <typename T>
         inline auto set(ofxOscMessage &m, T v)
-        -> enable_if_t<is_integral_and_lt_64bit<T>::value>
+        -> PubSubOsc::enable_if_t<is_integral_and_lt_64bit<T>::value>
         { m.addIntArg(v); }
         
         template <typename T>
         inline auto set(ofxOscMessage &m, T v)
-        -> enable_if_t<is_integral_and_geq_64bit<T>::value>
+        -> PubSubOsc::enable_if_t<is_integral_and_geq_64bit<T>::value>
         { m.addInt64Arg(v); }
 
         inline void set(ofxOscMessage &m, const ofxOscMessage &v) { m = v; }
@@ -139,19 +143,12 @@ namespace ofx {
             template <std::size_t index, typename ... Ts>
             inline auto set_recursive(ofxOscMessage &m,
                                       const std::tuple<Ts ...> &v)
-                -> typename std::enable_if<index == sizeof...(Ts) - 1>::type
-            {
-                set(m, std::get<index>(v));
-            }
+            -> typename std::enable_if<index == sizeof...(Ts) - 1>::type;
             
             template <std::size_t index, typename ... Ts>
             inline auto set_recursive(ofxOscMessage &m,
                                       const std::tuple<Ts ...> &v)
-                -> typename std::enable_if<index < sizeof...(Ts) - 1>::type
-            {
-                set(m, std::get<index>(v));
-                set_recursive<index + 1>(m, v);
-            }
+            -> typename std::enable_if<index < sizeof...(Ts) - 1>::type;
         }
         
         template <typename ... Ts>
@@ -199,6 +196,32 @@ namespace ofx {
         template <typename U>
         inline void set(ofxOscMessage &m, const ofParameter<U> &p) {
             set(m, p.get());
+        }
+        
+        template <typename T>
+        inline auto set(ofxOscMessage &m, const T &v)
+            -> PubSubOsc::enable_if_t<PubSubOsc::has_to_osc<T>::value>
+        {
+            set(m, v.toOsc());
+        }
+        
+        namespace details {
+            template <std::size_t index, typename ... Ts>
+            inline auto set_recursive(ofxOscMessage &m,
+                                      const std::tuple<Ts ...> &v)
+                -> typename std::enable_if<index == sizeof...(Ts) - 1>::type
+            {
+                set(m, std::get<index>(v));
+            }
+            
+            template <std::size_t index, typename ... Ts>
+            inline auto set_recursive(ofxOscMessage &m,
+                                      const std::tuple<Ts ...> &v)
+                -> typename std::enable_if<index < sizeof...(Ts) - 1>::type
+            {
+                set(m, std::get<index>(v));
+                set_recursive<index + 1>(m, v);
+            }
         }
     };
 };
