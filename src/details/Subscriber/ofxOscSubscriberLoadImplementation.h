@@ -272,33 +272,37 @@ namespace ofx {
 
         template <typename T, std::size_t size>
         inline void load(const ofxOscMessage &m, std::array<T, size> &v, std::size_t offset = 0) {
-            for(std::size_t i = 0; i < std::min(size, (m.getNumArgs() - offset) / type_traits<T>::size); i++) {
-                load(m, v[i], offset + i * type_traits<T>::size);
+            using traits = type_traits<remove_const_reference<T>>;
+            for(std::size_t i = 0; i < std::min(size, (m.getNumArgs() - offset) / traits::size); i++) {
+                load(m, v[i], offset + i * traits::size);
             }
         }
         
         template <typename T, std::size_t size>
         inline void load(const ofxOscMessage &m, T (&v)[size], std::size_t offset = 0) {
-            for(std::size_t i = 0; i < std::min(size, (m.getNumArgs() - offset) / type_traits<T>::size); i++) {
-                load(m, v[i], offset + i * type_traits<T>::size);
+            using traits = type_traits<remove_const_reference<T>>;
+            for(std::size_t i = 0; i < std::min(size, (m.getNumArgs() - offset) / traits::size); i++) {
+                load(m, v[i], offset + i * traits::size);
             }
         }
         
         template <typename T, typename Alloc>
         inline void load(const ofxOscMessage &m, std::vector<T, Alloc> &v, std::size_t offset = 0) {
-            std::size_t num = (m.getNumArgs() - offset) / type_traits<T>::size;
+            using traits = type_traits<remove_const_reference<T>>;
+            std::size_t num = (m.getNumArgs() - offset) / traits::size;
             if(v.size() != num) v.resize(num);
-            for(std::size_t i = 0; i < num; i++) {
-                load(m, v[i], offset + i * type_traits<T>::size);
+            for(std::size_t i = 0; i < v.size(); i++) {
+                load(m, v[i], offset + i * traits::size);
             }
         }
         
         template <typename T, typename Alloc>
         inline void load(const ofxOscMessage &m, std::deque<T, Alloc> &v, std::size_t offset = 0) {
-            std::size_t num = (m.getNumArgs() - offset) / type_traits<T>::size;
+            using traits = type_traits<remove_const_reference<T>>;
+            std::size_t num = (m.getNumArgs() - offset) / traits::size;
             if(v.size() != num) v.resize(num);
             for(std::size_t i = 0; i < num; i++) {
-                load(m, v[i], offset + i * type_traits<T>::size);
+                load(m, v[i], offset + i * traits::size);
             }
         }
         
@@ -321,7 +325,7 @@ namespace ofx {
         {
             using value_type = typename PubSubOsc::function_traits<decltype(&T::fromOsc)>::result_type;
             PubSubOsc::detail::remove_tuple_reference_t<value_type> vv;
-            load(m, vv);
+            load(m, vv, offset);
             v.fromOsc() = vv;
         }
         

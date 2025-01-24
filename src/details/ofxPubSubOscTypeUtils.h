@@ -51,6 +51,8 @@ namespace ofx {
             struct remove_const_reference<T &&> : remove_const_reference<T> {};
             template <typename T>
             struct remove_const_reference<const T> : remove_const_reference<T> {};
+            template <typename T>
+            struct remove_const_reference<const T &> : remove_const_reference<T> {};
         };
         
         template <typename T>

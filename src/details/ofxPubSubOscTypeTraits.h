@@ -56,16 +56,12 @@ namespace ofx {
         
         namespace detail {
             template <typename Arg, typename ... Args>
-            struct size_sum {
-                static constexpr std::size_t value = type_traits<Arg>::size + size_sum<Args ...>::value;
-            };
+            struct size_sum;
             
             template <typename Arg>
-            struct size_sum<Arg> {
-                static constexpr std::size_t value = type_traits<Arg>::size;
-            };
+            struct size_sum<Arg>;
         };
-        
+
         template <typename Res, typename ... Args>
         struct type_traits<std::function<Res(Args ...)>> {
             using inner_type = std::tuple<Args ...>;
@@ -163,7 +159,7 @@ namespace ofx {
         template <glm::length_t M, glm::length_t N, typename T, glm::qualifier Q>
         struct type_traits<glm::mat<M, N, T, Q>> {
             using inner_type = typename glm::mat<M, N, T, Q>::col_type;
-            static constexpr std::size_t size = M;
+            static constexpr std::size_t size = M * N;
             static constexpr bool has_array_operator = true;
         };
 #   endif
@@ -299,6 +295,20 @@ namespace ofx {
             type_traits<T>
         >::type {};
         
+        template <typename T>
+        struct type_traits<T, enable_if_t<has_to_osc<T>::value>> {
+            using inner_type = T;
+            static constexpr std::size_t size = type_traits<typename has_to_osc<T>::result_type>::size;
+            static constexpr bool has_array_operator = false;
+        };
+
+        template <typename T>
+        struct type_traits<T, enable_if_t<!has_to_osc<T>::value && has_from_osc<T>::value>> {
+            using inner_type = T;
+            static constexpr std::size_t size = type_traits<typename has_from_osc<T>::result_type>::size;
+            static constexpr bool has_array_operator = false;
+        };
+
         template <typename ... Ts>
         auto makeRefTuple(Ts & ... vs)
             -> std::tuple<Ts & ...>
@@ -310,6 +320,20 @@ namespace ofx {
 #define ofxPubSubOscify(...) \
         ofxPubSubOscMakePublishable(__VA_ARGS__); \
         ofxPubSubOscMakeSubscribable(__VA_ARGS__);
+        
+        namespace detail {
+            template <typename Arg, typename ... Args>
+            struct size_sum {
+                static constexpr std::size_t value = size_sum<Arg>::value + size_sum<Args ...>::value;
+            };
+            
+            template <typename Arg>
+            struct size_sum<Arg> {
+                static constexpr std::size_t value = type_traits<
+                    typename std::remove_reference<Arg>::type
+                >::size;
+            };
+        };
     };
 };
 
