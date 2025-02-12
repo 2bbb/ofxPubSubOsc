@@ -48,6 +48,15 @@ namespace ofx {
         define_set_arithmetic(double);
 #undef define_set_arithmetic
         
+        template <typename T>
+        auto load(const ofxOscMessage &m, T &v, std::size_t offset = 0)
+            -> typename std::enable_if<std::is_enum<T>::value>::type
+        {
+            typename std::underlying_type<T>::type value;
+            load(m, value, offset);
+            v = static_cast<T>(value);
+        }
+
         inline void load(const ofxOscMessage &m, std::string &v, std::size_t offset = 0) {
             if(m.getArgType(offset) == OFXOSC_TYPE_STRING) v = m.getArgAsString(offset);
             else if(m.getArgType(offset) == OFXOSC_TYPE_FLOAT) v = ofToString(m.getArgAsFloat(offset));

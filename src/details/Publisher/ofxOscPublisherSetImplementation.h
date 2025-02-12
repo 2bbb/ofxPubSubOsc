@@ -42,6 +42,12 @@ namespace ofx {
         define_set_float(float);
         define_set_float(double);
 #undef define_set_float
+        
+        template <typename T>
+        inline auto set(ofxOscMessage &m, T v)
+        -> enable_if_t<std::is_enum<T>::value>
+        { set(m, static_cast<std::underlying_type_t<T>>(v)); }
+        
         inline void set(ofxOscMessage &m, const std::string &v) { m.addStringArg(v); }
         inline void set(ofxOscMessage &m, const ofBuffer &v) { m.addBlobArg(v); };
         

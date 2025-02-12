@@ -32,6 +32,11 @@ namespace ofx {
             static constexpr bool has_array_operator = false;
         };
         
+        template <typename T>
+        struct type_traits<T, typename std::enable_if<std::is_enum<T>::value>::type>
+        : type_traits<typename std::underlying_type<T>::type>
+        {};
+
         template <>
         struct type_traits<void> {
             using inner_type = void;
