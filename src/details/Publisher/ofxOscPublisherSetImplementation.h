@@ -50,7 +50,8 @@ namespace ofx {
         define_set_float(float);
         define_set_float(double);
 #   undef define_set_float
-        
+#endif
+
         template <typename T>
         inline auto set(ofxOscMessage &m, T v)
         -> enable_if_t<std::is_enum<T>::value>
