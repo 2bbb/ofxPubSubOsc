@@ -18,7 +18,6 @@
 
 #include "ofColor.h"
 #include "ofParameter.h"
-#include "ofParameterGroup.h"
 #include "ofUtils.h"
 
 #include <cmath>
