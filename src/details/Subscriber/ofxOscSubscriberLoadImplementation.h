@@ -21,6 +21,10 @@
 
 namespace ofx {
     namespace PubSubOsc {
+        template <typename T>
+        inline auto load(const ofxOscMessage &m, T &v, std::size_t offset = 0)
+        -> PubSubOsc::enable_if_t<PubSubOsc::has_from_osc<T>::value>;
+
 #define define_set_arithmetic(type) \
         inline void load(const ofxOscMessage &m, type &v, std::size_t offset = 0) { \
             if(m.getArgType(offset) == OFXOSC_TYPE_INT32) v = m.getArgAsInt32(offset); \
@@ -30,7 +34,7 @@ namespace ofx {
             else if(m.getArgType(offset) == OFXOSC_TYPE_STRING) v = ofToDouble(m.getArgAsString(offset)); \
             else if(m.getArgType(offset) == OFXOSC_TYPE_TRUE) v = true; \
             else if(m.getArgType(offset) == OFXOSC_TYPE_FALSE) v = false; \
-}
+        }
         
         define_set_arithmetic(bool);
         define_set_arithmetic(char);
@@ -75,8 +79,8 @@ namespace ofx {
         }
 
 #pragma mark ofColor_
-        template <typename U>
-        inline void loadColor(const ofxOscMessage &m, ofColor_<U> &v, U defaultValue, std::size_t offset = 0) {
+        template <typename T>
+        inline void loadColor(const ofxOscMessage &m, ofColor_<T> &v, T defaultValue, std::size_t offset = 0) {
             if(m.getNumArgs() == 1) {
                 load(m, v.r, offset);
                 load(m, v.g, offset);
@@ -106,27 +110,27 @@ namespace ofx {
         }
         
 #pragma mark oF container type
-        template <std::size_t n, typename U>
+        template <std::size_t n, typename U, typename size_type = std::size_t>
         inline void loadVec(const ofxOscMessage &m, U &v, std::size_t offset = 0) {
-            for(std::size_t i = 0; i < std::min(static_cast<std::size_t>(m.getNumArgs() - offset), n); i++) {
+            for(size_type i = 0; i < std::min<std::size_t>(m.getNumArgs() - offset, n); i++) {
                 load(m, v[i], offset + i);
             }
         }
         
         inline void load(const ofxOscMessage &m, ofVec2f &v, std::size_t offset = 0) {
-            loadVec<2>(m, v, offset);
+            loadVec<2, ofVec2f, int>(m, v, offset);
         }
         inline void load(const ofxOscMessage &m, ofVec3f &v, std::size_t offset = 0) {
-            loadVec<3>(m, v, offset);
+            loadVec<3, ofVec3f, int>(m, v, offset);
         }
         inline void load(const ofxOscMessage &m, ofVec4f &v, std::size_t offset = 0) {
-            loadVec<4>(m, v, offset);
+            loadVec<4, ofVec4f, int>(m, v, offset);
         }
         inline void load(const ofxOscMessage &m, ofQuaternion &v, std::size_t offset = 0) {
-            loadVec<4>(m, v, offset);
+            loadVec<4, ofQuaternion, int>(m, v, offset);
         }
         inline void load(const ofxOscMessage &m, ofMatrix3x3 &v, std::size_t offset = 0) {
-            loadVec<9>(m, v, offset);
+            loadVec<9, ofMatrix3x3, int>(m, v, offset);
         }
         
         inline void load(const ofxOscMessage &m, ofMatrix4x4 &v, std::size_t offset = 0) {
@@ -162,18 +166,18 @@ namespace ofx {
         template <glm::length_t N, typename T, glm::qualifier Q>
         inline void load(const ofxOscMessage &m, glm::vec<N, T, Q> &v, std::size_t offset = 0)
         {
-            loadVec<N>(m, v, offset);
+            loadVec<N, glm::vec<N, T, Q>, glm::length_t>(m, v, offset);
         }
         
         template <glm::length_t M, glm::length_t N, typename T, glm::qualifier Q>
         inline void load(const ofxOscMessage &m, glm::mat<M, N, T, Q> &v, std::size_t offset = 0)
         {
-            for(std::size_t i = 0; i < M; i++) loadVec<N>(m, v[i], offset + N * i);
+            for(std::size_t i = 0; i < M; i++) loadVec<N, glm::vec<N, T, Q>, glm::length_t>(m, v[i], offset + N * i);
         }
         
         template <typename T, glm::precision P>
         inline void load(const ofxOscMessage &m, glm::tquat<T, P> &v, std::size_t offset = 0) {
-            loadVec<4>(m, v);
+            loadVec<4, glm::tquat<T, P>, glm::length_t>(m, v);
         }
 #   endif
 #endif
@@ -187,11 +191,11 @@ namespace ofx {
         
 #pragma mark ofParameter<T> / ofParameterGroup
         
-        template <typename U>
-        inline void load(const ofxOscMessage &m, ofParameter<U> &p, std::size_t offset = 0) {
-            U u;
-            load(m, u, offset);
-            p.set(u);
+        template <typename T>
+        inline void load(const ofxOscMessage &m, ofParameter<T> &p, std::size_t offset = 0) {
+            T t;
+            load(m, t, offset);
+            p.set(t);
         }
         
         inline void load(const ofxOscMessage &m, ofAbstractParameter &p, std::size_t offset = 0) {
@@ -261,6 +265,84 @@ namespace ofx {
             inline auto load_recursive(const ofxOscMessage &m,
                                        std::tuple<Ts ...> &v,
                                        std::size_t offset)
+            -> typename std::enable_if<index == sizeof...(Ts) - 1>::type;
+            
+            template <std::size_t index, typename ... Ts>
+            inline auto load_recursive(const ofxOscMessage &m,
+                                       std::tuple<Ts ...> &v,
+                                       std::size_t offset)
+            -> typename std::enable_if<index < sizeof...(Ts) - 1>::type;
+        }
+        
+        template <typename ... Ts>
+        inline void load(const ofxOscMessage &m, std::tuple<Ts ...> &v, std::size_t offset = 0) {
+            details::load_recursive<0>(m, v, offset);
+        }
+
+        template <typename T, std::size_t size>
+        inline void load(const ofxOscMessage &m, std::array<T, size> &v, std::size_t offset = 0) {
+            using traits = type_traits<remove_const_reference<T>>;
+            for(std::size_t i = 0; i < std::min(size, (m.getNumArgs() - offset) / traits::size); i++) {
+                load(m, v[i], offset + i * traits::size);
+            }
+        }
+        
+        template <typename T, std::size_t size>
+        inline void load(const ofxOscMessage &m, T (&v)[size], std::size_t offset = 0) {
+            using traits = type_traits<remove_const_reference<T>>;
+            for(std::size_t i = 0; i < std::min(size, (m.getNumArgs() - offset) / traits::size); i++) {
+                load(m, v[i], offset + i * traits::size);
+            }
+        }
+        
+        template <typename T, typename Alloc>
+        inline void load(const ofxOscMessage &m, std::vector<T, Alloc> &v, std::size_t offset = 0) {
+            using traits = type_traits<remove_const_reference<T>>;
+            std::size_t num = (m.getNumArgs() - offset) / traits::size;
+            if(v.size() != num) v.resize(num);
+            for(std::size_t i = 0; i < v.size(); i++) {
+                load(m, v[i], offset + i * traits::size);
+            }
+        }
+        
+        template <typename T, typename Alloc>
+        inline void load(const ofxOscMessage &m, std::deque<T, Alloc> &v, std::size_t offset = 0) {
+            using traits = type_traits<remove_const_reference<T>>;
+            std::size_t num = (m.getNumArgs() - offset) / traits::size;
+            if(v.size() != num) v.resize(num);
+            for(std::size_t i = 0; i < num; i++) {
+                load(m, v[i], offset + i * traits::size);
+            }
+        }
+        
+        namespace detail {
+            template <typename>
+            struct remove_tuple_reference;
+            
+            template <typename ... Ts>
+            struct remove_tuple_reference<std::tuple<Ts & ...>> {
+                using type = std::tuple<Ts ...>;
+            };
+            
+            template <typename T>
+            using remove_tuple_reference_t = typename remove_tuple_reference<T>::type;
+        }
+        
+        template <typename T>
+        inline auto load(const ofxOscMessage &m, T &v, std::size_t offset)
+        -> PubSubOsc::enable_if_t<PubSubOsc::has_from_osc<T>::value>
+        {
+            using value_type = typename PubSubOsc::function_traits<decltype(&T::fromOsc)>::result_type;
+            PubSubOsc::detail::remove_tuple_reference_t<value_type> vv;
+            load(m, vv, offset);
+            v.fromOsc() = vv;
+        }
+        
+        namespace details {
+            template <std::size_t index, typename ... Ts>
+            inline auto load_recursive(const ofxOscMessage &m,
+                                       std::tuple<Ts ...> &v,
+                                       std::size_t offset)
                 -> typename std::enable_if<index == sizeof...(Ts) - 1>::type
             {
                 load(m, std::get<index>(v), offset);
@@ -275,43 +357,6 @@ namespace ofx {
                 using value_type = remove_const_reference<decltype(std::get<index>(v))>;
                 load(m, std::get<index>(v), offset);
                 load_recursive<index + 1>(m, v, offset + type_traits<value_type>::size);
-            }
-        }
-        
-        template <typename ... Ts>
-        inline void load(const ofxOscMessage &m, std::tuple<Ts ...> &v, std::size_t offset = 0) {
-            details::load_recursive<0>(m, v, offset);
-        }
-
-        template <typename U, std::size_t size>
-        inline void load(const ofxOscMessage &m, std::array<U, size> &v, std::size_t offset = 0) {
-            for(std::size_t i = 0; i < std::min(size, (m.getNumArgs() - offset) / type_traits<U>::size); i++) {
-                load(m, v[i], offset + i * type_traits<U>::size);
-            }
-        }
-        
-        template <typename U, std::size_t size>
-        inline void load(const ofxOscMessage &m, U (&v)[size], std::size_t offset = 0) {
-            for(std::size_t i = 0; i < std::min(size, (m.getNumArgs() - offset) / type_traits<U>::size); i++) {
-                load(m, v[i], offset + i * type_traits<U>::size);
-            }
-        }
-        
-        template <typename U, typename Alloc>
-        inline void load(const ofxOscMessage &m, std::vector<U, Alloc> &v, std::size_t offset = 0) {
-            std::size_t num = (m.getNumArgs() - offset) / type_traits<U>::size;
-            if(v.size() != num) v.resize(num);
-            for(std::size_t i = 0; i < num; i++) {
-                load(m, v[i], offset + i * type_traits<U>::size);
-            }
-        }
-        
-        template <typename U, typename Alloc>
-        inline void load(const ofxOscMessage &m, std::deque<U, Alloc> &v, std::size_t offset = 0) {
-            std::size_t num = (m.getNumArgs() - offset) / type_traits<U>::size;
-            if(v.size() != num) v.resize(num);
-            for(std::size_t i = 0; i < num; i++) {
-                load(m, v[i], offset + i * type_traits<U>::size);
             }
         }
     };

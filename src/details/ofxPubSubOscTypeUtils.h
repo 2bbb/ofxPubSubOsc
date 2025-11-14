@@ -31,6 +31,16 @@ namespace ofx {
         using type_at = get_type<std::tuple_element<index, std::tuple<arguments ...>>>;
         
         namespace detail {
+            template <typename ... >
+            struct void_t_impl {
+                using type = void;
+            };
+        };
+        
+        template <typename ... Ts>
+        using void_t = typename detail::void_t_impl<Ts ...>::type;
+        
+        namespace detail {
             template <typename T>
             struct remove_const_reference {
                 using type = T;
@@ -41,6 +51,8 @@ namespace ofx {
             struct remove_const_reference<T &&> : remove_const_reference<T> {};
             template <typename T>
             struct remove_const_reference<const T> : remove_const_reference<T> {};
+            template <typename T>
+            struct remove_const_reference<const T &> : remove_const_reference<T> {};
         };
         
         template <typename T>
